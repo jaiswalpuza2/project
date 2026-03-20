@@ -1,32 +1,32 @@
-# 🚀 JobSphere - AI-Powered Job Marketplace
+#  JobSphere - AI-Powered Job Marketplace
 
 JobSphere is a high-performance, full-stack job marketplace designed for the modern gig economy. It leverages AI to bridge the gap between elite talent and top employers through intelligent matching, automated content generation, and real-time collaboration.
 
-## ✨ Key Features
+##  Key Features
 
-### 🤖 AI-Powered Suite (Google Gemini)
+###  AI-Powered Suite (Google Gemini)
 - **AI Resume Architect**: Generate high-impact, professional resumes in Markdown format.
 - **AI Proposal Assistant**: Draft tailored job proposals instantly within the application flow.
 - **Intelligent Job Matching**: Get real-time job recommendations based on your skill set.
 
-### 💬 Real-Time Collaboration
+###  Real-Time Collaboration
 - **Socket.io Messaging**: Low-latency, real-time chat between freelancers and employers.
 - **Persistent History**: Full conversation tracking across sessions.
 - **Status Tracking**: Real-time updates on job applications and hiring pipelines.
 
-### 🎨 Premium UI/UX
+###  Premium UI/UX
 - **Role-Based Dashboards**: Specialized interfaces for Freelancers, Employers, and Admins.
 - **Design System**: Built with Tailwind CSS, Plus Jakarta Sans, and Glassmorphism effects.
 - **Onboarding Wizard**: Step-by-step profile completion for new users.
 
-### 🛡️ Secure & Scalable
+###  Secure & Scalable
 - **Authentication**: Secure JWT-based auth with role-based access control (RBAC).
 - **Architecture**: Clean MVC pattern on the backend for maintainability.
 - **Error Resilience**: Integrated Error Boundaries for UI stability.
 
 ---
 
-## 🛠️ Technology Stack
+##  Technology Stack
 
 | Layer | Technologies |
 | :--- | :--- |
@@ -37,7 +37,7 @@ JobSphere is a high-performance, full-stack job marketplace designed for the mod
 
 ---
 
-## 🚀 Getting Started
+##  Getting Started
 
 ### Prerequisites
 - Node.js (v18+)
@@ -77,7 +77,7 @@ JobSphere is a high-performance, full-stack job marketplace designed for the mod
 
 ---
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 jobsphere/
@@ -98,8 +98,8 @@ jobsphere/
 
 ---
 
-## 🤝 Contributing
+##  Contributing
 Contributions are welcome! Please open an issue or submit a pull request for any improvements.
 
-## 📄 License
+##  License
 This project is licensed under the MIT License.
