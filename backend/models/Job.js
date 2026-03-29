@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-
 const jobSchema = new mongoose.Schema(
   {
     title: {
@@ -27,7 +26,6 @@ const jobSchema = new mongoose.Schema(
     category: {
       type: String,
       required: [true, "Please add a category"],
-      enum: ["Web Development", "Mobile Development", "UI/UX Design", "Content Writing", "Data Science", "Other"],
     },
     jobType: {
       type: String,
@@ -51,5 +49,4 @@ const jobSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
-
 module.exports = mongoose.model("Job", jobSchema);

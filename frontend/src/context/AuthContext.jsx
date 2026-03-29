@@ -1,22 +1,17 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
 import axios from "axios";
-
 const AuthContext = createContext();
-
 export const useAuth = () => useContext(AuthContext);
-
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState(localStorage.getItem("token"));
-
   useEffect(() => {
     const loadUser = async () => {
       if (!token) {
         setLoading(false);
         return;
       }
-
       try {
         const res = await axios.get("http://localhost:5000/api/auth/me", {
           headers: {
@@ -31,17 +26,14 @@ export const AuthProvider = ({ children }) => {
       }
       setLoading(false);
     };
-
     loadUser();
   }, [token]);
-
   const login = async (email, password) => {
     try {
       const res = await axios.post("http://localhost:5000/api/auth/login", {
         email,
         password,
       });
-
       localStorage.setItem("token", res.data.token);
       setToken(res.data.token);
       setUser(res.data.user);
@@ -54,11 +46,9 @@ export const AuthProvider = ({ children }) => {
       };
     }
   };
-
   const register = async (userData) => {
     try {
       const res = await axios.post("http://localhost:5000/api/auth/register", userData);
-
       localStorage.setItem("token", res.data.token);
       setToken(res.data.token);
       setUser(res.data.user);
@@ -71,13 +61,43 @@ export const AuthProvider = ({ children }) => {
       };
     }
   };
-
+  const forgotPasswordOTP = async (email) => {
+    try {
+      const res = await axios.post("http://localhost:5000/api/auth/forgot-password-otp", {
+        email,
+      });
+      return { success: true, message: res.data.data };
+    } catch (err) {
+      console.error("Forgot Password OTP Error:", err.response?.data || err.message);
+      return {
+        success: false,
+        message: err.response?.data?.message || "Failed to send OTP",
+      };
+    }
+  };
+  const loginWithOTP = async (email, otp) => {
+    try {
+      const res = await axios.post("http://localhost:5000/api/auth/login-otp", {
+        email,
+        otp,
+      });
+      localStorage.setItem("token", res.data.token);
+      setToken(res.data.token);
+      setUser(res.data.user);
+      return { success: true };
+    } catch (err) {
+      console.error("OTP Login Error:", err.response?.data || err.message);
+      return {
+        success: false,
+        message: err.response?.data?.message || "Authentication failed",
+      };
+    }
+  };
   const logout = () => {
     localStorage.removeItem("token");
     setToken(null);
     setUser(null);
   };
-
   const reloadUser = async () => {
     if (!token) return;
     try {
@@ -89,17 +109,17 @@ export const AuthProvider = ({ children }) => {
       console.error("Reload user failed", err);
     }
   };
-
   const value = {
     user,
     token,
     loading,
     login,
     register,
+    forgotPasswordOTP,
+    loginWithOTP,
     logout,
     reloadUser,
     isAuthenticated: !!user,
   };
-
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

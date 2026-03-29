@@ -25,13 +25,13 @@ async function run() {
     "gemini-2.0-flash",
     "gemini-2.0-flash-lite-preview-02-05"
   ];
-  
+
   const results = [];
   for (const m of models) {
     console.log(`Testing ${m}...`);
     results.push(await testModel(m));
   }
-  
+
   console.log("\nResults Summary:");
   console.table(results);
 }

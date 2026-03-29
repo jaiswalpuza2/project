@@ -1,10 +1,14 @@
 const express = require("express");
-const { getChatHistory, getContacts } = require("../controllers/chatController");
+const { getChatHistory, getContacts, deleteMessage, editMessage, togglePinMessage, addReaction, clearChat, getChatMedia, toggleMuteUser } = require("../controllers/chatController");
 const { protect } = require("../middleware/authMiddleware");
-
 const router = express.Router();
-
 router.get("/contacts", protect, getContacts);
+router.delete("/message/:id", protect, deleteMessage);
+router.put("/message/:id", protect, editMessage);
+router.patch("/message/:id/pin", protect, togglePinMessage);
+router.post("/message/:id/react", protect, addReaction);
+router.delete("/:userId/clear", protect, clearChat);
+router.post("/:userId/mute", protect, toggleMuteUser);
+router.get("/:userId/media", protect, getChatMedia);
 router.get("/:userId", protect, getChatHistory);
-
 module.exports = router;

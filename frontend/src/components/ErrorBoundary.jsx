@@ -1,20 +1,16 @@
 import React from "react";
 import { AlertTriangle, Home, RefreshCw } from "lucide-react";
-
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
     this.state = { hasError: false };
   }
-
   static getDerivedStateFromError(error) {
     return { hasError: true };
   }
-
   componentDidCatch(error, errorInfo) {
     console.error("Uncaught error:", error, errorInfo);
   }
-
   render() {
     if (this.state.hasError) {
       return (
@@ -30,7 +26,7 @@ class ErrorBoundary extends React.Component {
             <div className="flex flex-col gap-4">
               <button 
                 onClick={() => window.location.reload()}
-                className="w-full bg-gray-900 text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-blue-600 transition"
+                className="w-full bg-yellow-400 text-gray-900 py-4 rounded-2xl font-black flex items-center justify-center gap-2 hover:bg-yellow-500 transition shadow-xl shadow-yellow-100"
               >
                 <RefreshCw size={20} /> Reload Page
               </button>
@@ -45,9 +41,7 @@ class ErrorBoundary extends React.Component {
         </div>
       );
     }
-
     return this.props.children;
   }
 }
-
 export default ErrorBoundary;

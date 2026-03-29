@@ -1,28 +1,19 @@
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 const sendEmail = require("../utils/sendEmail");
-
-// @desc    Register user
-// @route   POST /api/auth/register
-// @access  Public
 exports.register = async (req, res, next) => {
   try {
     const { name, email, password, role } = req.body;
-
-    // Create user
     const user = await User.create({
       name,
       email,
       password,
       role,
     });
-
-    // Generate OTP
     const otp = user.getOTP();
     console.log(`------------- OTP FOR ${email}: ${otp} -------------`);
     await user.save({ validateBeforeSave: false });
-
-    // Send Welcome OTP Email
     const message = `
       <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px; max-width: 500px; margin: auto;">
         <h2 style="color: #2563eb; text-align: center;">Verify Your Email</h2>
@@ -36,7 +27,6 @@ exports.register = async (req, res, next) => {
         <p style="color: #9ca3af; font-size: 12px; text-align: center;">If you didn't request this code, please ignore this email.</p>
       </div>
     `;
-
     try {
       await sendEmail({
         email: user.email,
@@ -46,7 +36,6 @@ exports.register = async (req, res, next) => {
     } catch (err) {
       console.log("Email could not be sent");
     }
-
     sendTokenResponse(user, 201, res);
   } catch (err) {
     if (err.code === 11000) {
@@ -58,43 +47,31 @@ exports.register = async (req, res, next) => {
     next(err);
   }
 };
-
-// @desc    Verify OTP
-// @route   POST /api/auth/verify-otp
-// @access  Private
 exports.verifyOTP = async (req, res, next) => {
   try {
     const crypto = require("crypto");
     const { otp } = req.body;
-
     if (!otp) {
       res.status(400);
       throw new Error("Please provide OTP");
     }
-
-    // Hash the submitted OTP to compare
     const hashedOtp = crypto
       .createHash("sha256")
       .update(otp)
       .digest("hex");
-
     const user = await User.findOne({
       _id: req.user.id,
       otp: hashedOtp,
       otpExpire: { $gt: Date.now() },
     });
-
     if (!user) {
       res.status(400);
       throw new Error("Invalid or expired OTP");
     }
-
-    // Mark as verified
     user.isVerified = true;
     user.otp = undefined;
     user.otpExpire = undefined;
     await user.save();
-
     res.status(200).json({
       success: true,
       data: "Email verified successfully",
@@ -103,27 +80,19 @@ exports.verifyOTP = async (req, res, next) => {
     next(err);
   }
 };
-
-// @desc    Resend OTP
-// @route   POST /api/auth/resend-otp
-// @access  Private
 exports.resendOTP = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id);
-
     if (!user) {
       res.status(404);
       throw new Error("User not found");
     }
-
     if (user.isVerified) {
       res.status(400);
       throw new Error("Email already verified");
     }
-
     const otp = user.getOTP();
     await user.save({ validateBeforeSave: false });
-
     const message = `
       <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px; max-width: 500px; margin: auto;">
         <h2 style="color: #2563eb; text-align: center;">New Verification Code</h2>
@@ -135,7 +104,6 @@ exports.resendOTP = async (req, res, next) => {
         <p style="color: #6b7280; font-size: 14px; text-align: center;">Valid for 15 minutes.</p>
       </div>
     `;
-
     try {
       await sendEmail({
         email: user.email,
@@ -145,7 +113,6 @@ exports.resendOTP = async (req, res, next) => {
     } catch (err) {
       console.error(`Email delivery failed: ${err.message}`);
     }
-
     res.status(200).json({
       success: true,
       data: "New OTP sent to email",
@@ -154,43 +121,28 @@ exports.resendOTP = async (req, res, next) => {
     next(err);
   }
 };
-
-// @desc    Login user
-// @route   POST /api/auth/login
-// @access  Public
 exports.login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
     console.log(`Login attempt for: ${email}`);
-
-    // Validate email & password
     if (!email || !password) {
       res.status(400);
       throw new Error("Please provide an email and password");
     }
-
-    // Check for user
     const user = await User.findOne({ email }).select("+password");
-
     if (!user) {
       res.status(401);
       throw new Error("Invalid credentials");
     }
-
-    // Check if password matches
     const isMatch = await user.matchPassword(password);
-
     if (!isMatch) {
       res.status(401);
       throw new Error("Invalid credentials");
     }
-
-    // If user is not verified, send OTP and redirect
     if (!user.isVerified) {
       const otp = user.getOTP();
       console.log(`------------- LOGIN OTP FOR ${email}: ${otp} -------------`);
       await user.save({ validateBeforeSave: false });
-
       const verifyMessage = `
         <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px; max-width: 500px; margin: auto;">
           <h2 style="color: #2563eb; text-align: center;">Verify Your Email</h2>
@@ -202,7 +154,6 @@ exports.login = async (req, res, next) => {
           <p style="color: #6b7280; font-size: 14px; text-align: center;">Valid for 15 minutes.</p>
         </div>
       `;
-
       try {
         await sendEmail({
           email: user.email,
@@ -212,11 +163,8 @@ exports.login = async (req, res, next) => {
       } catch (err) {
         console.error(`Email delivery failed: ${err.message}`);
       }
-
       return sendTokenResponse(user, 200, res);
     }
-
-    // Send Login Notification
     const message = `
       <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
         <h2 style="color: #2563eb;">Security Alert: New Login</h2>
@@ -228,7 +176,6 @@ exports.login = async (req, res, next) => {
         </div>
       </div>
     `;
-
     try {
       await sendEmail({
         email: user.email,
@@ -238,17 +185,90 @@ exports.login = async (req, res, next) => {
     } catch (err) {
       console.log("Email could not be sent");
     }
-
     sendTokenResponse(user, 200, res);
   } catch (err) {
     console.error(`Login error: ${err.message}`);
     next(err);
   }
 };
-
-// @desc    Get current logged in user
-// @route   GET /api/auth/me
-// @access  Private
+exports.forgotPasswordOTP = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      res.status(400);
+      throw new Error("Please provide an email");
+    }
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(200).json({
+        success: true,
+        data: "If an account with that email exists, an OTP has been sent.",
+      });
+    }
+    const otp = user.getOTP();
+    console.log(`------------- LOGIN OTP FOR ${email}: ${otp} -------------`);
+    await user.save({ validateBeforeSave: false });
+    const message = `
+      <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px; max-width: 500px; margin: auto;">
+        <h2 style="color: #2563eb; text-align: center;">Login OTP</h2>
+        <p>Hello <strong>${user.name}</strong>,</p>
+        <p>You requested to login via OTP. Please use the following One-Time Password:</p>
+        <div style="background: #f3f4f6; padding: 20px; text-align: center; border-radius: 12px; margin: 20px 0;">
+          <h1 style="letter-spacing: 12px; margin: 0; color: #111827; font-size: 32px;">${otp}</h1>
+        </div>
+        <p style="color: #6b7280; font-size: 14px; text-align: center;">This code is valid for 15 minutes.</p>
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
+        <p style="color: #9ca3af; font-size: 12px; text-align: center;">If you didn't request this code, please ignore this email.</p>
+      </div>
+    `;
+    try {
+      await sendEmail({
+        email: user.email,
+        subject: "JobSphere - Login OTP",
+        message,
+      });
+    } catch (err) {
+      console.error(`Email delivery failed: ${err.message}`);
+    }
+    res.status(200).json({
+      success: true,
+      data: "OTP sent to email",
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+exports.loginWithOTP = async (req, res, next) => {
+  try {
+    const { email, otp } = req.body;
+    if (!email || !otp) {
+      res.status(400);
+      throw new Error("Please provide email and OTP");
+    }
+    const hashedOtp = crypto
+      .createHash("sha256")
+      .update(otp)
+      .digest("hex");
+    const user = await User.findOne({
+      email,
+      otp: hashedOtp,
+      otpExpire: { $gt: Date.now() },
+    });
+    if (!user) {
+      res.status(400);
+      throw new Error("Invalid or expired OTP");
+    }
+    if (!user.isVerified) {
+      user.isVerified = true;
+    }
+    user.otp = undefined;
+    user.otpExpire = undefined;
+    await user.save();
+    sendTokenResponse(user, 200, res);
+  } catch (err) {
+    next(err);
+  }
+};
 exports.getMe = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id);
@@ -260,19 +280,13 @@ exports.getMe = async (req, res, next) => {
     next(err);
   }
 };
-
-// @desc    Get user profile by ID
-// @route   GET /api/auth/profile/:id
-// @access  Public
 exports.getUserProfile = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id).select("-password -otp -otpExpire");
-
     if (!user) {
       res.status(404);
       throw new Error("User not found");
     }
-
     res.status(200).json({
       success: true,
       data: user,
@@ -281,16 +295,11 @@ exports.getUserProfile = async (req, res, next) => {
     next(err);
   }
 };
-
-// @desc    Get all freelancers (Talent Search)
-// @route   GET /api/auth/talent
-// @access  Private
 exports.getTalent = async (req, res, next) => {
   try {
     const talent = await User.find({ role: "freelancer" })
       .select("-password -otp -otpExpire")
       .sort({ createdAt: -1 });
-
     res.status(200).json({
       success: true,
       count: talent.length,
@@ -300,10 +309,20 @@ exports.getTalent = async (req, res, next) => {
     next(err);
   }
 };
-
-// @desc    Update user profile
-// @route   PUT /api/auth/update-profile
-// @access  Private
+exports.getMentors = async (req, res, next) => {
+  try {
+    const mentors = await User.find({ isMentor: true })
+      .select("-password -otp -otpExpire")
+      .sort({ mentorRating: -1 });
+    res.status(200).json({
+      success: true,
+      count: mentors.length,
+      data: mentors,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
 exports.updateProfile = async (req, res, next) => {
   try {
     const fieldsToUpdate = {
@@ -317,14 +336,19 @@ exports.updateProfile = async (req, res, next) => {
       companyDescription: req.body.companyDescription,
       location: req.body.location,
       resumeUrl: req.body.resumeUrl,
-      isProfileComplete: true, // Mark profile as complete after they finish the wizard
+      phone: req.body.phone,
+      github: req.body.github,
+      linkedin: req.body.linkedin,
+      website: req.body.website,
+      isMentor: req.body.isMentor,
+      mentorBio: req.body.mentorBio,
+      mentorExperience: req.body.mentorExperience,
+      isProfileComplete: true, 
     };
-
     const user = await User.findByIdAndUpdate(req.user.id, fieldsToUpdate, {
       new: true,
       runValidators: true,
     });
-
     res.status(200).json({
       success: true,
       data: user,
@@ -333,14 +357,53 @@ exports.updateProfile = async (req, res, next) => {
     next(err);
   }
 };
-
-// Get token from model, create cookie and send response
+exports.deleteAccount = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      res.status(404);
+      throw new Error("User not found");
+    }
+    await user.deleteOne();
+    res.status(200).json({
+      success: true,
+      data: "Account deleted successfully",
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+exports.changePassword = async (req, res, next) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    if (!currentPassword || !newPassword) {
+      res.status(400);
+      throw new Error("Please provide current and new password");
+    }
+    const user = await User.findById(req.user.id).select("+password");
+    if (!user) {
+      res.status(404);
+      throw new Error("User not found");
+    }
+    const isMatch = await user.matchPassword(currentPassword);
+    if (!isMatch) {
+      res.status(401);
+      throw new Error("Incorrect current password");
+    }
+    user.password = newPassword;
+    await user.save();
+    res.status(200).json({
+      success: true,
+      data: "Password updated successfully",
+    });
+  } catch (err) {
+    next(err);
+  }
+};
 const sendTokenResponse = (user, statusCode, res) => {
-  // Create token
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
     expiresIn: "30d",
   });
-
   res.status(statusCode).json({
     success: true,
     token,
@@ -351,6 +414,7 @@ const sendTokenResponse = (user, statusCode, res) => {
       role: user.role,
       isVerified: user.isVerified,
       isProfileComplete: user.isProfileComplete,
+      isMentor: user.isMentor,
     },
   });
 };

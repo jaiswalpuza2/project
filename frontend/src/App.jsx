@@ -5,7 +5,6 @@ import { SocketProvider } from "./context/SocketContext";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-// Pages
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -16,6 +15,7 @@ import JobListing from "./pages/JobListing";
 import JobDetail from "./pages/JobDetail";
 import PostJob from "./pages/PostJob";
 import ResumeGenerator from "./pages/ResumeGenerator";
+import AIChatbot from "./pages/AIChatbot";
 import Messaging from "./pages/Messaging";
 import AdminDashboard from "./pages/AdminDashboard";
 import Payments from "./pages/Payments";
@@ -27,34 +27,51 @@ import PaymentFailure from "./pages/PaymentFailure";
 import FreelancerProfile from "./pages/FreelancerProfile";
 import EditProfile from "./pages/EditProfile";
 import Mentorship from "./pages/Mentorship";
+import Settings from "./pages/Settings";
+import ChangePassword from "./pages/ChangePassword";
+import About from "./pages/About";
+import Blog from "./pages/Blog";
+import FAQ from "./pages/FAQ";
+import Services from "./pages/Services";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
 import ErrorBoundary from "./components/ErrorBoundary";
 import AIChatbotWidget from "./components/AIChatbotWidget";
+import DashboardLayout from "./components/DashboardLayout";
 
-const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated, loading } = useAuth();
+const ProtectedRoute = ({ children, role }) => {
+  const { isAuthenticated, user, loading } = useAuth();
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+    <div className="min-h-screen flex items-center justify-center bg-slate-900">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
     </div>
   );
 
-  return isAuthenticated ? children : <Navigate to="/login" />;
+  if (!isAuthenticated) {
+    return <Navigate to="/login" />;
+  }
+
+  if (role && user?.role !== role) {
+    return <Navigate to="/dashboard" />;
+  }
+
+  return children;
 };
 
 const DashboardRedirect = () => {
   const { user } = useAuth();
-  
+
   if (!user?.isVerified) {
     return <Navigate to="/verify-otp" />;
   }
 
-  if (!user?.isProfileComplete) {
-    return <Navigate to="/profile-wizard" />;
-  }
-
   if (user?.role === "admin") {
     return <Navigate to="/admin" />;
+  }
+
+  if (!user?.isProfileComplete) {
+    return <Navigate to="/profile-wizard" />;
   }
 
   if (user?.role === "employer") {
@@ -70,12 +87,12 @@ function App() {
       <AuthProvider>
         <SocketProvider>
           <Router>
-            <div className="min-h-screen bg-gray-50 text-gray-900">
+            <div className="min-h-screen bg-slate-900 text-slate-200">
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
-                
+
                 <Route
                   path="/dashboard"
                   element={
@@ -93,21 +110,25 @@ function App() {
                   </ProtectedRoute>
                 }
               />
-              
+
               <Route
                 path="/freelancer-dashboard"
                 element={
                   <ProtectedRoute>
-                    <FreelancerDashboard />
+                    <DashboardLayout>
+                      <FreelancerDashboard />
+                    </DashboardLayout>
                   </ProtectedRoute>
                 }
               />
-              
+
               <Route
                 path="/employer-dashboard"
                 element={
                   <ProtectedRoute>
-                    <EmployerDashboard />
+                    <DashboardLayout>
+                      <EmployerDashboard />
+                    </DashboardLayout>
                   </ProtectedRoute>
                 }
               />
@@ -116,7 +137,9 @@ function App() {
                 path="/jobs"
                 element={
                   <ProtectedRoute>
-                    <JobListing />
+                    <DashboardLayout>
+                      <JobListing />
+                    </DashboardLayout>
                   </ProtectedRoute>
                 }
               />
@@ -125,7 +148,9 @@ function App() {
                 path="/jobs/:id"
                 element={
                   <ProtectedRoute>
-                    <JobDetail />
+                    <DashboardLayout>
+                      <JobDetail />
+                    </DashboardLayout>
                   </ProtectedRoute>
                 }
               />
@@ -134,7 +159,19 @@ function App() {
                 path="/post-job"
                 element={
                   <ProtectedRoute>
-                    <PostJob />
+                    <DashboardLayout>
+                      <PostJob />
+                    </DashboardLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/edit-job/:id"
+                element={
+                  <ProtectedRoute>
+                    <DashboardLayout>
+                      <PostJob />
+                    </DashboardLayout>
                   </ProtectedRoute>
                 }
               />
@@ -143,7 +180,20 @@ function App() {
                 path="/resume-generator"
                 element={
                   <ProtectedRoute>
-                    <ResumeGenerator />
+                    <DashboardLayout>
+                      <ResumeGenerator />
+                    </DashboardLayout>
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/ai-chatbot"
+                element={
+                  <ProtectedRoute>
+                    <DashboardLayout>
+                      <AIChatbot />
+                    </DashboardLayout>
                   </ProtectedRoute>
                 }
               />
@@ -152,7 +202,9 @@ function App() {
                 path="/messages"
                 element={
                   <ProtectedRoute>
-                    <Messaging />
+                    <DashboardLayout>
+                      <Messaging />
+                    </DashboardLayout>
                   </ProtectedRoute>
                 }
               />
@@ -160,14 +212,16 @@ function App() {
                 path="/mentorship"
                 element={
                   <ProtectedRoute>
-                    <Mentorship />
+                    <DashboardLayout>
+                      <Mentorship />
+                    </DashboardLayout>
                   </ProtectedRoute>
                 }
               />
               <Route
                 path="/admin"
                 element={
-                  <ProtectedRoute>
+                  <ProtectedRoute role="admin">
                     <AdminDashboard />
                   </ProtectedRoute>
                 }
@@ -176,7 +230,9 @@ function App() {
                 path="/payments"
                 element={
                   <ProtectedRoute>
-                    <Payments />
+                    <DashboardLayout>
+                      <Payments />
+                    </DashboardLayout>
                   </ProtectedRoute>
                 }
               />
@@ -184,7 +240,9 @@ function App() {
                 path="/my-applications"
                 element={
                   <ProtectedRoute>
-                    <MyApplications />
+                    <DashboardLayout>
+                      <MyApplications />
+                    </DashboardLayout>
                   </ProtectedRoute>
                 }
               />
@@ -192,7 +250,9 @@ function App() {
                 path="/saved-jobs"
                 element={
                   <ProtectedRoute>
-                    <SavedJobs />
+                    <DashboardLayout>
+                      <SavedJobs />
+                    </DashboardLayout>
                   </ProtectedRoute>
                 }
               />
@@ -232,10 +292,41 @@ function App() {
                 path="/edit-profile"
                 element={
                   <ProtectedRoute>
-                    <EditProfile />
+                    <DashboardLayout>
+                      <EditProfile />
+                    </DashboardLayout>
                   </ProtectedRoute>
                 }
               />
+              <Route
+                path="/settings"
+                element={
+                  <ProtectedRoute>
+                    <DashboardLayout>
+                      <Settings />
+                    </DashboardLayout>
+                  </ProtectedRoute>
+                }
+              />
+                <Route
+                  path="/change-password"
+                  element={
+                    <ProtectedRoute>
+                      <DashboardLayout>
+                        <ChangePassword />
+                      </DashboardLayout>
+                    </ProtectedRoute>
+                  }
+                />
+
+                <Route path="/about" element={<About />} />
+                <Route path="/blog" element={<Blog />} />
+                <Route path="/faq" element={<FAQ />} />
+                <Route path="/employer-faq" element={<FAQ />} />
+                <Route path="/services" element={<Services />} />
+                <Route path="/tools" element={<Services />} />
+                <Route path="/terms" element={<Terms />} />
+                <Route path="/privacy" element={<Privacy />} />
             </Routes>
             <AIChatbotWidget />
             <ToastContainer position="top-right" autoClose={3000} />

@@ -1,19 +1,15 @@
 import React, { useEffect, useRef } from "react";
-
 const EsewaPayment = ({ esewaData }) => {
   const formRef = useRef(null);
-
   useEffect(() => {
     if (esewaData && formRef.current) {
       formRef.current.submit();
     }
   }, [esewaData]);
-
   return (
     <div className="flex flex-col items-center justify-center min-h-[200px] p-8 bg-white rounded-3xl shadow-sm border border-gray-100">
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
       <p className="text-gray-600 font-bold italic">Redirecting to eSewa Gateway...</p>
-      
       <form
         ref={formRef}
         action="https://rc-epay.esewa.com.np/api/epay/main/v2/form"
@@ -35,5 +31,4 @@ const EsewaPayment = ({ esewaData }) => {
     </div>
   );
 };
-
 export default EsewaPayment;

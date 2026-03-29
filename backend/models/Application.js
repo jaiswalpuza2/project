@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-
 const applicationSchema = new mongoose.Schema(
   {
     job: {
@@ -29,8 +28,5 @@ const applicationSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
-
-// Prevent user from applying to the same job twice
 applicationSchema.index({ job: 1, freelancer: 1 }, { unique: true });
-
 module.exports = mongoose.model("Application", applicationSchema);

@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-
 const mentorshipSchema = new mongoose.Schema(
     {
         title: {
@@ -31,5 +30,4 @@ const mentorshipSchema = new mongoose.Schema(
         timestamps: true,
     }
 );
-
 module.exports = mongoose.model("Mentorship", mentorshipSchema);

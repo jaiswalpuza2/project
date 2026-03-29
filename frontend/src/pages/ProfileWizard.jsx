@@ -92,22 +92,28 @@ const ProfileWizard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 font-['Plus_Jakarta_Sans']">
-      <div className="max-w-3xl w-full bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100">
-        <div className="bg-blue-600 p-10 text-white relative overflow-hidden">
-          <div className="absolute top-0 right-0 p-10 opacity-10">
+    <div className="min-h-screen bg-[#0F172A] flex items-center justify-center p-4 font-['Plus_Jakarta_Sans']">
+      <div className="max-w-3xl w-full bg-[#1E293B] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] rounded-[3rem] overflow-hidden border border-slate-600/50 relative">
+        <div className="bg-gradient-to-r from-indigo-500 to-violet-600 p-12 text-white relative overflow-hidden">
+          <div className="absolute top-0 right-0 p-10 opacity-20">
             <Sparkles size={120} />
           </div>
-          <h2 className="text-4xl font-black tracking-tight">Onboarding</h2>
-          <p className="mt-2 text-blue-100 font-medium italic opacity-80">
+          <div className="flex items-center gap-3 mb-4">
+             <div className="h-8 w-8 bg-cyan-400 rounded-lg flex items-center justify-center text-slate-900">
+                <Sparkles size={18} />
+             </div>
+             <h2 className="text-3xl font-black tracking-tighter uppercase">JobSphere</h2>
+          </div>
+          <h2 className="text-4xl font-black tracking-tight">{isEmployer ? "Employer Hub" : "Freelancer Setup"}</h2>
+          <p className="mt-2 text-indigo-100 font-medium italic">
             {isEmployer ? "Build your company presence." : "Let's highlight your professional excellence."}
           </p>
           <div className="mt-8 flex gap-3">
             {Array.from({ length: totalSteps }).map((_, i) => (
               <div
                 key={i}
-                className={`h-2.5 flex-1 rounded-full transition-all duration-500 ${
-                  i + 1 <= step ? "bg-white shadow-lg shadow-white/20" : "bg-blue-400/50"
+                className={`h-2 flex-1 rounded-full transition-all duration-500 ${
+                  i + 1 <= step ? "bg-cyan-400 shadow-lg shadow-cyan-400/20" : "bg-white/20"
                 }`}
               />
             ))}
@@ -116,18 +122,18 @@ const ProfileWizard = () => {
 
         <div className="p-10">
           {step === 1 && (
-            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <div className="flex items-center gap-4 mb-8">
-                <div className="p-4 bg-blue-50 text-blue-600 rounded-2xl">
-                  <FileText size={24} />
+            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <div className="flex items-center gap-6 mb-10">
+                <div className="p-5 bg-indigo-500/10 text-indigo-400 rounded-2xl border border-indigo-500/20 shadow-lg shadow-indigo-500/10">
+                  <FileText size={28} />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-black text-gray-900 leading-tight">Professional Bio</h3>
-                  <p className="text-gray-400 text-sm font-medium italic">Summarize your journey and expertise.</p>
+                  <h3 className="text-3xl font-black text-[#E2E8F0] leading-tight tracking-tight">Professional Bio</h3>
+                  <p className="text-slate-400 font-medium italic mt-1">Summarize your journey and expertise.</p>
                 </div>
               </div>
               <textarea
-                className="w-full p-6 border-2 border-gray-100 rounded-3xl h-48 focus:border-blue-500 outline-none transition font-medium text-gray-700 leading-relaxed"
+                className="w-full p-8 border border-slate-600/50 bg-[#0F172A] rounded-[2.5rem] h-56 focus:border-indigo-500/50 outline-none transition font-medium text-slate-300 leading-relaxed placeholder:text-slate-500 shadow-inner"
                 placeholder={isEmployer ? "Describe your company values and culture..." : "Write a compelling summary of your career highlights..."}
                 value={formData.bio}
                 onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
@@ -138,25 +144,25 @@ const ProfileWizard = () => {
           {step === 2 && !isEmployer && (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div className="flex items-center gap-4 mb-8">
-                <div className="p-4 bg-purple-50 text-purple-600 rounded-2xl">
+                <div className="p-4 bg-violet-500/20 text-violet-400 rounded-2xl">
                   <Briefcase size={24} />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-black text-gray-900 leading-tight">Mastered Skills</h3>
-                  <p className="text-gray-400 text-sm font-medium italic">Add skills to get matched with the right jobs.</p>
+                  <h3 className="text-2xl font-black text-slate-200 leading-tight">Mastered Skills</h3>
+                  <p className="text-slate-400 text-sm font-medium italic">Add skills to get matched with the right jobs.</p>
                 </div>
               </div>
               <form onSubmit={addSkill} className="flex gap-4">
                 <input
                   type="text"
-                  className="flex-1 p-5 border-2 border-gray-100 rounded-2xl outline-none focus:border-purple-500 transition font-bold"
+                  className="flex-1 p-5 border border-slate-600 bg-[#0F172A] rounded-2xl outline-none focus:border-violet-500 transition font-bold text-slate-200 placeholder:text-slate-400"
                   placeholder="E.g. Full-Stack Dev, UI/UX..."
                   value={formData.skillInput}
                   onChange={(e) => setFormData({ ...formData, skillInput: e.target.value })}
                 />
                 <button
                   type="submit"
-                  className="bg-purple-600 text-white px-8 rounded-2xl font-black hover:bg-purple-700 transition shadow-lg shadow-purple-100"
+                  className="bg-gradient-to-r from-indigo-500 to-violet-600 text-white px-8 rounded-2xl font-black hover:brightness-110 transition shadow-lg shadow-indigo-500/20"
                 >
                   Add
                 </button>
@@ -165,11 +171,11 @@ const ProfileWizard = () => {
                 {formData.skills.map((skill) => (
                   <span
                     key={skill}
-                    className="bg-gray-50 text-gray-700 px-6 py-3 rounded-2xl flex items-center gap-3 font-bold text-sm border border-gray-100"
+                    className="bg-[#0F172A] text-slate-300 px-6 py-3 rounded-2xl flex items-center gap-3 font-bold text-sm border border-slate-600"
                   >
                     {skill}
                     <X
-                      className="h-4 w-4 cursor-pointer text-gray-400 hover:text-red-500 transition"
+                      className="h-4 w-4 cursor-pointer text-slate-400 hover:text-red-400 transition"
                       onClick={() => removeSkill(skill)}
                     />
                   </span>
@@ -179,42 +185,42 @@ const ProfileWizard = () => {
           )}
 
           {step === 2 && isEmployer && (
-            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <div className="flex items-center gap-4 mb-8">
-                <div className="p-4 bg-emerald-50 text-emerald-600 rounded-2xl">
-                  <Building size={24} />
+            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <div className="flex items-center gap-6 mb-10">
+                <div className="p-5 bg-emerald-500/10 text-emerald-400 rounded-2xl border border-emerald-500/20 shadow-lg shadow-emerald-500/10">
+                  <Building size={28} />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-black text-gray-900 leading-tight">Company Identity</h3>
-                  <p className="text-gray-400 text-sm font-medium italic">Help talent trust your brand.</p>
+                  <h3 className="text-3xl font-black text-[#E2E8F0] leading-tight tracking-tight">Company Identity</h3>
+                  <p className="text-slate-400 font-medium italic mt-1">Help talent trust your brand.</p>
                 </div>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2 ml-1">Logo URL</label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="space-y-3">
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Logo URL</label>
                   <input
                     type="text"
-                    className="w-full p-4 border-2 border-gray-100 rounded-2xl outline-none focus:border-emerald-500 transition font-bold"
+                    className="w-full p-5 border border-slate-600/50 bg-[#0F172A] rounded-2xl outline-none focus:border-emerald-500/50 transition font-bold text-[#E2E8F0] placeholder:text-slate-500 shadow-inner"
                     placeholder="https://..."
                     value={formData.companyLogo}
                     onChange={(e) => setFormData({ ...formData, companyLogo: e.target.value })}
                   />
                 </div>
-                <div>
-                  <label className="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2 ml-1">HQ Location</label>
+                <div className="space-y-3">
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">HQ Location</label>
                   <input
                     type="text"
-                    className="w-full p-4 border-2 border-gray-100 rounded-2xl outline-none focus:border-emerald-500 transition font-bold"
+                    className="w-full p-5 border border-slate-600/50 bg-[#0F172A] rounded-2xl outline-none focus:border-emerald-500/50 transition font-bold text-[#E2E8F0] placeholder:text-slate-500 shadow-inner"
                     placeholder="San Francisco, CA"
                     value={formData.location}
                     onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                   />
                 </div>
               </div>
-              <div>
-                <label className="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2 ml-1">Elevator Pitch</label>
+              <div className="space-y-3">
+                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Elevator Pitch</label>
                 <textarea
-                  className="w-full p-4 border-2 border-gray-100 rounded-2xl h-32 focus:border-emerald-500 outline-none transition font-medium"
+                  className="w-full p-5 border border-slate-600/50 bg-[#0F172A] rounded-2xl h-32 focus:border-emerald-500/50 outline-none transition font-medium text-slate-300 placeholder:text-slate-500 shadow-inner"
                   placeholder="One sentence that defines your company..."
                   value={formData.companyDescription}
                   onChange={(e) => setFormData({ ...formData, companyDescription: e.target.value })}
@@ -226,17 +232,17 @@ const ProfileWizard = () => {
           {step === 3 && !isEmployer && (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div className="flex items-center gap-4 mb-8">
-                <div className="p-4 bg-orange-50 text-orange-600 rounded-2xl">
+                <div className="p-4 bg-amber-500/20 text-amber-400 rounded-2xl">
                   <UploadCloud size={24} />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-black text-gray-900 leading-tight">Resume Management</h3>
-                  <p className="text-gray-400 text-sm font-medium italic">Upload your latest resume for instant applications.</p>
+                  <h3 className="text-2xl font-black text-slate-200 leading-tight">Resume Management</h3>
+                  <p className="text-slate-400 text-sm font-medium italic">Upload your latest resume for instant applications.</p>
                 </div>
               </div>
               <div 
                 onClick={() => fileInputRef.current.click()}
-                className="border-4 border-dashed border-gray-50 rounded-[2rem] p-12 text-center group hover:border-blue-100 transition cursor-pointer relative"
+                className="border-2 border-dashed border-slate-600 rounded-[2rem] p-12 text-center group hover:border-indigo-500/30 transition cursor-pointer relative"
               >
                 <input
                   type="file"
@@ -245,27 +251,27 @@ const ProfileWizard = () => {
                   className="hidden"
                   accept=".pdf,.doc,.docx"
                 />
-                <div className="inline-block p-6 bg-blue-50 text-blue-600 rounded-3xl mb-6 group-hover:scale-110 transition duration-500 shadow-lg shadow-blue-50">
+                <div className="inline-block p-6 bg-indigo-500/20 text-indigo-400 rounded-3xl mb-6 group-hover:scale-110 transition duration-500">
                   {uploadLoading ? (
                     <RefreshCw className="animate-spin" size={48} />
                   ) : (
                     <UploadCloud size={48} />
                   )}
                 </div>
-                <h4 className="text-xl font-black text-gray-900">
+                <h4 className="text-xl font-black text-slate-200">
                   {formData.resumeUrl ? "Resume Uploaded ✓" : "Upload PDF / Word"}
                 </h4>
-                <p className="text-gray-400 text-sm mt-3 font-medium">
+                <p className="text-slate-400 text-sm mt-3 font-medium">
                   {formData.resumeUrl 
                     ? "Click to change file or edit the link below." 
                     : "Or paste a public Google Drive / Dropbox link below."}
                 </p>
                 <input
                   type="text"
-                  className="mt-8 w-full p-4 border-2 border-gray-100 rounded-2xl outline-none focus:border-blue-500 transition font-bold text-center"
+                  className="mt-8 w-full p-4 border border-slate-600 bg-[#0F172A] rounded-2xl outline-none focus:border-indigo-500 transition font-bold text-center text-slate-200 placeholder:text-slate-400"
                   placeholder="https://..."
                   value={formData.resumeUrl}
-                  onClick={(e) => e.stopPropagation()} // Prevent triggering file input click
+                  onClick={(e) => e.stopPropagation()}
                   onChange={(e) => setFormData({ ...formData, resumeUrl: e.target.value })}
                 />
               </div>
@@ -274,11 +280,11 @@ const ProfileWizard = () => {
 
           {( (step === 3 && isEmployer) || (step === 4 && !isEmployer) ) && (
             <div className="text-center py-12 animate-in fade-in zoom-in duration-700">
-              <div className="inline-block p-8 bg-emerald-50 text-emerald-600 rounded-full mb-8 shadow-xl shadow-emerald-50">
+              <div className="inline-block p-8 bg-emerald-500/20 text-emerald-400 rounded-full mb-8 shadow-xl shadow-emerald-500/10">
                 <CheckCircle size={64} />
               </div>
-              <h3 className="text-4xl font-black text-gray-900 mb-4 tracking-tight">You're All Set!</h3>
-              <p className="text-gray-500 text-lg font-medium max-w-sm mx-auto italic leading-relaxed">
+              <h3 className="text-4xl font-black text-slate-200 mb-4 tracking-tight">You're All Set!</h3>
+              <p className="text-slate-400 text-lg font-medium max-w-sm mx-auto italic leading-relaxed">
                 Your profile is now verified and optimized for global reach. Welcome to the JobSphere family.
               </p>
             </div>
@@ -288,7 +294,7 @@ const ProfileWizard = () => {
             {step > 1 && (
               <button
                 onClick={handleBack}
-                className="px-10 py-4 text-gray-400 font-black hover:text-gray-900 transition active:scale-95 uppercase tracking-widest text-xs"
+                className="px-10 py-4 text-slate-400 font-black hover:text-slate-200 transition active:scale-95 uppercase tracking-widest text-xs"
               >
                 Go Back
               </button>
@@ -297,14 +303,14 @@ const ProfileWizard = () => {
               {step < totalSteps ? (
                 <button
                   onClick={handleNext}
-                  className="bg-blue-600 text-white px-12 py-5 rounded-[1.5rem] font-black hover:bg-gray-900 transition flex items-center gap-3 shadow-xl shadow-blue-100 active:scale-95"
+                  className="bg-gradient-to-r from-indigo-500 to-violet-600 text-white px-12 py-5 rounded-[1.5rem] font-black hover:brightness-110 transition flex items-center gap-3 shadow-xl shadow-indigo-500/20 active:scale-95 uppercase tracking-widest text-xs"
                 >
                   Continue <ChevronRight size={20} />
                 </button>
               ) : (
                 <button
                   onClick={handleSubmit}
-                  className="bg-emerald-600 text-white px-12 py-5 rounded-[1.5rem] font-black hover:bg-gray-900 transition flex items-center gap-3 shadow-xl shadow-emerald-100 active:scale-95"
+                  className="bg-cyan-400 text-slate-900 px-12 py-5 rounded-[1.5rem] font-black hover:bg-cyan-300 transition flex items-center gap-3 shadow-xl shadow-cyan-400/20 active:scale-95 uppercase tracking-widest text-xs"
                 >
                   Complete Setup <CheckCircle size={20} />
                 </button>

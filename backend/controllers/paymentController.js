@@ -1,15 +1,11 @@
 const Payment = require("../models/Payment");
 const Job = require("../models/Job");
+const Notification = require("../models/Notification");
 const { generateEsewaSignature } = require("../utils/esewa");
 const axios = require("axios");
-
-// @desc    Initiate payment (Mock Escrow)
-// @route   POST /api/payments/escrow
-// @access  Private (Employer)
 exports.initiateEscrow = async (req, res, next) => {
     try {
         const { jobId, freelancerId, amount } = req.body;
-
         const payment = await Payment.create({
             job: jobId,
             employer: req.user.id,
@@ -18,7 +14,12 @@ exports.initiateEscrow = async (req, res, next) => {
             status: "escrowed",
             transactionId: "MOCK_TXN_" + Math.random().toString(36).substring(7).toUpperCase(),
         });
-
+        await Notification.create({
+            recipient: freelancerId,
+            message: `Payment of Rs. ${amount} has been escrowed for job: ${jobId}`,
+            type: "payment",
+            relatedId: payment._id,
+        });
         res.status(201).json({
             success: true,
             data: payment,
@@ -27,10 +28,6 @@ exports.initiateEscrow = async (req, res, next) => {
         next(err);
     }
 };
-
-// @desc    Get user payments
-// @route   GET /api/payments/my-payments
-// @access  Private
 exports.getMyPayments = async (req, res, next) => {
     try {
         const payments = await Payment.find({
@@ -40,7 +37,6 @@ exports.getMyPayments = async (req, res, next) => {
             .populate("employer", "name")
             .populate("freelancer", "name")
             .sort("-createdAt");
-
         res.status(200).json({
             success: true,
             data: payments,
@@ -49,19 +45,12 @@ exports.getMyPayments = async (req, res, next) => {
         next(err);
     }
 };
-
-// @desc    Get eSewa Parameters
-// @route   POST /api/payments/initiate-esewa
-// @access  Private (Employer)
 exports.getEsewaParameters = async (req, res, next) => {
     try {
         const { jobId, freelancerId, amount } = req.body;
-
         const transactionUuid = `ESEWA-${Date.now()}-${req.user.id}`;
         const productCode = (process.env.ESEWA_MERCHANT_CODE || "EPAYTEST").trim();
         const secretKey = (process.env.ESEWA_SECRET_KEY || "8gBm/:&EnhH.1/q").trim();
-
-        // Create pending payment record
         await Payment.create({
             job: jobId,
             employer: req.user.id,
@@ -70,11 +59,8 @@ exports.getEsewaParameters = async (req, res, next) => {
             status: "pending",
             transactionId: transactionUuid,
         });
-
-        // Signature message format: total_amount=VAL,transaction_uuid=VAL,product_code=VAL (ePay 2.0)
         const signatureMessage = `total_amount=${amount},transaction_uuid=${transactionUuid},product_code=${productCode}`;
         const signature = generateEsewaSignature(signatureMessage, secretKey);
-
         const esewaData = {
             amount,
             tax_amount: 0,
@@ -88,7 +74,6 @@ exports.getEsewaParameters = async (req, res, next) => {
             signed_field_names: "total_amount,transaction_uuid,product_code",
             signature: signature,
         };
-
         res.status(200).json({
             success: true,
             data: esewaData,
@@ -97,35 +82,30 @@ exports.getEsewaParameters = async (req, res, next) => {
         next(err);
     }
 };
-
-// @desc    Verify eSewa Payment
-// @route   GET /api/payments/verify-esewa
-// @access  Public (Callback)
 exports.verifyEsewaPayment = async (req, res, next) => {
     try {
         const { data } = req.query; // eSewa returns base64 encoded data in 'data' query param
         if (!data) {
             return res.status(400).json({ success: false, message: "No data provided" });
         }
-
         const decodedData = JSON.parse(Buffer.from(data, "base64").toString("utf-8"));
-
-        // Example decodedData: { status: "COMPLETE", transaction_uuid: "...", total_amount: "...", ... }
         if (decodedData.status !== "COMPLETE") {
             return res.status(400).json({ success: false, message: "Payment not completed" });
         }
-
-        // Update payment status
         const payment = await Payment.findOneAndUpdate(
             { transactionId: decodedData.transaction_uuid },
             { status: "escrowed" },
             { new: true }
         );
-
+        await Notification.create({
+            recipient: payment.freelancer,
+            message: `eSewa payment verified and escrowed for your project.`,
+            type: "payment",
+            relatedId: payment._id,
+        });
         if (!payment) {
             return res.status(404).json({ success: false, message: "Payment record not found" });
         }
-
         res.status(200).json({
             success: true,
             data: payment,
@@ -134,16 +114,10 @@ exports.verifyEsewaPayment = async (req, res, next) => {
         next(err);
     }
 };
-
-// @desc    Initiate Khalti Payment
-// @route   POST /api/payments/initiate-khalti
-// @access  Private (Employer)
 exports.initiateKhaltiPayment = async (req, res, next) => {
     try {
         const { jobId, freelancerId, amount } = req.body;
         const transactionId = `KHALTI-${Date.now()}-${req.user.id}`;
-
-        // Save pending payment
         await Payment.create({
             job: jobId,
             employer: req.user.id,
@@ -152,7 +126,6 @@ exports.initiateKhaltiPayment = async (req, res, next) => {
             status: "pending",
             transactionId,
         });
-
         const khaltiPayload = {
             return_url: `${process.env.FRONTEND_URL}/payment-success?gateway=khalti`,
             website_url: process.env.FRONTEND_URL,
@@ -165,7 +138,6 @@ exports.initiateKhaltiPayment = async (req, res, next) => {
                 phone: "9800000000"
             }
         };
-
         const response = await axios.post(
             "https://a.khalti.com/api/v2/epayment/initiate/",
             khaltiPayload,
@@ -176,7 +148,6 @@ exports.initiateKhaltiPayment = async (req, res, next) => {
                 }
             }
         );
-
         res.status(200).json({
             success: true,
             payment_url: response.data.payment_url, // URL to redirect the user
@@ -187,18 +158,12 @@ exports.initiateKhaltiPayment = async (req, res, next) => {
         next(err);
     }
 };
-
-// @desc    Verify Khalti Payment
-// @route   POST /api/payments/verify-khalti
-// @access  Public (Callback)
 exports.verifyKhaltiPayment = async (req, res, next) => {
     try {
         const { pidx } = req.body;
-
         if (!pidx) {
             return res.status(400).json({ success: false, message: "Missing pidx" });
         }
-
         const response = await axios.post(
             "https://a.khalti.com/api/v2/epayment/lookup/",
             { pidx },
@@ -209,21 +174,23 @@ exports.verifyKhaltiPayment = async (req, res, next) => {
                 }
             }
         );
-
         if (response.data.status !== "Completed") {
             return res.status(400).json({ success: false, message: "Khalti payment not completed" });
         }
-
         const payment = await Payment.findOneAndUpdate(
             { transactionId: response.data.purchase_order_id },
             { status: "escrowed" },
             { new: true }
         );
-
+        await Notification.create({
+            recipient: payment.freelancer,
+            message: `Khalti payment verified and escrowed for your project.`,
+            type: "payment",
+            relatedId: payment._id,
+        });
         if (!payment) {
             return res.status(404).json({ success: false, message: "Payment record not found" });
         }
-
         res.status(200).json({
             success: true,
             data: payment,

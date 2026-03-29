@@ -23,7 +23,7 @@ async function run() {
     "gemini-2.5-flash",
     "gemini-3-flash-preview"
   ];
-  
+
   for (const m of models) {
     await testModel(m);
   }

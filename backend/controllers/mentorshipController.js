@@ -1,8 +1,4 @@
 const Mentorship = require("../models/Mentorship");
-
-// @desc    Get all mentorships/internships
-// @route   GET /api/mentorships
-// @access  Public
 exports.getMentorships = async (req, res, next) => {
     try {
         let query = {};
@@ -18,10 +14,6 @@ exports.getMentorships = async (req, res, next) => {
         next(err);
     }
 };
-
-// @desc    Create a mentorship
-// @route   POST /api/mentorships
-// @access  Private/Admin
 exports.createMentorship = async (req, res, next) => {
     try {
         const mentorship = await Mentorship.create(req.body);

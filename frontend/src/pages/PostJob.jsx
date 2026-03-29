@@ -1,26 +1,55 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { Briefcase, DollarSign, FileText, ChevronRight, Plus, X } from "lucide-react";
+import { Briefcase, DollarSign, FileText, ChevronRight, Plus, X, Edit3 } from "lucide-react";
 
 const PostJob = () => {
   const { token } = useAuth();
   const navigate = useNavigate();
+  const { id } = useParams();
+  const isEditMode = !!id;
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     budget: "",
     category: "Web Development",
+    customCategory: "",
     jobType: "Fixed",
     experienceLevel: "Intermediate",
     skillsRequired: [],
     skillInput: "",
   });
 
-  const categories = ["Web Development", "Mobile Development", "UI/UX Design", "Content Writing", "Data Science", "Other"];
+  useEffect(() => {
+    if (isEditMode) {
+      const fetchJobData = async () => {
+        try {
+          const res = await axios.get(`http://localhost:5000/api/jobs/${id}`);
+          const job = res.data.data;
+          setFormData({
+            title: job.title,
+            description: job.description,
+            budget: job.budget * 133, // Convert back to NPR
+            category: job.category,
+            customCategory: "",
+            jobType: job.jobType || "Fixed",
+            experienceLevel: job.experienceLevel || "Intermediate",
+            skillsRequired: job.skillsRequired || [],
+            skillInput: "",
+          });
+        } catch (err) {
+          toast.error("Failed to load job data");
+          navigate("/employer-dashboard");
+        }
+      };
+      fetchJobData();
+    }
+  }, [id, isEditMode, navigate]);
+
+  const categories = ["Web Development", "Mobile Development", "UI/UX Design", "Content Writing", "Data Science", "Game Development", "Other"];
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -48,41 +77,52 @@ const PostJob = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post(
-        "http://localhost:5000/api/jobs",
+      const url = isEditMode 
+        ? `http://localhost:5000/api/jobs/${id}` 
+        : "http://localhost:5000/api/jobs";
+      const method = isEditMode ? "put" : "post";
+
+      await axios[method](
+        url,
         {
           ...formData,
-          budget: Number(formData.budget),
+          category: formData.category === "Other" && formData.customCategory ? formData.customCategory : formData.category,
+          budget: Number(formData.budget) / 133,
         },
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      toast.success("Job posted successfully!");
+      toast.success(isEditMode ? "Job updated successfully!" : "Job posted successfully!");
       navigate("/employer-dashboard");
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to post job");
+      toast.error(err.response?.data?.message || `Failed to ${isEditMode ? "update" : "post"} job`);
     }
     setLoading(false);
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-3xl mx-auto bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
-        <div className="bg-gray-900 p-10 text-white">
-          <h2 className="text-3xl font-bold">Post a New Job</h2>
-          <p className="mt-2 text-gray-400 italic">Reach thousands of talented freelancers instantly.</p>
+    <div className="space-y-10">
+      <div className="max-w-3xl mx-auto bg-[#1E293B] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] rounded-[3rem] overflow-hidden border border-slate-600/50">
+        <div className="bg-gradient-to-r from-indigo-500 to-violet-600 p-12 text-white relative">
+          <div className="absolute top-0 right-0 p-8 opacity-20">
+            {isEditMode ? <Edit3 size={80} /> : <Plus size={80} />}
+          </div>
+          <h2 className="text-5xl font-black tracking-tight">{isEditMode ? "Edit Job Post" : "Post a New Job"}</h2>
+          <p className="mt-4 text-indigo-100 font-black uppercase tracking-widest text-xs">
+            {isEditMode ? "Update your requirements to attract the best talent" : "Reach thousands of talented freelancers instantly"}
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="p-10 space-y-8">
-          <div className="space-y-2">
-            <label className="text-sm font-bold text-gray-700 uppercase tracking-wider">Job Title</label>
-            <div className="relative">
-              <Briefcase className="absolute left-4 top-3.5 text-gray-400" size={20} />
+          <div className="space-y-4">
+            <label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Job Title</label>
+            <div className="relative group/input">
+              <Briefcase className="absolute left-6 top-6 text-slate-400 group-focus-within/input:text-indigo-400 transition-colors" size={24} />
               <input
                 name="title"
                 required
-                className="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition"
+                className="w-full pl-16 pr-8 py-6 bg-[#0F172A] border border-slate-600/50 focus:border-indigo-500/50 rounded-2xl outline-none font-black transition text-base text-[#E2E8F0] placeholder:text-slate-500 shadow-inner"
                 placeholder="e.g. Full-Stack Developer for SaaS Platform"
                 value={formData.title}
                 onChange={handleChange}
@@ -91,42 +131,57 @@ const PostJob = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="space-y-2">
-              <label className="text-sm font-bold text-gray-700 uppercase tracking-wider">Budget ($)</label>
-              <div className="relative">
-                <DollarSign className="absolute left-4 top-3.5 text-gray-400" size={20} />
+            <div className="space-y-4">
+              <label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Budget (NRP)</label>
+              <div className="relative group/input">
+                <span className="absolute left-6 top-6 text-[#E2E8F0] font-black group-focus-within/input:text-indigo-400 transition-colors text-lg">NRP</span>
                 <input
                   name="budget"
                   type="number"
                   required
-                  className="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition"
+                  className="w-full pl-18 pr-8 py-6 bg-[#0F172A] border border-slate-600/50 focus:border-indigo-500/50 rounded-2xl outline-none font-black transition text-base text-[#E2E8F0] placeholder:text-slate-500 shadow-inner"
                   placeholder="5000"
                   value={formData.budget}
                   onChange={handleChange}
                 />
               </div>
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-bold text-gray-700 uppercase tracking-wider">Category</label>
-              <select
-                name="category"
-                className="w-full px-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition appearance-none"
-                value={formData.category}
-                onChange={handleChange}
-              >
-                {categories.map((c) => (
-                  <option key={c} value={c}>{c}</option>
-                ))}
-              </select>
+             <div className="space-y-4">
+              <label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Category</label>
+              <div className="relative group/input">
+                <select
+                  name="category"
+                  className="w-full px-8 py-6 bg-[#0F172A] border border-slate-600/50 focus:border-indigo-500/50 rounded-2xl outline-none font-black transition appearance-none text-base text-[#E2E8F0] shadow-inner"
+                  value={formData.category}
+                  onChange={handleChange}
+                >
+                  {categories.map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+                <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500">
+                   <ChevronRight size={24} className="rotate-90" />
+                </div>
+              </div>
+              {formData.category === "Other" && (
+                <input
+                  name="customCategory"
+                  required
+                  className="w-full mt-3 px-6 py-5 bg-[#0F172A] border border-slate-600/50 focus:border-indigo-500/50 rounded-2xl outline-none font-bold transition text-[#E2E8F0] placeholder:text-slate-500 shadow-inner"
+                  placeholder="Enter your custom category"
+                  value={formData.customCategory}
+                  onChange={handleChange}
+                />
+              )}
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="space-y-2">
-              <label className="text-sm font-bold text-gray-700 uppercase tracking-wider">Job Type</label>
+              <label className="text-sm font-bold text-slate-300 uppercase tracking-wider">Job Type</label>
               <select
                 name="jobType"
-                className="w-full px-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition appearance-none"
+                className="w-full px-4 py-3 bg-[#0F172A] border border-slate-600 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition appearance-none text-slate-200"
                 value={formData.jobType}
                 onChange={handleChange}
               >
@@ -136,10 +191,10 @@ const PostJob = () => {
               </select>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-bold text-gray-700 uppercase tracking-wider">Experience Level</label>
+              <label className="text-sm font-bold text-slate-300 uppercase tracking-wider">Experience Level</label>
               <select
                 name="experienceLevel"
-                className="w-full px-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition appearance-none"
+                className="w-full px-4 py-3 bg-[#0F172A] border border-slate-600 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition appearance-none text-slate-200"
                 value={formData.experienceLevel}
                 onChange={handleChange}
               >
@@ -150,13 +205,13 @@ const PostJob = () => {
             </div>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-bold text-gray-700 uppercase tracking-wider">Job Description</label>
+          <div className="space-y-3">
+            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Job Description</label>
             <textarea
               name="description"
               required
-              rows="6"
-              className="w-full p-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition"
+              rows="8"
+              className="w-full p-8 bg-[#0F172A] border border-slate-600/50 focus:border-indigo-500/50 rounded-[2rem] outline-none font-medium text-slate-300 leading-relaxed transition placeholder:text-slate-500 shadow-inner"
               placeholder="Detailed description of requirements, scope, and deliverables..."
               value={formData.description}
               onChange={handleChange}
@@ -164,11 +219,11 @@ const PostJob = () => {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-bold text-gray-700 uppercase tracking-wider">Skills Required</label>
+            <label className="text-sm font-bold text-slate-300 uppercase tracking-wider">Skills Required</label>
             <div className="flex gap-2">
               <input
                 name="skillInput"
-                className="flex-1 px-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition"
+                className="flex-1 px-4 py-3 bg-[#0F172A] border border-slate-600 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition text-slate-200 placeholder:text-slate-400"
                 placeholder="e.g. React, Python"
                 value={formData.skillInput}
                 onChange={handleChange}
@@ -177,16 +232,16 @@ const PostJob = () => {
               <button
                 type="button"
                 onClick={addSkill}
-                className="bg-gray-900 text-white p-3 rounded-2xl hover:bg-blue-600 transition"
+                className="bg-gradient-to-r from-indigo-500 to-violet-600 text-white p-3 rounded-2xl hover:brightness-110 transition"
               >
                 <Plus />
               </button>
             </div>
             <div className="flex flex-wrap gap-2 mt-3">
               {formData.skillsRequired.map((skill) => (
-                <span key={skill} className="bg-blue-50 text-blue-700 px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 border border-blue-100">
+                <span key={skill} className="bg-indigo-500/20 text-indigo-300 px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 border border-indigo-500/30">
                   {skill}
-                  <X className="h-4 w-4 cursor-pointer" onClick={() => removeSkill(skill)} />
+                  <X className="h-4 w-4 cursor-pointer hover:text-red-400 transition" onClick={() => removeSkill(skill)} />
                 </span>
               ))}
             </div>
@@ -195,9 +250,11 @@ const PostJob = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold text-lg shadow-lg shadow-blue-100 hover:bg-blue-700 transition"
+            className="w-full bg-gradient-to-r from-indigo-500 to-violet-600 text-white py-4 rounded-2xl font-bold text-lg shadow-lg shadow-indigo-500/20 hover:brightness-110 transition"
           >
-            {loading ? "Publishing..." : "Publish Job Post"}
+            {loading 
+              ? (isEditMode ? "Updating..." : "Publishing...") 
+              : (isEditMode ? "Update Job Post" : "Publish Job Post")}
           </button>
         </form>
       </div>

@@ -1,17 +1,25 @@
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
-
-// Ensure upload directory exists
-const uploadDir = path.join(__dirname, "../uploads/resumes");
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-// Set Storage Engine
+const resumeDir = path.join(__dirname, "../uploads/resumes");
+const imageDir = path.join(__dirname, "../uploads/images");
+const attachmentDir = path.join(__dirname, "../uploads/attachments");
+[resumeDir, imageDir, attachmentDir].forEach(dir => {
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+    }
+});
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, uploadDir);
+        if (file.fieldname === "resume") {
+            cb(null, resumeDir);
+        } else if (file.fieldname === "profileImage") {
+            cb(null, imageDir);
+        } else if (file.fieldname === "chatAttachment") {
+            cb(null, attachmentDir);
+        } else {
+            cb(new Error("Invalid field name"), null);
+        }
     },
     filename: function (req, file, cb) {
         cb(
@@ -20,24 +28,26 @@ const storage = multer.diskStorage({
         );
     },
 });
-
-// Check File Type
 function checkFileType(file, cb) {
-    // Allowed ext
-    const filetypes = /pdf|doc|docx/;
-    // Check ext
+    let filetypes;
+    if (file.fieldname === "resume") {
+        filetypes = /pdf|doc|docx/;
+    } else if (file.fieldname === "profileImage") {
+        filetypes = /jpeg|jpg|png|gif|webp/;
+    } else if (file.fieldname === "chatAttachment") {
+        filetypes = /jpeg|jpg|png|gif|webp|pdf|doc|docx|zip|txt/;
+    }
+    if (!filetypes) {
+        return cb(new Error("Invalid field name for file type check"));
+    }
     const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-    // Check mime
     const mimetype = filetypes.test(file.mimetype);
-
     if (mimetype && extname) {
         return cb(null, true);
     } else {
-        cb("Error: Documents Only (PDF, DOC, DOCX)!");
+        cb(new Error(`Error: Invalid file type for ${file.fieldname}!`));
     }
 }
-
-// Init Upload
 const upload = multer({
     storage: storage,
     limits: { fileSize: 5000000 }, // 5MB
@@ -45,5 +55,4 @@ const upload = multer({
         checkFileType(file, cb);
     },
 });
-
 module.exports = upload;

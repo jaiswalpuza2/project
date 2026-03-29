@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-
 const savedJobSchema = new mongoose.Schema(
     {
         user: {
@@ -17,8 +16,5 @@ const savedJobSchema = new mongoose.Schema(
         timestamps: true,
     }
 );
-
-// Prevent duplicate bookmarks
 savedJobSchema.index({ user: 1, job: 1 }, { unique: true });
-
 module.exports = mongoose.model("SavedJob", savedJobSchema);

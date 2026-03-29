@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-
 const notificationSchema = new mongoose.Schema(
     {
         recipient: {
@@ -18,7 +17,6 @@ const notificationSchema = new mongoose.Schema(
         },
         relatedId: {
             type: mongoose.Schema.Types.ObjectId,
-            // Could refer to Job, Application, Payment, etc.
         },
         isRead: {
             type: Boolean,
@@ -27,5 +25,4 @@ const notificationSchema = new mongoose.Schema(
     },
     { timestamps: true }
 );
-
 module.exports = mongoose.model("Notification", notificationSchema);

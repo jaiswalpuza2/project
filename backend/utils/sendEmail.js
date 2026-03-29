@@ -1,5 +1,4 @@
 const nodemailer = require("nodemailer");
-
 const sendEmail = async (options) => {
     const transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST,
@@ -13,8 +12,6 @@ const sendEmail = async (options) => {
             rejectUnauthorized: false
         }
     });
-
-    // Verify connection configuration
     try {
         await transporter.verify();
         console.log("SMTP Server is ready to take our messages");
@@ -22,16 +19,13 @@ const sendEmail = async (options) => {
         console.error("SMTP Connection Error Details:", err.message);
         throw err;
     }
-
     const message = {
         from: `${process.env.FROM_NAME || "JobSphere"} <${process.env.SMTP_USER}>`,
         to: options.email,
         subject: options.subject,
         html: options.message,
     };
-
     const info = await transporter.sendMail(message);
     console.log("Message sent: %s", info.messageId);
 };
-
 module.exports = sendEmail;
