@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Users, FileText, Activity, AlertCircle, BarChart3, ShieldCheck, LogOut, TrendingUp, DollarSign, Briefcase, CheckCircle } from "lucide-react";
+import { Users, FileText, Activity, AlertCircle, BarChart3, ShieldCheck, LogOut, TrendingUp, DollarSign, Briefcase, CheckCircle, Sparkles } from "lucide-react";
+
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { toast } from "react-toastify";
@@ -35,7 +36,18 @@ const AdminDashboard = () => {
     totalRevenue: 0,
     fraudCount: 0
   });
+  const [blogs, setBlogs] = useState([]);
+  const [blogForm, setBlogForm] = useState({ 
+    title: "", 
+    excerpt: "", 
+    content: "", 
+    category: "Freelancing Tips", 
+    image: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=800&q=80" 
+  });
+
+  const [blogLoading, setBlogLoading] = useState(false);
   const [loading, setLoading] = useState(true);
+
   const { user } = useAuth();
 
   useEffect(() => {
@@ -49,7 +61,9 @@ const AdminDashboard = () => {
     if (activeTab === "overview") fetchDashboardData();
     if (activeTab === "users") fetchUsers();
     if (activeTab === "jobs") fetchJobs();
+    if (activeTab === "blogs") fetchBlogs();
   }, [activeTab]);
+
 
   useEffect(() => {
     if (activeTab === "overview") fetchChartData();
@@ -101,6 +115,18 @@ const AdminDashboard = () => {
     }
   };
 
+  const fetchBlogs = async () => {
+    setLoading(true);
+    try {
+      const res = await axios.get("http://localhost:5000/api/blogs");
+      setBlogs(res.data.data);
+    } catch (err) {
+      toast.error("Failed to load blogs");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const fetchJobs = async () => {
     setLoading(true);
     try {
@@ -114,6 +140,45 @@ const AdminDashboard = () => {
       setLoading(false);
     }
   };
+
+  const handleCreateBlog = async (e) => {
+
+    e.preventDefault();
+    setBlogLoading(true);
+    try {
+      await axios.post("http://localhost:5000/api/blogs", blogForm, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success("Blog post created successfully!");
+      setBlogForm({ 
+        title: "", 
+        excerpt: "", 
+        content: "", 
+        category: "Freelancing Tips", 
+        image: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=800&q=80" 
+      });
+
+      fetchBlogs();
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to create blog");
+    } finally {
+      setBlogLoading(false);
+    }
+  };
+
+  const handleDeleteBlog = async (id) => {
+    if (!window.confirm("Delete this blog post?")) return;
+    try {
+      await axios.delete(`http://localhost:5000/api/blogs/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success("Blog deleted successfully");
+      fetchBlogs();
+    } catch (err) {
+      toast.error("Failed to delete blog");
+    }
+  };
+
 
   const handleDeleteUser = async (id) => {
     if (!window.confirm("Are you sure you want to delete this user? This action cannot be undone.")) return;
@@ -164,7 +229,9 @@ const AdminDashboard = () => {
     { id: 'overview', label: 'Overview', icon: <Activity size={20} /> },
     { id: 'users', label: 'Manage Users', icon: <Users size={20} /> },
     { id: 'jobs', label: 'Job Posts', icon: <FileText size={20} /> },
+    { id: 'blogs', label: 'Insights Blog', icon: <Sparkles size={20} /> },
   ];
+
 
   const renderContent = () => {
     if (loading) return (
@@ -279,6 +346,125 @@ const AdminDashboard = () => {
             </div>
           </div>
         );
+      case "blogs":
+
+        return (
+          <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            {/* Create Blog Form */}
+            <div className="bg-[#1E293B] shadow-2xl rounded-[2.5rem] border border-slate-700/50 overflow-hidden">
+               <div className="p-10 border-b border-slate-700/50 bg-slate-800/20">
+                 <h3 className="text-2xl font-black text-slate-100 uppercase tracking-tight">Create New Insight Story</h3>
+               </div>
+               <form onSubmit={handleCreateBlog} className="p-10 grid grid-cols-1 md:grid-cols-2 gap-8">
+                 <div className="space-y-2">
+                   <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-2">Title</label>
+                   <input 
+                     type="text" 
+                     value={blogForm.title}
+                     onChange={(e) => setBlogForm({...blogForm, title: e.target.value})}
+                     className="w-full bg-slate-900 border border-slate-800 rounded-2xl py-4 px-6 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/50 transition-all"
+                     placeholder="How to land your first gig..."
+                     required
+                   />
+                 </div>
+                 <div className="space-y-2">
+                   <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-2">Category</label>
+                   <select 
+                     value={blogForm.category}
+                     onChange={(e) => setBlogForm({...blogForm, category: e.target.value})}
+                     className="w-full bg-slate-900 border border-slate-800 rounded-2xl py-4 px-6 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/50 transition-all font-bold"
+                   >
+                     <option>Freelancing Tips</option>
+                     <option>Market Trends</option>
+                     <option>Lifestyle</option>
+                     <option>Success Stories</option>
+                   </select>
+                 </div>
+                 <div className="md:col-span-2 space-y-2">
+                   <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-2">Image URL</label>
+                   <input 
+                     type="text" 
+                     value={blogForm.image}
+                     onChange={(e) => setBlogForm({...blogForm, image: e.target.value})}
+                     className="w-full bg-slate-900 border border-slate-800 rounded-2xl py-4 px-6 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/50 transition-all font-mono text-sm"
+                     placeholder="https://images.unsplash.com/..."
+                     required
+                   />
+                 </div>
+
+                 <div className="md:col-span-2 space-y-2">
+                   <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-2">Excerpt (Short Summary)</label>
+                   <textarea 
+                     value={blogForm.excerpt}
+                     onChange={(e) => setBlogForm({...blogForm, excerpt: e.target.value})}
+                     className="w-full bg-slate-900 border border-slate-800 rounded-2xl py-4 px-6 text-white h-24 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/50 transition-all"
+                     placeholder="A brief summary of the story..."
+                     required
+                   />
+                 </div>
+                 <div className="md:col-span-2 space-y-2">
+                   <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-2">Main Content</label>
+                   <textarea 
+                     value={blogForm.content}
+                     onChange={(e) => setBlogForm({...blogForm, content: e.target.value})}
+                     className="w-full bg-slate-900 border border-slate-800 rounded-2xl py-4 px-6 text-white h-48 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/50 transition-all"
+                     placeholder="Write the full story here..."
+                     required
+                   />
+                 </div>
+                 <button 
+                   type="submit" 
+                   disabled={blogLoading}
+                   className="md:col-span-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-black uppercase tracking-widest py-5 rounded-2xl transition-all shadow-xl shadow-indigo-500/20 flex items-center justify-center gap-3"
+                 >
+                   {blogLoading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Sparkles size={18} />}
+                   Publish Story
+                 </button>
+               </form>
+            </div>
+
+            {/* Blogs List */}
+            <div className="bg-[#1E293B] shadow-2xl rounded-[2.5rem] border border-slate-700/50 overflow-hidden">
+               <div className="p-10 border-b border-slate-700/50 bg-slate-800/20">
+                 <h3 className="text-2xl font-black text-slate-100 uppercase tracking-tight">Existing Stories</h3>
+               </div>
+               <div className="p-8 overflow-x-auto">
+                 <table className="w-full text-left min-w-[600px]">
+                   <thead>
+                     <tr className="text-xs text-slate-500 uppercase tracking-widest font-black border-b border-slate-700/50">
+                       <th className="pb-6">Title</th>
+                       <th className="pb-6">Category</th>
+                       <th className="pb-6">Date</th>
+                       <th className="pb-6 text-right">Actions</th>
+                     </tr>
+                   </thead>
+                   <tbody className="text-sm text-slate-300">
+                     {blogs.map((b) => (
+                       <tr key={b._id} className="border-b border-slate-700/30 last:border-0 hover:bg-slate-700/20 transition group">
+                         <td className="py-6 pr-6 font-bold text-slate-200 group-hover:text-indigo-400 transition-colors tracking-tight line-clamp-1">{b.title}</td>
+                         <td className="py-6">
+                           <span className="px-3 py-1 bg-indigo-500/10 text-indigo-400 text-[10px] font-black uppercase tracking-widest rounded-lg border border-indigo-500/20">
+                             {b.category}
+                           </span>
+                         </td>
+                         <td className="py-6 text-slate-500 text-xs font-black tracking-widest">{new Date(b.createdAt).toLocaleDateString()}</td>
+                         <td className="py-6 text-right">
+                           <button 
+                             onClick={() => handleDeleteBlog(b._id)}
+                             className="bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white px-5 py-2.5 rounded-xl transition-all font-black text-xs uppercase border border-red-500/20"
+                           >
+                             Delete
+                           </button>
+                         </td>
+                       </tr>
+                     ))}
+                   </tbody>
+                 </table>
+               </div>
+            </div>
+          </div>
+        );
+
       default:
         return (
           <>
@@ -293,7 +479,7 @@ const AdminDashboard = () => {
                     </span>
                   </div>
                   <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-1 md:mb-2 relative z-10">{stat.label}</p>
-                  <h3 className="text-2xl md:text-5xl font-black text-[#F8FAFC] tracking-tight relative z-10">{stat.value}</h3>
+                  <h3 className="text-2xl md:text-3xl font-black text-[#F8FAFC] tracking-tight relative z-10">{stat.value}</h3>
                 </div>
               ))}
             </div>
@@ -305,7 +491,7 @@ const AdminDashboard = () => {
                   <div>
                     <div className="flex items-center gap-3 md:gap-4 mb-2">
                       <div className="w-2 h-6 md:w-2.5 md:h-8 bg-indigo-500 rounded-full"></div>
-                      <h3 className="text-xl md:text-3xl font-black text-slate-100 uppercase tracking-tight">Platform Growth</h3>
+                      <h3 className="text-lg md:text-2xl font-black text-slate-100 uppercase tracking-tight">Platform Growth</h3>
                     </div>
                     <p className="text-slate-400 text-sm md:text-lg font-medium ml-5 md:ml-6">Real-time system engagement metrics.</p>
                   </div>
@@ -414,7 +600,7 @@ const AdminDashboard = () => {
               <div className="p-6 md:p-8 border-b border-slate-700/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-800/20">
                 <div className="flex items-center gap-3">
                   <div className="w-2 h-6 bg-pink-500 rounded-full"></div>
-                  <h3 className="text-lg md:text-xl font-black text-slate-100 uppercase tracking-tight">Security & Fraud Monitoring</h3>
+                  <h3 className="text-lg md:text-2xl font-black text-slate-100 uppercase tracking-tight">Security & Fraud Monitoring</h3>
                 </div>
                 <button className="w-full sm:w-auto bg-indigo-500/10 hover:bg-indigo-500 text-indigo-400 hover:text-white px-5 py-2.5 rounded-xl transition-all duration-300 font-black text-[10px] uppercase border border-indigo-500/20 tracking-widest">
                   View Full Audit Logs
@@ -476,7 +662,7 @@ const AdminDashboard = () => {
     >
       <div className="space-y-6 md:space-y-10">
         <header className="mb-6 md:mb-10 px-1 md:px-0">
-          <h2 className="text-xl md:text-3xl font-black text-slate-200 uppercase tracking-tight">
+          <h2 className="text-xl md:text-2xl font-black text-slate-200 uppercase tracking-tight">
             {activeTab === "overview" ? "System Insight" : activeTab === "users" ? "User Management" : "Job Management"}
           </h2>
           <p className="text-xs md:text-base text-slate-400 mt-1 font-bold">JobSphere real-time control panel</p>

@@ -1,34 +1,27 @@
-import React from "react";
-import { Clock, User, ChevronRight, Search, Tag, Sparkles } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Clock, User, ChevronRight, Search, Tag, Sparkles, Loader2 } from "lucide-react";
+import axios from "axios";
 import Footer from "../components/Footer";
 
+
 const Blog = () => {
-  const posts = [
-    {
-      title: "How to land your first high-paying freelance gig in Nepal",
-      excerpt: "The ultimate guide to building a profile that stands out and attracts global clients while working from Nepal.",
-      author: "Puja Chaudhary",
-      date: "March 24, 2026",
-      category: "Freelacing Tips",
-      image: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=800&q=80"
-    },
-    {
-      title: "Top 10 skills in demand for 2026: What employers want",
-      excerpt: "From AI integration to specialized development, discover which skills are commanding the highest rates this year.",
-      author: "JobSphere Editorial",
-      date: "March 20, 2026",
-      category: "Market Trends",
-      image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80"
-    },
-    {
-      title: "Remote work ergonomics: Setting up your perfect home office",
-      excerpt: "Maximize your productivity and protect your health with these essential tips for a professional home workspace.",
-      author: "Health & Wellness",
-      date: "March 15, 2026",
-      category: "Lifestyle",
-      image: "https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=800&q=80"
-    }
-  ];
+  const [posts, setPosts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/api/blogs");
+        setPosts(res.data.data);
+      } catch (err) {
+        console.error("Failed to fetch blogs:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchBlogs();
+  }, []);
+
 
   return (
     <div className="min-h-screen bg-[#0F172A] flex flex-col pt-24">
@@ -58,42 +51,62 @@ const Blog = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 mb-20">
-          {posts.map((post, i) => (
-            <article key={i} className="bg-slate-900 rounded-[2.5rem] overflow-hidden border border-slate-800 hover:border-violet-500/30 transition-all group shadow-2xl">
-              <div className="aspect-video overflow-hidden">
-                <img src={post.image} alt={post.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+        {isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 mb-20">
+            {[1, 2, 3].map((n) => (
+              <div key={n} className="bg-slate-900 rounded-[2.5rem] overflow-hidden border border-slate-800 animate-pulse">
+                <div className="aspect-video bg-slate-800" />
+                <div className="p-8">
+                  <div className="flex gap-4 mb-4">
+                    <div className="h-6 w-24 bg-slate-800 rounded-full" />
+                    <div className="h-6 w-24 bg-slate-800 rounded-full" />
+                  </div>
+                  <div className="h-8 w-full bg-slate-800 rounded-lg mb-4" />
+                  <div className="h-8 w-2/3 bg-slate-800 rounded-lg mb-6" />
+                  <div className="h-20 w-full bg-slate-800 rounded-lg" />
+                </div>
               </div>
-              <div className="p-8">
-                <div className="flex items-center gap-4 mb-4">
-                  <span className="px-3 py-1 bg-violet-500/10 text-violet-400 text-xs font-black uppercase tracking-widest rounded-full border border-violet-500/20">
-                    {post.category}
-                  </span>
-                  <div className="flex items-center gap-1.5 text-slate-400 text-xs font-black uppercase tracking-widest">
-                    <Clock size={12} /> {post.date}
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 mb-20 text-white">
+            {posts.map((post, i) => (
+              <article key={i} className="bg-slate-900 rounded-[2.5rem] overflow-hidden border border-slate-800 hover:border-violet-500/30 transition-all group shadow-2xl">
+                <div className="aspect-video overflow-hidden">
+                  <img src={post.image} alt={post.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                </div>
+                <div className="p-8">
+                  <div className="flex items-center gap-4 mb-4">
+                    <span className="px-3 py-1 bg-violet-500/10 text-violet-400 text-xs font-black uppercase tracking-widest rounded-full border border-violet-500/20">
+                      {post.category}
+                    </span>
+                    <div className="flex items-center gap-1.5 text-slate-400 text-xs font-black uppercase tracking-widest">
+                      <Clock size={12} /> {new Date(post.createdAt).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' })}
+                    </div>
+
+                  </div>
+                  <h3 className="text-3xl font-black text-white mb-4 line-clamp-2 group-hover:text-violet-400 transition-colors tracking-tight">
+                    {post.title}
+                  </h3>
+                  <p className="text-slate-300 text-base font-medium leading-relaxed mb-6 line-clamp-3">
+                    {post.excerpt}
+                  </p>
+                  <div className="flex items-center justify-between pt-6 border-t border-slate-800/50">
+                     <div className="flex items-center gap-3">
+                        <div className="h-8 w-8 bg-slate-800 rounded-full border border-slate-700 flex items-center justify-center text-slate-400">
+                          <User size={16} />
+                        </div>
+                        <span className="text-sm font-bold text-slate-300 uppercase tracking-wider">{post.author}</span>
+                     </div>
+                     <button className="h-10 w-10 rounded-xl bg-slate-800 flex items-center justify-center text-white hover:bg-violet-600 transition-colors group-hover:shadow-lg group-hover:shadow-violet-500/20">
+                        <ChevronRight size={20} />
+                     </button>
                   </div>
                 </div>
-                <h3 className="text-3xl font-black text-white mb-4 line-clamp-2 group-hover:text-violet-400 transition-colors tracking-tight">
-                  {post.title}
-                </h3>
-                <p className="text-slate-300 text-base font-medium leading-relaxed mb-6 line-clamp-3">
-                  {post.excerpt}
-                </p>
-                <div className="flex items-center justify-between pt-6 border-t border-slate-800/50">
-                   <div className="flex items-center gap-3">
-                      <div className="h-8 w-8 bg-slate-800 rounded-full border border-slate-700 flex items-center justify-center text-slate-400">
-                        <User size={16} />
-                      </div>
-                      <span className="text-sm font-bold text-slate-300 uppercase tracking-wider">{post.author}</span>
-                   </div>
-                   <button className="h-10 w-10 rounded-xl bg-slate-800 flex items-center justify-center text-white hover:bg-violet-600 transition-colors group-hover:shadow-lg group-hover:shadow-violet-500/20">
-                      <ChevronRight size={20} />
-                   </button>
-                </div>
-              </div>
-            </article>
-          ))}
-        </div>
+              </article>
+            ))}
+          </div>
+        )}
 
         <div className="bg-slate-900 border border-slate-800 rounded-[3rem] p-12 text-center md:flex md:items-center md:justify-between md:text-left gap-8">
            <div>

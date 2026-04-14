@@ -77,7 +77,7 @@ JobSphere is a high-performance, full-stack job marketplace designed for the mod
 
 ---
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 jobsphere/

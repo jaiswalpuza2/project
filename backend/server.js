@@ -29,6 +29,7 @@ app.use("/api/upload", require("./routes/uploadRoutes"));
 app.use("/api/notifications", require("./routes/notificationRoutes"));
 app.use("/api/mentorships", require("./routes/mentorshipRoutes"));
 app.use("/api/admin", require("./routes/adminRoutes"));
+app.use("/api/blogs", require("./routes/blogRoutes"));
 app.get("/", (req, res) => {
   res.send("JobSphere API is running...");
 });
@@ -127,5 +128,6 @@ io.on("connection", (socket) => {
 });
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
-  console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+  const mode = process.env.NODE_ENV || "development";
+  console.log(`Server running in ${mode} mode on port ${PORT}`);
 });

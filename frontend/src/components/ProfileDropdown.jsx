@@ -62,7 +62,12 @@ const ProfileDropdown = () => {
     { label: user?.role === "employer" ? "Billing" : "Financials", icon: <CreditCard size={18} />, to: "/payments" },
     { label: "Change Password", icon: <Lock size={18} />, to: "/change-password" },
     { label: "Log out", icon: <LogOut size={18} />, onClick: handleLogout, danger: true },
-  ];
+  ].filter(item => {
+    if (user?.role === "admin") {
+      return item.label !== "Overview" && item.label !== "Financials" && item.label !== "Billing";
+    }
+    return true;
+  });
 
   return (
     <div className="relative" ref={dropdownRef}>
@@ -108,7 +113,7 @@ const ProfileDropdown = () => {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5">
-                    <h4 className="font-black text-[#E2E8F0] truncate tracking-tight">{user?.name}</h4>
+                    <h4 className="font-black text-[#E2E8F0] text-xl tracking-tight">{user?.name}</h4>
                     {user?.isVerified && <CheckCircle size={14} className="text-blue-400 flex-shrink-0" />}
                   </div>
                   <div className="space-y-0.5 mt-1">

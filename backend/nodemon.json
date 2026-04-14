@@ -1,0 +1,3 @@
+{
+  "ignore": ["temp_test/*", "test_*.js", "*.txt", "*.json"]
+}

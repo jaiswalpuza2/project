@@ -59,7 +59,9 @@ const DashboardLayout = ({ children, setActiveTab, activeTab }) => {
     { to: "/admin", icon: <Activity size={24} />, label: "Overview" },
     { to: "/admin", icon: <Users size={24} />, label: "Manage Users", activeTab: "users" },
     { to: "/admin", icon: <FileText size={24} />, label: "Job Posts", activeTab: "jobs" },
+    { to: "/admin", icon: <Sparkles size={24} />, label: "Insights Blog", activeTab: "blogs" },
   ];
+
 
   const links = user?.role === "admin" ? adminLinks : user?.role === "employer" ? employerLinks : freelancerLinks;
 

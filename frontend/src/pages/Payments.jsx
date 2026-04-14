@@ -28,7 +28,7 @@ const Payments = () => {
   return (
     <div className="space-y-12">
       <header className="mb-10">
-        <h1 className="text-4xl font-black text-slate-200 mb-2">Financials</h1>
+        <h1 className="text-2xl font-black text-slate-200 mb-2">Financials</h1>
         <p className="text-slate-400">Track your earnings, escrowed funds, and transaction history.</p>
       </header>
 
@@ -38,7 +38,7 @@ const Payments = () => {
           <div>
             <CreditCard size={36} className="mb-8 text-white/80" />
             <p className="text-indigo-100 font-black uppercase tracking-[0.2em] text-[10px]">Total Balance</p>
-            <h2 className="text-4xl font-black mt-3 tracking-tight">NRP 16,55,850.00</h2>
+            <h2 className="text-2xl font-black mt-3 tracking-tight">NRP 16,55,850.00</h2>
           </div>
           <div className="mt-12 flex gap-4">
             <button className="flex-1 bg-white text-indigo-700 py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg hover:scale-[1.02] active:scale-95 transition-all">Withdraw</button>
@@ -52,7 +52,7 @@ const Payments = () => {
               <ShieldCheck size={32} className="text-emerald-400" />
             </div>
             <p className="text-slate-400 font-black uppercase tracking-[0.2em] text-[10px]">Escrowed Funds</p>
-            <h2 className="text-4xl font-black mt-3 text-[#E2E8F0] tracking-tight">NRP 4,25,600.00</h2>
+            <h2 className="text-2xl font-black mt-3 text-[#E2E8F0] tracking-tight">NRP 4,25,600.00</h2>
           </div>
           <p className="text-[10px] text-slate-500 mt-12 font-black uppercase tracking-widest">Securely held until project completion</p>
         </div>
@@ -63,7 +63,7 @@ const Payments = () => {
               <Clock size={32} className="text-amber-400" />
             </div>
             <p className="text-slate-400 font-black uppercase tracking-[0.2em] text-[10px]">Pending Clearances</p>
-            <h2 className="text-4xl font-black mt-3 text-[#E2E8F0] tracking-tight">NRP 1,13,050.00</h2>
+            <h2 className="text-2xl font-black mt-3 text-[#E2E8F0] tracking-tight">NRP 1,13,050.00</h2>
           </div>
           <p className="text-[10px] text-amber-500/80 mt-12 font-black uppercase tracking-[0.15em]">Expect funds by March 5th</p>
         </div>
