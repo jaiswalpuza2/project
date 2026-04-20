@@ -30,7 +30,7 @@ const OtpVerify = () => {
     setLoading(true);
     try {
       await axios.post(
-        "http://localhost:5000/api/auth/verify-otp",
+        import.meta.env.VITE_API_URL + "/api/auth/verify-otp",
         { otp: otpCode },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -45,7 +45,7 @@ const OtpVerify = () => {
   const handleResend = async () => {
     try {
       await axios.post(
-        "http://localhost:5000/api/auth/resend-otp",
+        import.meta.env.VITE_API_URL + "/api/auth/resend-otp",
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );

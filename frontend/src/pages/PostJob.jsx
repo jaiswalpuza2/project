@@ -27,7 +27,7 @@ const PostJob = () => {
     if (isEditMode) {
       const fetchJobData = async () => {
         try {
-          const res = await axios.get(`http://localhost:5000/api/jobs/${id}`);
+          const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/jobs/${id}`);
           const job = res.data.data;
           setFormData({
             title: job.title,
@@ -78,8 +78,8 @@ const PostJob = () => {
     setLoading(true);
     try {
       const url = isEditMode 
-        ? `http://localhost:5000/api/jobs/${id}` 
-        : "http://localhost:5000/api/jobs";
+        ? `${import.meta.env.VITE_API_URL}/api/jobs/${id}` 
+        : import.meta.env.VITE_API_URL + "/api/jobs";
       const method = isEditMode ? "put" : "post";
 
       await axios[method](

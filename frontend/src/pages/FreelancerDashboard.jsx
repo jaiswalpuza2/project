@@ -56,7 +56,7 @@ const FreelancerDashboard = () => {
   React.useEffect(() => {
     const fetchRecommendations = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/jobs/recommendations", {
+        const res = await axios.get(import.meta.env.VITE_API_URL + "/api/jobs/recommendations", {
           headers: { Authorization: `Bearer ${token}` }
         });
         setRecommendations(res.data.data);

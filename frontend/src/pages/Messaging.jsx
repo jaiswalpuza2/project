@@ -57,11 +57,11 @@ const Messaging = () => {
   };
   const fetchContacts = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/chat/contacts", {
+      const res = await axios.get(import.meta.env.VITE_API_URL + "/api/chat/contacts", {
         headers: { Authorization: `Bearer ${token}` }
       });
       setContacts(res.data.data);
-      const userRes = await axios.get("http://localhost:5000/api/auth/me", {
+      const userRes = await axios.get(import.meta.env.VITE_API_URL + "/api/auth/me", {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (userRes.data.success) {
@@ -73,7 +73,7 @@ const Messaging = () => {
   };
   const fetchMedia = async (userId) => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/chat/${userId}/media`, {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/chat/${userId}/media`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setMediaData(res.data.data);
@@ -83,7 +83,7 @@ const Messaging = () => {
   };
   const fetchChatHistory = async (userId) => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/chat/${userId}`, {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/chat/${userId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setMessages(res.data.data.map(m => ({
@@ -132,7 +132,7 @@ const Messaging = () => {
   };
   const handleUpdateMessage = async () => {
     try {
-      const res = await axios.put(`http://localhost:5000/api/chat/message/${editingMessageId}`, {
+      const res = await axios.put(`${import.meta.env.VITE_API_URL}/api/chat/message/${editingMessageId}`, {
         content: newMessage
       }, {
         headers: { Authorization: `Bearer ${token}` }
@@ -151,7 +151,7 @@ const Messaging = () => {
   const handleClearChat = async () => {
     if (!window.confirm("Are you sure you want to clear this chat? This cannot be undone.")) return;
     try {
-      const res = await axios.delete(`http://localhost:5000/api/chat/${activeChat._id}/clear`, {
+      const res = await axios.delete(`${import.meta.env.VITE_API_URL}/api/chat/${activeChat._id}/clear`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.data.success) {
@@ -166,7 +166,7 @@ const Messaging = () => {
   };
   const handleMuteToggle = async () => {
     try {
-      const res = await axios.post(`http://localhost:5000/api/chat/${activeChat._id}/mute`, {}, {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/chat/${activeChat._id}/mute`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.data.success) {
@@ -186,7 +186,7 @@ const Messaging = () => {
   const handleBlockUser = async () => {
     if (!window.confirm(`Are you sure you want to block ${activeChat.name}?`)) return;
     try {
-      const res = await axios.post(`http://localhost:5000/api/chat/${activeChat._id}/block`, {}, {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/chat/${activeChat._id}/block`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.data.success) {
@@ -202,7 +202,7 @@ const Messaging = () => {
     const reason = window.prompt("Why are you reporting this user?");
     if (!reason) return;
     try {
-      const res = await axios.post(`http://localhost:5000/api/chat/${activeChat._id}/report`, { reason }, {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/chat/${activeChat._id}/report`, { reason }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.data.success) {
@@ -221,7 +221,7 @@ const Messaging = () => {
     formData.append("chatAttachment", file);
     try {
       toast.info(`Uploading ${type}...`);
-      const res = await axios.post("http://localhost:5000/api/upload/chat-attachment", formData, {
+      const res = await axios.post(import.meta.env.VITE_API_URL + "/api/upload/chat-attachment", formData, {
         headers: { 
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data"
@@ -276,7 +276,7 @@ const Messaging = () => {
   const handleDeleteMessage = async (messageId) => {
     if (!window.confirm("Are you sure you want to unsend this message?")) return;
     try {
-      const res = await axios.delete(`http://localhost:5000/api/chat/message/${messageId}`, {
+      const res = await axios.delete(`${import.meta.env.VITE_API_URL}/api/chat/message/${messageId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.data.success) {
@@ -297,7 +297,7 @@ const Messaging = () => {
   };
   const handlePinMessage = async (msg) => {
     try {
-      const res = await axios.patch(`http://localhost:5000/api/chat/message/${msg._id}/pin`, {}, {
+      const res = await axios.patch(`${import.meta.env.VITE_API_URL}/api/chat/message/${msg._id}/pin`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.data.success) {
@@ -367,7 +367,7 @@ const Messaging = () => {
   };
   const handleAddReaction = async (msgId, emoji) => {
     try {
-      const res = await axios.post(`http://localhost:5000/api/chat/message/${msgId}/react`, { emoji }, {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/chat/message/${msgId}/react`, { emoji }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.data.success) {

@@ -21,7 +21,7 @@ const JobListing = () => {
   const fetchJobs = async () => {
     setLoading(true);
     try {
-      let url = `http://localhost:5000/api/jobs?keyword=${search}`;
+      let url = `${import.meta.env.VITE_API_URL}/api/jobs?keyword=${search}`;
       if (category !== "All") url += `&category=${category}`;
       if (jobType !== "All") url += `&jobType=${jobType}`;
       if (experienceLevel !== "All") url += `&experienceLevel=${experienceLevel}`;
@@ -37,7 +37,7 @@ const JobListing = () => {
   };
   const handleSaveJob = async (jobId) => {
     try {
-      await axios.post(`http://localhost:5000/api/saved-jobs/${jobId}`, {}, {
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/saved-jobs/${jobId}`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success("Job bookmarked!");

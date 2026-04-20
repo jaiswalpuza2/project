@@ -13,7 +13,7 @@ export const AuthProvider = ({ children }) => {
         return;
       }
       try {
-        const res = await axios.get("http://localhost:5000/api/auth/me", {
+        const res = await axios.get(import.meta.env.VITE_API_URL + "/api/auth/me", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -30,7 +30,7 @@ export const AuthProvider = ({ children }) => {
   }, [token]);
   const login = async (email, password) => {
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/login", {
+      const res = await axios.post(import.meta.env.VITE_API_URL + "/api/auth/login", {
         email,
         password,
       });
@@ -48,7 +48,7 @@ export const AuthProvider = ({ children }) => {
   };
   const register = async (userData) => {
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/register", userData);
+      const res = await axios.post(import.meta.env.VITE_API_URL + "/api/auth/register", userData);
       localStorage.setItem("token", res.data.token);
       setToken(res.data.token);
       setUser(res.data.user);
@@ -63,7 +63,7 @@ export const AuthProvider = ({ children }) => {
   };
   const forgotPasswordOTP = async (email) => {
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/forgot-password-otp", {
+      const res = await axios.post(import.meta.env.VITE_API_URL + "/api/auth/forgot-password-otp", {
         email,
       });
       return { success: true, message: res.data.data };
@@ -77,7 +77,7 @@ export const AuthProvider = ({ children }) => {
   };
   const loginWithOTP = async (email, otp) => {
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/login-otp", {
+      const res = await axios.post(import.meta.env.VITE_API_URL + "/api/auth/login-otp", {
         email,
         otp,
       });
@@ -101,7 +101,7 @@ export const AuthProvider = ({ children }) => {
   const reloadUser = async () => {
     if (!token) return;
     try {
-      const res = await axios.get("http://localhost:5000/api/auth/me", {
+      const res = await axios.get(import.meta.env.VITE_API_URL + "/api/auth/me", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUser(res.data.data);

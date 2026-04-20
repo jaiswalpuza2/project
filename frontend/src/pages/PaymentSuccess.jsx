@@ -23,7 +23,7 @@ const PaymentSuccess = () => {
 
   const verifyPayment = async (encodedData) => {
     try {
-      await axios.get(`http://localhost:5000/api/payments/verify-esewa?data=${encodedData}`);
+      await axios.get(`${import.meta.env.VITE_API_URL}/api/payments/verify-esewa?data=${encodedData}`);
       setStatus("success");
       toast.success("Payment verified and funds escrowed!");
     } catch (err) {

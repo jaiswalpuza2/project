@@ -16,7 +16,7 @@ const JobDetail = () => {
   const [generatingAI, setGeneratingAI] = useState(false);
   const handleSaveJob = async () => {
     try {
-      await axios.post(`http://localhost:5000/api/saved-jobs/${id}`, {}, {
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/saved-jobs/${id}`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success("Job bookmarked!");
@@ -31,7 +31,7 @@ const JobDetail = () => {
     setGeneratingAI(true);
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/ai/generate-proposal",
+        import.meta.env.VITE_API_URL + "/api/ai/generate-proposal",
         { jobId: id },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -44,7 +44,7 @@ const JobDetail = () => {
   };
   const fetchJob = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/jobs/${id}`);
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/jobs/${id}`);
       setJob(res.data.data);
     } catch (err) {
       toast.error("Failed to load job details");
@@ -57,7 +57,7 @@ const JobDetail = () => {
     setApplying(true);
     try {
       await axios.post(
-        "http://localhost:5000/api/applications/apply",
+        import.meta.env.VITE_API_URL + "/api/applications/apply",
         {
           job: id,
           proposal,

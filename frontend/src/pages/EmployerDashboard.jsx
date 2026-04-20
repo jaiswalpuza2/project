@@ -35,7 +35,7 @@ const EmployerDashboard = () => {
   React.useEffect(() => {
     const fetchAnalytics = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/analytics", {
+        const res = await axios.get(import.meta.env.VITE_API_URL + "/api/analytics", {
           headers: { Authorization: `Bearer ${token}` }
         });
         setStats(res.data.data);
@@ -45,7 +45,7 @@ const EmployerDashboard = () => {
     };
     const fetchMyJobs = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/jobs", {
+        const res = await axios.get(import.meta.env.VITE_API_URL + "/api/jobs", {
           headers: { Authorization: `Bearer ${token}` }
         });
         setJobs(res.data.data.filter(j => j.employer === user._id || j.employer?._id === user._id));
@@ -58,7 +58,7 @@ const EmployerDashboard = () => {
     const fetchTalents = async () => {
       try {
         setLoadingTalent(true);
-        const res = await axios.get("http://localhost:5000/api/auth/talent", {
+        const res = await axios.get(import.meta.env.VITE_API_URL + "/api/auth/talent", {
           headers: { Authorization: `Bearer ${token}` }
         });
         setTalents(res.data.data);
@@ -78,7 +78,7 @@ const EmployerDashboard = () => {
     setSelectedJob(job);
     setLoadingApps(true);
     try {
-      const res = await axios.get(`http://localhost:5000/api/applications/job/${job._id}`, {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/applications/job/${job._id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setApplications(res.data.data);
@@ -90,7 +90,7 @@ const EmployerDashboard = () => {
   };
   const updateApplicationStatus = async (appId, status) => {
     try {
-      await axios.put(`http://localhost:5000/api/applications/${appId}`, { status }, {
+      await axios.put(`${import.meta.env.VITE_API_URL}/api/applications/${appId}`, { status }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success(`Application ${status}!`);
@@ -101,11 +101,11 @@ const EmployerDashboard = () => {
   };
   const handleHireAndPay = async (app) => {
     try {
-      await axios.put(`http://localhost:5000/api/applications/${app._id}`, { status: 'accepted' }, {
+      await axios.put(`${import.meta.env.VITE_API_URL}/api/applications/${app._id}`, { status: 'accepted' }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const res = await axios.post(
-        "http://localhost:5000/api/payments/initiate-esewa",
+        import.meta.env.VITE_API_URL + "/api/payments/initiate-esewa",
         {
           jobId: app.job._id || app.job,
           freelancerId: app.freelancer._id || app.freelancer,
@@ -124,7 +124,7 @@ const EmployerDashboard = () => {
   const handleDeleteJob = async (jobId) => {
     if (!window.confirm("Are you sure you want to delete this job? This action cannot be undone.")) return;
     try {
-      await axios.delete(`http://localhost:5000/api/jobs/${jobId}`, {
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/jobs/${jobId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success("Job deleted successfully");

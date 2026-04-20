@@ -30,7 +30,7 @@ const AIChatbot = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post("http://localhost:5000/api/ai/chatbot", {
+      const response = await axios.post(import.meta.env.VITE_API_URL + "/api/ai/chatbot", {
         message: userMessage,
         context: "Jobsphere dedicated AI Chatbot page. Providing comprehensive career guidance and platform support.",
       });

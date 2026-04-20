@@ -34,7 +34,7 @@ const ChangePassword = () => {
 
     setLoading(true);
     try {
-      await axios.put("http://localhost:5000/api/auth/change-password", {
+      await axios.put(import.meta.env.VITE_API_URL + "/api/auth/change-password", {
         currentPassword: formData.currentPassword,
         newPassword: formData.newPassword
       }, {

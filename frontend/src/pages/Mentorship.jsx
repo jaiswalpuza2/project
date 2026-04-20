@@ -22,7 +22,7 @@ const Mentorship = () => {
   const fetchRealMentors = async () => {
     setFetchingMentors(true);
     try {
-      const res = await axios.get("http://localhost:5000/api/auth/mentors");
+      const res = await axios.get(import.meta.env.VITE_API_URL + "/api/auth/mentors");
       if (res.data.success && res.data.data.length > 0) {
         const fetchedMentors = res.data.data.map((m, index) => {
           const userSkills = user?.skills || [];
@@ -172,7 +172,7 @@ const Mentorship = () => {
     setLoading(true);
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/ai/recommend-mentorship",
+        import.meta.env.VITE_API_URL + "/api/ai/recommend-mentorship",
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -192,7 +192,7 @@ const Mentorship = () => {
     setActiveGap(skill);
     try {
       const res = await axios.get(
-        `http://localhost:5000/api/mentorships?skill=${encodeURIComponent(skill)}`,
+        `${import.meta.env.VITE_API_URL}/api/mentorships?skill=${encodeURIComponent(skill)}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setProviders(res.data.data);

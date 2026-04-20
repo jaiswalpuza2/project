@@ -57,7 +57,7 @@ const ProfileWizard = () => {
     setUploadLoading(true);
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/upload/resume",
+        import.meta.env.VITE_API_URL + "/api/upload/resume",
         formDataUpload,
         {
           headers: {
@@ -78,7 +78,7 @@ const ProfileWizard = () => {
   const handleSubmit = async () => {
     try {
       await axios.put(
-        "http://localhost:5000/api/auth/update-profile",
+        import.meta.env.VITE_API_URL + "/api/auth/update-profile",
         formData,
         {
           headers: { Authorization: `Bearer ${token}` },

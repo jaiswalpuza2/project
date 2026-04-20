@@ -214,7 +214,7 @@ const ResumeGenerator = () => {
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/ai/generate-resume",
+        import.meta.env.VITE_API_URL + "/api/ai/generate-resume",
         { description },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -394,7 +394,7 @@ const ResumeGenerator = () => {
       `;
 
       const res = await axios.post(
-        "http://localhost:5000/api/ai/export-pdf",
+        import.meta.env.VITE_API_URL + "/api/ai/export-pdf",
         { html: resumeHtml, userName: resumeData.fullName },
         { headers: { Authorization: `Bearer ${token}` }, responseType: "blob" }
       );

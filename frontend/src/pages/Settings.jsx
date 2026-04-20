@@ -23,7 +23,7 @@ const Settings = () => {
     if (!window.confirm("Are you sure you want to completely close your account? This action is permanent and cannot be undone.")) return;
 
     try {
-      await axios.delete("http://localhost:5000/api/auth/delete-account", {
+      await axios.delete(import.meta.env.VITE_API_URL + "/api/auth/delete-account", {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success("Account successfully completely deleted.");

@@ -63,7 +63,7 @@ const EditProfile = () => {
 
   const fetchProfile = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/auth/me", {
+      const res = await axios.get(import.meta.env.VITE_API_URL + "/api/auth/me", {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = res.data.data;
@@ -153,7 +153,7 @@ const EditProfile = () => {
     uploadData.append("profileImage", imageFile);
 
     try {
-      const res = await axios.post("http://localhost:5000/api/upload/profile-image", uploadData, {
+      const res = await axios.post(import.meta.env.VITE_API_URL + "/api/upload/profile-image", uploadData, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${token}`,
@@ -174,7 +174,7 @@ const EditProfile = () => {
     uploadData.append("resume", resumeFile);
 
     try {
-      const res = await axios.post("http://localhost:5000/api/upload/resume", uploadData, {
+      const res = await axios.post(import.meta.env.VITE_API_URL + "/api/upload/resume", uploadData, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${token}`,
@@ -204,7 +204,7 @@ const EditProfile = () => {
       };
 
       const res = await axios.put(
-        "http://localhost:5000/api/auth/update-profile",
+        import.meta.env.VITE_API_URL + "/api/auth/update-profile",
         updatedData,
         {
           headers: { Authorization: `Bearer ${token}` },

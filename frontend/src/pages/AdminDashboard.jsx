@@ -71,7 +71,7 @@ const AdminDashboard = () => {
 
   const fetchChartData = async () => {
     try {
-      const chartRes = await axios.get(`http://localhost:5000/api/admin/chart-stats?period=${timeRange.toLowerCase()}`, {
+      const chartRes = await axios.get(`${import.meta.env.VITE_API_URL}/api/admin/chart-stats?period=${timeRange.toLowerCase()}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setChartData(chartRes.data.data);
@@ -84,10 +84,10 @@ const AdminDashboard = () => {
     setLoading(true);
     try {
       const [fraudRes, statsRes] = await Promise.all([
-        axios.get("http://localhost:5000/api/admin/fraud-reports", {
+        axios.get(import.meta.env.VITE_API_URL + "/api/admin/fraud-reports", {
           headers: { Authorization: `Bearer ${token}` }
         }),
-        axios.get("http://localhost:5000/api/admin/stats", {
+        axios.get(import.meta.env.VITE_API_URL + "/api/admin/stats", {
           headers: { Authorization: `Bearer ${token}` }
         })
       ]);
@@ -104,7 +104,7 @@ const AdminDashboard = () => {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("http://localhost:5000/api/admin/users", {
+      const res = await axios.get(import.meta.env.VITE_API_URL + "/api/admin/users", {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUsers(res.data.data);
@@ -118,7 +118,7 @@ const AdminDashboard = () => {
   const fetchBlogs = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("http://localhost:5000/api/blogs");
+      const res = await axios.get(import.meta.env.VITE_API_URL + "/api/blogs");
       setBlogs(res.data.data);
     } catch (err) {
       toast.error("Failed to load blogs");
@@ -130,7 +130,7 @@ const AdminDashboard = () => {
   const fetchJobs = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("http://localhost:5000/api/admin/jobs", {
+      const res = await axios.get(import.meta.env.VITE_API_URL + "/api/admin/jobs", {
         headers: { Authorization: `Bearer ${token}` }
       });
       setJobs(res.data.data);
@@ -146,7 +146,7 @@ const AdminDashboard = () => {
     e.preventDefault();
     setBlogLoading(true);
     try {
-      await axios.post("http://localhost:5000/api/blogs", blogForm, {
+      await axios.post(import.meta.env.VITE_API_URL + "/api/blogs", blogForm, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success("Blog post created successfully!");
@@ -169,7 +169,7 @@ const AdminDashboard = () => {
   const handleDeleteBlog = async (id) => {
     if (!window.confirm("Delete this blog post?")) return;
     try {
-      await axios.delete(`http://localhost:5000/api/blogs/${id}`, {
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/blogs/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success("Blog deleted successfully");
@@ -183,7 +183,7 @@ const AdminDashboard = () => {
   const handleDeleteUser = async (id) => {
     if (!window.confirm("Are you sure you want to delete this user? This action cannot be undone.")) return;
     try {
-      await axios.delete(`http://localhost:5000/api/admin/users/${id}`, {
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/admin/users/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success("User deleted successfully");
@@ -195,7 +195,7 @@ const AdminDashboard = () => {
 
   const handleToggleUserStatus = async (id) => {
     try {
-      await axios.put(`http://localhost:5000/api/admin/users/${id}/toggle-status`, {}, {
+      await axios.put(`${import.meta.env.VITE_API_URL}/api/admin/users/${id}/toggle-status`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success("User status updated");
@@ -208,7 +208,7 @@ const AdminDashboard = () => {
   const handleDeleteJob = async (id) => {
     if (!window.confirm("Are you sure you want to delete this job post?")) return;
     try {
-      await axios.delete(`http://localhost:5000/api/admin/jobs/${id}`, {
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/admin/jobs/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success("Job deleted successfully");

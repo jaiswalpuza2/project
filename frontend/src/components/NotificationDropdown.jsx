@@ -11,7 +11,7 @@ const NotificationDropdown = () => {
   const fetchNotifications = async () => {
     try {
       setLoading(true);
-      const res = await axios.get("http://localhost:5000/api/notifications", {
+      const res = await axios.get(import.meta.env.VITE_API_URL + "/api/notifications", {
         headers: { Authorization: `Bearer ${token}` }
       });
       setNotifications(res.data.data);
@@ -37,7 +37,7 @@ const NotificationDropdown = () => {
   }, []);
   const markAsRead = async (id) => {
     try {
-      await axios.put(`http://localhost:5000/api/notifications/${id}/read`, {}, {
+      await axios.put(`${import.meta.env.VITE_API_URL}/api/notifications/${id}/read`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setNotifications(notifications.map(n => n._id === id ? { ...n, isRead: true } : n));
@@ -47,7 +47,7 @@ const NotificationDropdown = () => {
   };
   const markAllAsRead = async () => {
     try {
-      await axios.put(`http://localhost:5000/api/notifications/read-all`, {}, {
+      await axios.put(`${import.meta.env.VITE_API_URL}/api/notifications/read-all`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setNotifications(notifications.map(n => ({ ...n, isRead: true })));
