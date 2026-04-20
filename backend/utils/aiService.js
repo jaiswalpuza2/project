@@ -253,10 +253,10 @@ class AIService {
                 try {
                     return JSON.parse(matches[0]);
                 } catch (e) {
-                    return text; // Return as string fallback
+                    return text; 
                 }
             }
-            return text; // Return as string fallback
+            return text; 
         }
     }
 }

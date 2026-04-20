@@ -32,7 +32,7 @@ const FAQ = () => {
     },
     {
       q: "What payment methods do you support?",
-      a: "We support major digital wallets (e.g., eSewa, Khalti) and direct bank transfers for secure transactions within Nepal."
+      a: "We support major digital wallets (e.g., eSewa) and direct bank transfers for secure transactions within Nepal."
     }
   ];
 

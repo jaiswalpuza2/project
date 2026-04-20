@@ -16,7 +16,7 @@ const seedRecommendations = async () => {
             employer = await User.create({
                 name: "Tech Solutions Inc.",
                 email: "employer@techsolutions.com",
-                password: "password123", // Note: This should be hashed in a real scenario
+                password: "password123", 
                 role: "employer",
                 isVerified: true,
                 isProfileComplete: true,

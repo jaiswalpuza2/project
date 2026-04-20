@@ -6,7 +6,7 @@ const API_URL = 'http://localhost:5000/api';
 async function runTests() {
   console.log('--- STARTING UNIT TESTS ---');
 
-  // UT01: User Login (Freelancer)
+ 
   let freelancerToken;
   try {
     console.log('\n[UT01] Testing User Login (Freelancer)...');
@@ -22,7 +22,6 @@ async function runTests() {
     console.error('Error:', err.response ? err.response.data : err.message);
   }
 
-  // UT02: Registration
   try {
     console.log('\n[UT02] Testing Registration...');
     const randomSuffix = Math.floor(Math.random() * 10000);
@@ -39,7 +38,7 @@ async function runTests() {
     console.error('Error:', err.response ? err.response.data : err.message);
   }
 
-  // UT03: Job Posting (Employer)
+
   let employerToken;
   let jobId;
   try {
@@ -67,13 +66,13 @@ async function runTests() {
     console.error('Error:', err.response ? err.response.data : err.message);
   }
 
-  // UT04: Job Application Retrieval (Employer)
+  
   try {
     console.log('\n[UT04] Testing Application Retrieval (Employer)...');
     if (!jobId) {
-      // Fallback: get first job by this employer
+
       const jobsRes = await axios.get(`${API_URL}/jobs`, {
-        params: { employer: 'employeet357@gmail.com' } // API filtering might differ
+        params: { employer: 'employeet357@gmail.com' } 
       });
       jobId = jobsRes.data.data[0]?._id;
     }
@@ -93,7 +92,7 @@ async function runTests() {
     console.error('Error:', err.response ? err.response.data : err.message);
   }
 
-  // UT05: Messaging (Freelancer)
+
   try {
     console.log('\n[UT05] Testing Messaging Retrieval (Freelancer)...');
     const chatRes = await axios.get(`${API_URL}/chat/contacts`, {

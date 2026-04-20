@@ -9,7 +9,7 @@ async function runFreelancerTests() {
   let freelancerId;
   let sampleJobId;
 
-  // UT-F01: Registration
+
   const testEmail = `testuser${Math.floor(Math.random() * 10000)}@gmail.com`;
   try {
     console.log('\n[UT-F01] Testing Freelancer Registration...');
@@ -25,11 +25,11 @@ async function runFreelancerTests() {
     console.error('UT-F01 FAIL:', err.response ? err.response.data : err.message);
   }
 
-  // UT-F02: Login
+
   try {
     console.log('\n[UT-F02] Testing Freelancer Login...');
     const loginRes = await axios.post(`${AUTH_URL}/login`, {
-      email: testEmail, // Login with the user we just registered!
+      email: testEmail, 
       password: 'password123'
     });
     token = loginRes.data.token;
@@ -42,7 +42,6 @@ async function runFreelancerTests() {
 
   const headers = { Authorization: `Bearer ${token}` };
 
-  // UT-F03: Browse All Jobs
   try {
     console.log('\n[UT-F03] Testing Browse All Jobs...');
     const jobsRes = await axios.get(`${API_URL}/jobs`);
@@ -54,7 +53,7 @@ async function runFreelancerTests() {
     console.error('UT-F02 FAIL:', err.response ? err.response.data : err.message);
   }
 
-  // UT-F04: Get Recommendations
+ 
   try {
     console.log('\n[UT-F04] Testing Job Recommendations...');
     const recRes = await axios.get(`${API_URL}/jobs/recommendations`, { headers });
@@ -64,7 +63,6 @@ async function runFreelancerTests() {
     console.error('UT-F03 FAIL:', err.response ? err.response.data : err.message);
   }
 
-  // UT-F05: Save a Job
   try {
     if (sampleJobId) {
       console.log(`\n[UT-F05] Testing Save Job ID: ${sampleJobId}...`);
@@ -76,7 +74,7 @@ async function runFreelancerTests() {
     console.error('UT-F04 FAIL:', err.response ? err.response.data : err.message);
   }
 
-  // UT-F06: Get Saved Jobs
+
   try {
     console.log('\n[UT-F06] Testing Get Saved Jobs...');
     const savedRes = await axios.get(`${API_URL}/saved-jobs`, { headers });
@@ -86,11 +84,11 @@ async function runFreelancerTests() {
     console.error('UT-F05 FAIL:', err.response ? err.response.data : err.message);
   }
 
-  // UT-F07: Submit Job Application (Proposal)
+
   try {
     if (sampleJobId) {
       console.log(`\n[UT-F07] Testing Submit Application for Job: ${sampleJobId}...`);
-      // Controller expects req.body.job
+
       const appRes = await axios.post(`${API_URL}/applications/apply`, {
         job: sampleJobId,
         proposal: 'I am highly interested in this project. (Testing Refinement v2)',
@@ -104,7 +102,6 @@ async function runFreelancerTests() {
     console.log('Response:', err.response ? (err.response.data.message || err.response.data) : err.message);
   }
 
-  // UT-F08: Get My Applications
   try {
     console.log('\n[UT-F08] Testing Get My Applications...');
     const myAppsRes = await axios.get(`${API_URL}/applications/my`, { headers });
@@ -114,7 +111,7 @@ async function runFreelancerTests() {
     console.error('UT-F07 FAIL:', err.response ? err.response.data : err.message);
   }
 
-  // UT-F09: AI Chatbot Query
+
   try {
     console.log('\n[UT-F09] Testing AI Chatbot Query...');
     const botRes = await axios.post(`${API_URL}/ai/chatbot`, {
@@ -126,7 +123,6 @@ async function runFreelancerTests() {
     console.error('UT-F08 FAIL:', err.response ? err.response.data : err.message);
   }
 
-  // UT-F10: AI Status Check
   try {
     console.log('\n[UT-F10] Testing AI Service Status...');
     const resumeRes = await axios.get(`${API_URL}/ai/status`);
@@ -136,7 +132,7 @@ async function runFreelancerTests() {
     console.error('UT-F09 FAIL:', err.response ? err.response.data : err.message);
   }
 
-  // UT-F11: Get Chat Contacts
+
   try {
     console.log('\n[UT-F11] Testing Get Chat Contacts...');
     const chatRes = await axios.get(`${API_URL}/chat/contacts`, { headers });
@@ -146,7 +142,6 @@ async function runFreelancerTests() {
     console.error('UT-F10 FAIL:', err.response ? err.response.data : err.message);
   }
 
-  // UT-F12: Get Payment History
   try {
     console.log('\n[UT-F12] Testing Get Payment History...');
     const payRes = await axios.get(`${API_URL}/payments/my-payments`, { headers });

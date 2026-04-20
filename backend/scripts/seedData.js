@@ -65,7 +65,7 @@ const seedData = async () => {
                 title: "Senior React Developer",
                 description: "We are looking for a React expert to help us build a modern SaaS platform.",
                 employer: employer._id,
-                budget: 5000 / 133, // Around $37.5
+                budget: 5000 / 133, 
                 skillsRequired: ["React", "Tailwind CSS", "Node.js"],
                 category: "Web Development",
                 jobType: "Fixed",

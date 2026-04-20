@@ -31,8 +31,6 @@ const DashboardLayout = ({ children, setActiveTab, activeTab }) => {
   const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
 
-  // ... rest of imports/links remain same but we change how we map them ...
-
   const freelancerLinks = [
     { to: "/freelancer-dashboard", icon: <Layout size={24} />, label: "Dashboard" },
     { to: "/jobs", icon: <Search size={24} />, label: "Find Jobs" },

@@ -102,7 +102,7 @@ exports.deleteJob = async (req, res, next) => {
 };
 exports.getChartStats = async (req, res, next) => {
     try {
-        const { period = 'monthly' } = req.query; // weekly, monthly, yearly
+        const { period = 'monthly' } = req.query; 
         const getMonthlyStats = async (Model, dateField = "createdAt", sumField = null) => {
             const group = {
                 _id: {
@@ -136,7 +136,6 @@ exports.getChartStats = async (req, res, next) => {
         const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
         const chartData = [];
         const now = new Date();
-        // Generate data for the last 12 months instead of 6
         for (let i = 11; i >= 0; i--) {
             const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
             const m = d.getMonth() + 1;

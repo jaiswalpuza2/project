@@ -18,7 +18,7 @@ const resetPassword = async (email, newPassword) => {
     }
 
     user.password = newPassword;
-    user.isVerified = true; // Ensure verified too
+    user.isVerified = true;
 
     await user.save();
     console.log(`Password for ${email} has been reset.`);

@@ -52,7 +52,7 @@ const MyApplications = () => {
     <div className="space-y-10">
       <div className="max-w-6xl mx-auto">
         <header className="mb-10">
-          <h2 className="text-3xl font-black text-slate-200 tracking-tight">My Applications 📄</h2>
+          <h2 className="text-3xl font-black text-slate-200 tracking-tight">My Applications </h2>
           <p className="text-slate-400 mt-2 font-medium italic">Track the status of your active proposals and job reach-outs.</p>
         </header>
 

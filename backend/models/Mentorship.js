@@ -10,7 +10,7 @@ const mentorshipSchema = new mongoose.Schema(
             required: [true, "Please add a description"],
         },
         category: {
-            type: String, // 'Mentorship' or 'Micro-Internship'
+            type: String, 
             enum: ["Mentorship", "Micro-Internship"],
             default: "Mentorship",
         },
@@ -20,10 +20,10 @@ const mentorshipSchema = new mongoose.Schema(
         },
         skillsCovered: [String],
         duration: {
-            type: String, // e.g. "4 Weeks"
+            type: String,
         },
         link: {
-            type: String, // URL to apply or learn more
+            type: String,
         },
     },
     {
