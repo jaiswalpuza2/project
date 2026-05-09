@@ -51,9 +51,7 @@ exports.getMyPayments = async (req, res, next) => {
 exports.getEsewaParameters = async (req, res, next) => {
     try {
         const { jobId, freelancerId, amount } = req.body;
-        // Ensure amount is a number and has 2 decimal places as a string for eSewa
         const formattedAmount = Number(amount).toFixed(2);
-        
         const transactionUuid = `JS-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
         const productCode = (process.env.ESEWA_MERCHANT_CODE || "EPAYTEST").trim();
         const secretKey = (process.env.ESEWA_SECRET_KEY || "8gBm/:&EnhH.1/q").trim();
@@ -67,7 +65,7 @@ exports.getEsewaParameters = async (req, res, next) => {
             transactionId: transactionUuid,
         });
 
-        // The signature message must use the EXACT same formatted amount string
+     
         const signatureMessage = `total_amount=${formattedAmount},transaction_uuid=${transactionUuid},product_code=${productCode}`;
         const signature = generateEsewaSignature(signatureMessage, secretKey);
 
@@ -101,8 +99,6 @@ exports.verifyEsewaPayment = async (req, res, next) => {
             return res.status(400).json({ success: false, message: "No data provided" });
         }
         const decodedData = JSON.parse(Buffer.from(data, "base64").toString("utf-8"));
-        
-        // Find the pending payment by the transaction UUID
         const payment = await Payment.findOneAndUpdate(
             { transactionId: decodedData.transaction_uuid },
             { status: "escrowed" },

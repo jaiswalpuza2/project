@@ -1,6 +1,6 @@
 const nodemailer = require("nodemailer");
 
-// Create a singleton transporter for production efficiency
+
 let transporter;
 
 const createTransporter = () => {
@@ -17,7 +17,6 @@ const createTransporter = () => {
         tls: {
             rejectUnauthorized: false
         },
-        // Performance optimizations for persistent connections
         pool: true,
         maxConnections: 5,
         maxMessages: 100

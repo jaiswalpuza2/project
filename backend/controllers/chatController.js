@@ -57,7 +57,7 @@ exports.deleteMessage = async (req, res, next) => {
         res.status(200).json({
             success: true,
             data: {},
-            recipientId: recipientId // Pass this back so frontend knows who to notify via socket
+            recipientId: recipientId 
         });
     } catch (err) {
         next(err);

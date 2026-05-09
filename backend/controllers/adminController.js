@@ -169,7 +169,6 @@ exports.getChartStats = async (req, res, next) => {
             for (let i = 7; i >= 0; i--) {
                 const d = new Date(now.getTime() - i * 7 * 24 * 60 * 60 * 1000);
                 const w = getWeekNumber(d);
-                // Approximate isoWeekYear for finding in array (safe enough for recent weeks)
                 const y = new Date(d.getTime() + 3 * 24 * 60 * 60 * 1000).getFullYear();
 
                 const userData = userGrowth.find(u => u._id.week === w && u._id.year === y);

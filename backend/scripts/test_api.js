@@ -1,5 +1,4 @@
 const axios = require('axios');
-
 const AUTH_URL = 'http://localhost:5000/api/auth';
 const API_URL = 'http://localhost:5000/api';
 

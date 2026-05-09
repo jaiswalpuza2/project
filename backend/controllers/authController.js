@@ -27,7 +27,7 @@ exports.register = async (req, res, next) => {
         <p style="color: #9ca3af; font-size: 12px; text-align: center;">If you didn't request this code, please ignore this email.</p>
       </div>
     `;
-    // ASYNC SEND: Don't await email in production for speed
+
     sendEmail({
       email: user.email,
       subject: "JobSphere - Email Verification Code",
@@ -152,7 +152,8 @@ exports.login = async (req, res, next) => {
           <p style="color: #6b7280; font-size: 14px; text-align: center;">Valid for 15 minutes.</p>
         </div>
       `;
-      // ASYNC SEND
+    
+      
       sendEmail({
         email: user.email,
         subject: "JobSphere - Email Verification Code",
@@ -172,7 +173,7 @@ exports.login = async (req, res, next) => {
         </div>
       </div>
     `;
-    // ASYNC SEND
+  
     sendEmail({
       email: user.email,
       subject: "JobSphere - New Login Detected",

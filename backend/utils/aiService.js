@@ -9,7 +9,6 @@ class AIService {
         this.genAI = this.apiKey ? new GoogleGenerativeAI(this.apiKey) : null;
         this.isGeminiBroken = false;
         this.lastHealthCheck = 0;
-
         this.models = [
             "gemini-2.0-flash",
             "gemini-1.5-flash",

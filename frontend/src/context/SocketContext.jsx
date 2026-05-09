@@ -10,7 +10,7 @@ export const SocketProvider = ({ children }) => {
   const { user, isAuthenticated } = useAuth();
   const [socket, setSocket] = useState(null);
   const [messages, setMessages] = useState([]);
-  const [typingStatus, setTypingStatus] = useState({}); // { userId: isTyping }
+  const [typingStatus, setTypingStatus] = useState({}); 
 
   const [call, setCall] = useState({});
   const [callAccepted, setCallAccepted] = useState(false);

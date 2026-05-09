@@ -34,11 +34,11 @@ import {
 
 const ResumeGenerator = () => {
   const { token, user } = useAuth();
-  const [currentStep, setCurrentStep] = useState("hero"); // hero, input, form, preview
+  const [currentStep, setCurrentStep] = useState("hero");
   const [loading, setLoading] = useState(false);
   const [description, setDescription] = useState("");
   const [theme, setTheme] = useState("classic");
-  const [pageMode, setPageMode] = useState("auto"); // auto, compact, spacious
+  const [pageMode, setPageMode] = useState("auto"); 
 
   const pageModeStyles = {
     "auto": {
