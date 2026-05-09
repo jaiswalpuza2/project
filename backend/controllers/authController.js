@@ -27,15 +27,13 @@ exports.register = async (req, res, next) => {
         <p style="color: #9ca3af; font-size: 12px; text-align: center;">If you didn't request this code, please ignore this email.</p>
       </div>
     `;
-    try {
-      await sendEmail({
-        email: user.email,
-        subject: "JobSphere - Email Verification Code",
-        message,
-      });
-    } catch (err) {
-      console.log("Email could not be sent");
-    }
+    // ASYNC SEND: Don't await email in production for speed
+    sendEmail({
+      email: user.email,
+      subject: "JobSphere - Email Verification Code",
+      message,
+    }).catch(err => console.error("Registration Email Error:", err.message));
+
     sendTokenResponse(user, 201, res);
   } catch (err) {
     if (err.code === 11000) {
@@ -154,15 +152,13 @@ exports.login = async (req, res, next) => {
           <p style="color: #6b7280; font-size: 14px; text-align: center;">Valid for 15 minutes.</p>
         </div>
       `;
-      try {
-        await sendEmail({
-          email: user.email,
-          subject: "JobSphere - Email Verification Code",
-          message: verifyMessage,
-        });
-      } catch (err) {
-        console.error(`Email delivery failed: ${err.message}`);
-      }
+      // ASYNC SEND
+      sendEmail({
+        email: user.email,
+        subject: "JobSphere - Email Verification Code",
+        message: verifyMessage,
+      }).catch(err => console.error("Login Verification Email Error:", err.message));
+
       return sendTokenResponse(user, 200, res);
     }
     const message = `
@@ -176,15 +172,13 @@ exports.login = async (req, res, next) => {
         </div>
       </div>
     `;
-    try {
-      await sendEmail({
-        email: user.email,
-        subject: "JobSphere - New Login Detected",
-        message,
-      });
-    } catch (err) {
-      console.log("Email could not be sent");
-    }
+    // ASYNC SEND
+    sendEmail({
+      email: user.email,
+      subject: "JobSphere - New Login Detected",
+      message,
+    }).catch(err => console.error("Login Alert Email Error:", err.message));
+
     sendTokenResponse(user, 200, res);
   } catch (err) {
     console.error(`Login error: ${err.message}`);

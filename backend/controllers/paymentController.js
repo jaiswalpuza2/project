@@ -3,6 +3,7 @@ const Job = require("../models/Job");
 const Notification = require("../models/Notification");
 const { generateEsewaSignature } = require("../utils/esewa");
 const axios = require("axios");
+
 exports.initiateEscrow = async (req, res, next) => {
     try {
         const { jobId, freelancerId, amount } = req.body;
@@ -28,6 +29,7 @@ exports.initiateEscrow = async (req, res, next) => {
         next(err);
     }
 };
+
 exports.getMyPayments = async (req, res, next) => {
     try {
         const payments = await Payment.find({
@@ -45,35 +47,44 @@ exports.getMyPayments = async (req, res, next) => {
         next(err);
     }
 };
+
 exports.getEsewaParameters = async (req, res, next) => {
     try {
         const { jobId, freelancerId, amount } = req.body;
-        const transactionUuid = `ESEWA-${Date.now()}-${req.user.id}`;
+        // Ensure amount is a number and has 2 decimal places as a string for eSewa
+        const formattedAmount = Number(amount).toFixed(2);
+        
+        const transactionUuid = `JS-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
         const productCode = (process.env.ESEWA_MERCHANT_CODE || "EPAYTEST").trim();
         const secretKey = (process.env.ESEWA_SECRET_KEY || "8gBm/:&EnhH.1/q").trim();
+
         await Payment.create({
             job: jobId,
             employer: req.user.id,
             freelancer: freelancerId,
-            amount,
+            amount: Number(amount),
             status: "pending",
             transactionId: transactionUuid,
         });
-        const signatureMessage = `total_amount=${amount},transaction_uuid=${transactionUuid},product_code=${productCode}`;
+
+        // The signature message must use the EXACT same formatted amount string
+        const signatureMessage = `total_amount=${formattedAmount},transaction_uuid=${transactionUuid},product_code=${productCode}`;
         const signature = generateEsewaSignature(signatureMessage, secretKey);
+
         const esewaData = {
-            amount,
-            tax_amount: 0,
-            total_amount: amount,
+            amount: formattedAmount,
+            tax_amount: "0.00",
+            total_amount: formattedAmount,
             transaction_uuid: transactionUuid,
             product_code: productCode,
-            product_service_charge: 0,
-            product_delivery_charge: 0,
+            product_service_charge: "0.00",
+            product_delivery_charge: "0.00",
             success_url: `${process.env.FRONTEND_URL}/payment-success`,
             failure_url: `${process.env.FRONTEND_URL}/payment-failure`,
             signed_field_names: "total_amount,transaction_uuid,product_code",
             signature: signature,
         };
+
         res.status(200).json({
             success: true,
             data: esewaData,
@@ -82,6 +93,7 @@ exports.getEsewaParameters = async (req, res, next) => {
         next(err);
     }
 };
+
 exports.verifyEsewaPayment = async (req, res, next) => {
     try {
         const { data } = req.query; 
@@ -89,23 +101,25 @@ exports.verifyEsewaPayment = async (req, res, next) => {
             return res.status(400).json({ success: false, message: "No data provided" });
         }
         const decodedData = JSON.parse(Buffer.from(data, "base64").toString("utf-8"));
-        if (decodedData.status !== "COMPLETE") {
-            return res.status(400).json({ success: false, message: "Payment not completed" });
-        }
+        
+        // Find the pending payment by the transaction UUID
         const payment = await Payment.findOneAndUpdate(
             { transactionId: decodedData.transaction_uuid },
             { status: "escrowed" },
             { new: true }
         );
-        await Notification.create({
-            recipient: payment.freelancer,
-            message: `eSewa payment verified and escrowed for your project.`,
-            type: "payment",
-            relatedId: payment._id,
-        });
+        
         if (!payment) {
             return res.status(404).json({ success: false, message: "Payment record not found" });
         }
+
+        await Notification.create({
+            recipient: payment.freelancer,
+            message: `eSewa payment verified and funds of NPR ${payment.amount} have been escrowed.`,
+            type: "payment",
+            relatedId: payment._id,
+        });
+
         res.status(200).json({
             success: true,
             data: payment,

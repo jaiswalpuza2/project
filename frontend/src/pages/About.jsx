@@ -8,8 +8,7 @@ const About = () => {
       <div className="flex-1 max-w-5xl mx-auto px-8 py-16">
         <div className="text-center mb-20">
           <div className="inline-flex items-center gap-3 mb-6 bg-indigo-500/10 px-6 py-2 rounded-full border border-indigo-500/20">
-            <Sparkles size={18} className="text-indigo-400" />
-            <span className="text-indigo-400 font-black uppercase tracking-widest text-sm">Our Vision</span>
+            <span className="text-indigo-400 font-black uppercase tracking-widest text-base">Our Vision</span>
           </div>
           <h1 className="text-5xl md:text-6xl font-black text-white tracking-tighter mb-8 leading-tight">
             Building the Infrastructure for <br />

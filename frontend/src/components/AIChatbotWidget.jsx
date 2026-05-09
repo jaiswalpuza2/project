@@ -1,33 +1,33 @@
 import React, { useState, useRef, useEffect } from "react";
 import { MessageSquare, X, Send, Bot, User } from "lucide-react";
-import axios from "axios";
+import api from "../utils/api";
 import { toast } from "react-toastify";
 import ReactMarkdown from "react-markdown";
-const AIChatbotWidget = () => {
+  const AIChatbotWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { role: "bot", content: "Hi! I'm the Jobsphere AI assistant. How can I help you today?" },
-  ]);
+      { role: "bot", content: "Hi! I'm the Jobsphere AI assistant. How can I help you today?" },
+    ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-  useEffect(() => {
-    if (isOpen) {
-      scrollToBottom();
-    }
-  }, [messages, isOpen]);
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
+    useEffect(() => {
+      if (isOpen) {
+        scrollToBottom();
+      }
+    }, [messages, isOpen]);
   const handleSend = async (e) => {
     e.preventDefault();
     if (!input.trim()) return;
-    const userMessage = input;
+  const userMessage = input;
     setMessages((prev) => [...prev, { role: "user", content: userMessage }]);
     setInput("");
     setIsLoading(true);
     try {
-      const response = await axios.post(import.meta.env.VITE_API_URL + "/api/ai/chatbot", {
+  const response = await api.post("/ai/chatbot", {
         message: userMessage,
         context: "Jobsphere freelancing platform. Helping users navigate jobs, proposals, and profiles.",
       });
@@ -60,7 +60,7 @@ const AIChatbotWidget = () => {
               <div className="h-6 w-6 bg-indigo-500/20 rounded flex items-center justify-center text-indigo-400">
                 <Bot size={16} />
               </div>
-              <h3 className="font-bold tracking-tight uppercase text-xs">Jobsphere AI</h3>
+              <h3 className="font-bold tracking-tight uppercase text-xs text-white">Jobsphere AI</h3>
             </div>
             <button onClick={() => setIsOpen(false)} className="text-slate-400 hover:text-white transition">
               <X size={20} />
@@ -81,7 +81,7 @@ const AIChatbotWidget = () => {
                        <ReactMarkdown>{msg.content}</ReactMarkdown>
                     </div>
                   ) : (
-                    <p className="text-sm break-words">{msg.content}</p>
+                    <p className={`text-sm break-words ${msg.role === "user" ? "text-white" : "text-gray-800"}`}>{msg.content}</p>
                   )}
                 </div>
               </div>

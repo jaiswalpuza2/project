@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import api from "../utils/api";
 import { useAuth } from "../context/AuthContext";
 import { toast } from "react-toastify";
 import {
@@ -213,11 +213,7 @@ const ResumeGenerator = () => {
     console.log("Starting new resume generation...");
 
     try {
-      const res = await axios.post(
-        import.meta.env.VITE_API_URL + "/api/ai/generate-resume",
-        { description },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const res = await api.post("/ai/generate-resume", { description });
       if (res.data.success) {
         const ai = res.data.data;
         console.log("New AI Response Received:", ai);
@@ -393,10 +389,10 @@ const ResumeGenerator = () => {
         </div>
       `;
 
-      const res = await axios.post(
-        import.meta.env.VITE_API_URL + "/api/ai/export-pdf",
+      const res = await api.post(
+        "/ai/export-pdf",
         { html: resumeHtml, userName: resumeData.fullName },
-        { headers: { Authorization: `Bearer ${token}` }, responseType: "blob" }
+        { responseType: "blob" }
       );
 
       const blob = new Blob([res.data], { type: "application/pdf" });
@@ -424,17 +420,17 @@ const ResumeGenerator = () => {
   };
 
   const renderHero = () => (
-    <div className="min-h-[70vh] flex flex-col items-center justify-center text-center px-4">
+    <div className="min-h-[80vh] flex flex-col items-center justify-center text-center px-4 relative">
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-indigo-500/10 rounded-full blur-[100px] animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-violet-500/10 rounded-full blur-[120px] animate-pulse delay-1000" />
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-indigo-500/10 dark:bg-indigo-500/20 rounded-full blur-[100px] animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-violet-500/10 dark:bg-violet-500/20 rounded-full blur-[120px] animate-pulse delay-1000" />
       </div>
       <div className="relative z-10 max-w-4xl animate-in fade-in slide-in-from-bottom-8 duration-700">
-        <h1 className="text-6xl md:text-8xl font-black text-slate-200 leading-[0.9] mb-8 tracking-tighter">
+        <h1 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-slate-100 leading-[1.1] mb-8 tracking-tight transition-colors">
           Build a resume that <br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-violet-400 to-cyan-400">gets you hired.</span>
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-violet-600 to-cyan-600 dark:from-indigo-400 dark:via-violet-400 dark:to-cyan-400">gets you hired.</span>
         </h1>
-        <p className="text-xl text-slate-400 max-w-2xl mx-auto mb-12 font-medium leading-relaxed">
+        <p className="text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto mb-12 font-medium leading-relaxed transition-colors">
           Leverage the power of AI to craft a professional, ATS-optimized resume in minutes. Pre-filled with your profile, polished by intelligence.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -442,16 +438,15 @@ const ResumeGenerator = () => {
             onClick={() => setCurrentStep("input")}
             className="group relative inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-indigo-500 to-violet-600 text-white rounded-2xl font-black text-lg hover:brightness-110 transition-all duration-300 hover:scale-[1.02] active:scale-95 shadow-2xl shadow-indigo-500/20"
           >
-            <Sparkles size={20} className="text-cyan-400 group-hover:rotate-12 transition-transform" />
             Start Building
             <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
           </button>
         </div>
-        <div className="mt-20 flex flex-wrap justify-center gap-8 text-slate-400 opacity-70 hover:opacity-100 transition-all duration-500">
-          <div className="flex items-center gap-2 text-sm font-bold"><CheckCircle size={16} className="text-cyan-400" /> ATS Optimized</div>
-          <div className="flex items-center gap-2 text-sm font-bold"><Sparkles size={16} className="text-indigo-400" /> AI Writing</div>
-          <div className="flex items-center gap-2 text-sm font-bold"><Layout size={16} className="text-violet-400" /> Modern Layouts</div>
-          <div className="flex items-center gap-2 text-sm font-bold"><FileDown size={16} className="text-emerald-400" /> PDF Export</div>
+        <div className="mt-20 flex flex-wrap justify-center gap-8 text-slate-500 dark:text-slate-400 opacity-70 hover:opacity-100 transition-all duration-500 transition-colors">
+          <div className="flex items-center gap-2 text-sm font-bold"><CheckCircle size={16} className="text-emerald-500 dark:text-cyan-400" /> ATS Optimized</div>
+          <div className="flex items-center gap-2 text-sm font-bold"><Sparkles size={16} className="text-indigo-500 dark:text-indigo-400" /> AI Writing</div>
+          <div className="flex items-center gap-2 text-sm font-bold"><Layout size={16} className="text-violet-500 dark:text-violet-400" /> Modern Layouts</div>
+          <div className="flex items-center gap-2 text-sm font-bold"><FileDown size={16} className="text-emerald-500 dark:text-emerald-400" /> PDF Export</div>
         </div>
       </div>
     </div>
@@ -459,18 +454,18 @@ const ResumeGenerator = () => {
 
   const renderInput = () => (
     <div className="min-h-[70vh] flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-2xl bg-[#1E293B] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] rounded-[3rem] p-10 md:p-14 border border-slate-600/50 animate-in fade-in zoom-in-95 duration-500 relative">
-        <button onClick={() => setCurrentStep("hero")} className="flex items-center gap-2 text-slate-400 hover:text-indigo-400 mb-10 font-black uppercase tracking-widest text-[10px] transition-colors">
+      <div className="w-full max-w-2xl bg-white dark:bg-[#1E293B] shadow-xl dark:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] rounded-[3rem] p-10 md:p-14 border border-slate-100 dark:border-slate-600/50 animate-in fade-in zoom-in-95 duration-500 relative transition-colors">
+        <button onClick={() => setCurrentStep("hero")} className="flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 mb-10 font-black uppercase tracking-widest text-xs transition-colors">
           <ChevronLeft size={16} /> Go Back
         </button>
 
-        <div className="flex items-center gap-3 mb-3">
+        <div className="flex items-center gap-3 mb-3 transition-colors">
           <div className="w-10 h-10 bg-gradient-to-r from-indigo-500 to-violet-500 rounded-xl flex items-center justify-center text-white">
             <FileText size={20} />
           </div>
-          <h2 className="text-2xl font-black text-white tracking-tight">AI Resume Description Input</h2>
+          <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight transition-colors">AI Resume Description Input</h2>
         </div>
-        <p className="text-slate-400 font-medium mb-8 text-sm">
+        <p className="text-slate-500 dark:text-slate-400 font-medium mb-8 text-sm transition-colors">
           Enter a detailed description about yourself to generate your professional resume.
         </p>
 
@@ -479,7 +474,7 @@ const ResumeGenerator = () => {
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Type your description here…&#10;&#10;Example: I am Puja Jaiswal, a full-stack developer with 3 years of experience in React..."
-          className="w-full bg-[#0F172A] border border-slate-600/50 rounded-3xl px-8 py-6 text-[#E2E8F0] font-medium placeholder-slate-600 focus:border-indigo-500/50 focus:outline-none transition-all resize-none mb-10 text-sm leading-relaxed shadow-inner"
+          className="w-full bg-slate-50 dark:bg-[#0F172A] border border-slate-200 dark:border-slate-600/50 rounded-3xl px-8 py-6 text-slate-900 dark:text-[#E2E8F0] font-medium placeholder-slate-400 dark:placeholder-slate-600 focus:border-indigo-500/50 focus:outline-none transition-all resize-none mb-10 text-sm leading-relaxed shadow-inner"
         />
 
         <button
@@ -493,10 +488,7 @@ const ResumeGenerator = () => {
               Generating Resume...
             </>
           ) : (
-            <>
-              <Sparkles size={22} />
-              Generate Resume
-            </>
+            "Generate Resume"
           )}
         </button>
       </div>
@@ -504,22 +496,22 @@ const ResumeGenerator = () => {
   );
 
   const renderForm = () => {
-    const inputClass = "w-full px-6 py-4 bg-[#0F172A] border border-slate-600/50 rounded-2xl focus:border-indigo-500/50 transition-all font-bold outline-none text-sm shadow-inner text-[#E2E8F0] placeholder:text-slate-600";
-    const labelClass = "block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3 ml-1";
-    const sectionClass = "bg-[#1E293B] border border-slate-600/50 rounded-[2.5rem] p-10 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] hover:border-slate-500/50 transition-all duration-500";
+    const inputClass = "w-full px-6 py-4 bg-slate-50 dark:bg-[#0F172A] border border-slate-200 dark:border-slate-600/50 rounded-2xl focus:border-indigo-500/50 transition-all font-bold outline-none text-sm shadow-inner text-slate-900 dark:text-[#E2E8F0] placeholder:text-slate-400 dark:placeholder:text-slate-600";
+    const labelClass = "block text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-3 ml-1 transition-colors";
+    const sectionClass = "bg-white dark:bg-[#1E293B] border border-slate-100 dark:border-slate-600/50 rounded-[2.5rem] p-10 shadow-xl dark:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] hover:border-indigo-100 dark:hover:border-slate-500/50 transition-all duration-500 transition-colors";
 
     return (
       <div className="max-w-5xl mx-auto py-12 px-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
-        <button onClick={() => setCurrentStep("input")} className="flex items-center gap-2 text-slate-400 hover:text-indigo-400 mb-6 font-bold text-sm transition-colors">
+        <button onClick={() => setCurrentStep("input")} className="flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 mb-6 font-bold text-sm transition-colors">
           <ChevronLeft size={16} /> Back to Input
         </button>
-        <h2 className="text-4xl font-black text-slate-200 tracking-tight mb-2">Edit Your Resume</h2>
-        <p className="text-slate-400 font-medium mb-10">Review and edit the AI-generated content below. All fields are editable.</p>
+        <h2 className="text-4xl font-black text-slate-900 dark:text-slate-200 tracking-tight mb-2 transition-colors">Edit Your Resume</h2>
+        <p className="text-slate-500 dark:text-slate-400 font-medium mb-10 transition-colors">Review and edit the AI-generated content below. All fields are editable.</p>
 
         <div className={`${sectionClass} mb-8`}>
-          <div className="flex items-center gap-3 mb-8">
-            <div className="w-10 h-10 bg-indigo-500/20 rounded-xl flex items-center justify-center text-indigo-400"><User size={20} /></div>
-            <h3 className="text-xl font-black text-slate-200">Personal Information</h3>
+          <div className="flex items-center gap-3 mb-8 transition-colors">
+            <div className="w-10 h-10 bg-indigo-500/10 dark:bg-indigo-500/20 rounded-xl flex items-center justify-center text-indigo-600 dark:text-indigo-400 transition-colors"><User size={20} /></div>
+            <h3 className="text-xl font-black text-slate-900 dark:text-slate-200 transition-colors">Personal Information</h3>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div><label className={labelClass}>Full Name</label><input className={inputClass} value={resumeData.fullName} onChange={(e) => handleFieldChange("fullName", e.target.value)} /></div>
@@ -533,9 +525,9 @@ const ResumeGenerator = () => {
         </div>
 
         <div className={`${sectionClass} mb-8`}>
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 bg-amber-500/20 rounded-xl flex items-center justify-center text-amber-400"><FileText size={20} /></div>
-            <h3 className="text-xl font-black text-slate-200">Professional Summary</h3>
+          <div className="flex items-center gap-3 mb-6 transition-colors">
+            <div className="w-10 h-10 bg-amber-500/10 dark:bg-amber-500/20 rounded-xl flex items-center justify-center text-amber-600 dark:text-amber-400 transition-colors"><FileText size={20} /></div>
+            <h3 className="text-xl font-black text-slate-900 dark:text-slate-200 transition-colors">Professional Summary</h3>
           </div>
           <textarea rows={4} className={`${inputClass} resize-none`} value={resumeData.summary} onChange={(e) => handleFieldChange("summary", e.target.value)} />
         </div>
@@ -543,16 +535,16 @@ const ResumeGenerator = () => {
         <div className={`${sectionClass} mb-8`}>
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-emerald-500/20 rounded-xl flex items-center justify-center text-emerald-400"><Code size={20} /></div>
-              <h3 className="text-xl font-black text-slate-200">Skills</h3>
+              <div className="w-10 h-10 bg-emerald-500/10 dark:bg-emerald-500/20 rounded-xl flex items-center justify-center text-emerald-600 dark:text-emerald-400 transition-colors"><Code size={20} /></div>
+              <h3 className="text-xl font-black text-slate-900 dark:text-slate-200 transition-colors">Skills</h3>
             </div>
-            <button onClick={() => handleAddItem("skills")} className="flex items-center gap-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg font-bold text-xs transition-all text-slate-300"><Plus size={14} /> Add</button>
+            <button onClick={() => handleAddItem("skills")} className="flex items-center gap-1 px-4 py-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-lg font-bold text-xs transition-all text-slate-600 dark:text-slate-300"><Plus size={14} /> Add</button>
           </div>
           <div className="flex flex-wrap gap-3">
             {resumeData.skills.map((skill, idx) => (
               <div key={idx} className="relative group">
-                <input className="px-4 py-2 bg-[#0F172A] border-2 border-transparent rounded-xl focus:border-indigo-500 transition-all font-bold outline-none text-sm min-w-[120px] text-slate-200" value={skill} onChange={(e) => handleArrayItemChange("skills", idx, null, e.target.value)} />
-                <button onClick={() => handleRemoveItem("skills", idx)} className="absolute -top-1 -right-1 p-1 bg-red-500/20 text-red-400 rounded-full opacity-0 group-hover:opacity-100 transition-all"><Trash2 size={10} /></button>
+                <input className="px-4 py-2 bg-slate-50 dark:bg-[#0F172A] border-2 border-transparent rounded-xl focus:border-indigo-500 transition-all font-bold outline-none text-sm min-w-[120px] text-slate-900 dark:text-slate-200 transition-colors" value={skill} onChange={(e) => handleArrayItemChange("skills", idx, null, e.target.value)} />
+                <button onClick={() => handleRemoveItem("skills", idx)} className="absolute -top-1 -right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-all shadow-md"><Trash2 size={10} /></button>
               </div>
             ))}
           </div>
@@ -561,14 +553,14 @@ const ResumeGenerator = () => {
         <div className={`${sectionClass} mb-8`}>
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center text-blue-400"><Briefcase size={20} /></div>
-              <h3 className="text-xl font-black text-slate-200">Work Experience</h3>
+              <div className="w-10 h-10 bg-blue-500/10 dark:bg-blue-500/20 rounded-xl flex items-center justify-center text-blue-600 dark:text-blue-400 transition-colors"><Briefcase size={20} /></div>
+              <h3 className="text-xl font-black text-slate-900 dark:text-slate-200 transition-colors">Work Experience</h3>
             </div>
-            <button onClick={() => handleAddItem("experience")} className="flex items-center gap-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg font-bold text-xs transition-all text-slate-300"><Plus size={14} /> Add</button>
+            <button onClick={() => handleAddItem("experience")} className="flex items-center gap-1 px-4 py-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-lg font-bold text-xs transition-all text-slate-600 dark:text-slate-300"><Plus size={14} /> Add</button>
           </div>
           {resumeData.experience.map((exp, idx) => (
-            <div key={idx} className="relative mb-6 pb-6 border-b border-slate-600 last:border-0 last:pb-0 last:mb-0">
-              <button onClick={() => handleRemoveItem("experience", idx)} className="absolute top-0 right-0 p-2 text-slate-400 hover:text-red-400 rounded-lg transition-all"><Trash2 size={16} /></button>
+            <div key={idx} className="relative mb-6 pb-6 border-b border-slate-100 dark:border-slate-600 last:border-0 last:pb-0 last:mb-0">
+              <button onClick={() => handleRemoveItem("experience", idx)} className="absolute top-0 right-0 p-2 text-slate-400 hover:text-red-600 dark:hover:text-red-400 rounded-lg transition-all"><Trash2 size={16} /></button>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
                 <input placeholder="Company" className={inputClass} value={exp.company} onChange={(e) => handleArrayItemChange("experience", idx, "company", e.target.value)} />
                 <input placeholder="Role" className={inputClass} value={exp.role} onChange={(e) => handleArrayItemChange("experience", idx, "role", e.target.value)} />
@@ -582,14 +574,14 @@ const ResumeGenerator = () => {
         <div className={`${sectionClass} mb-8`}>
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-violet-500/20 rounded-xl flex items-center justify-center text-violet-400"><GraduationCap size={20} /></div>
-              <h3 className="text-xl font-black text-slate-200">Education</h3>
+              <div className="w-10 h-10 bg-violet-500/10 dark:bg-violet-500/20 rounded-xl flex items-center justify-center text-violet-600 dark:text-violet-400 transition-colors"><GraduationCap size={20} /></div>
+              <h3 className="text-xl font-black text-slate-900 dark:text-slate-200 transition-colors">Education</h3>
             </div>
-            <button onClick={() => handleAddItem("education")} className="flex items-center gap-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg font-bold text-xs transition-all text-slate-300"><Plus size={14} /> Add</button>
+            <button onClick={() => handleAddItem("education")} className="flex items-center gap-1 px-4 py-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-lg font-bold text-xs transition-all text-slate-600 dark:text-slate-300"><Plus size={14} /> Add</button>
           </div>
           {resumeData.education.map((edu, idx) => (
-            <div key={idx} className="relative mb-6 pb-6 border-b border-slate-600 last:border-0 last:pb-0 last:mb-0">
-              <button onClick={() => handleRemoveItem("education", idx)} className="absolute top-0 right-0 p-2 text-slate-400 hover:text-red-400 rounded-lg transition-all"><Trash2 size={16} /></button>
+            <div key={idx} className="relative mb-6 pb-6 border-b border-slate-100 dark:border-slate-600 last:border-0 last:pb-0 last:mb-0">
+              <button onClick={() => handleRemoveItem("education", idx)} className="absolute top-0 right-0 p-2 text-slate-400 hover:text-red-600 dark:hover:text-red-400 rounded-lg transition-all"><Trash2 size={16} /></button>
               <input placeholder="School/University" className={`${inputClass} mb-3`} value={edu.school} onChange={(e) => handleArrayItemChange("education", idx, "school", e.target.value)} />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <input placeholder="Degree" className={inputClass} value={edu.degree} onChange={(e) => handleArrayItemChange("education", idx, "degree", e.target.value)} />
@@ -602,14 +594,14 @@ const ResumeGenerator = () => {
         <div className={`${sectionClass} mb-8`}>
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-indigo-500/20 rounded-xl flex items-center justify-center text-indigo-400"><Code size={20} /></div>
-              <h3 className="text-xl font-black text-slate-200">Projects</h3>
+              <div className="w-10 h-10 bg-indigo-500/10 dark:bg-indigo-500/20 rounded-xl flex items-center justify-center text-indigo-600 dark:text-indigo-400 transition-colors"><Code size={20} /></div>
+              <h3 className="text-xl font-black text-slate-900 dark:text-slate-200 transition-colors">Projects</h3>
             </div>
-            <button onClick={() => handleAddItem("projects")} className="flex items-center gap-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg font-bold text-xs transition-all text-slate-300"><Plus size={14} /> Add</button>
+            <button onClick={() => handleAddItem("projects")} className="flex items-center gap-1 px-4 py-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-lg font-bold text-xs transition-all text-slate-600 dark:text-slate-300"><Plus size={14} /> Add</button>
           </div>
           {resumeData.projects.map((proj, idx) => (
-            <div key={idx} className="relative mb-6 pb-6 border-b border-slate-600 last:border-0 last:pb-0 last:mb-0">
-              <button onClick={() => handleRemoveItem("projects", idx)} className="absolute top-0 right-0 p-2 text-slate-400 hover:text-red-400 rounded-lg transition-all"><Trash2 size={16} /></button>
+            <div key={idx} className="relative mb-6 pb-6 border-b border-slate-100 dark:border-slate-600 last:border-0 last:pb-0 last:mb-0">
+              <button onClick={() => handleRemoveItem("projects", idx)} className="absolute top-0 right-0 p-2 text-slate-400 hover:text-red-600 dark:hover:text-red-400 rounded-lg transition-all"><Trash2 size={16} /></button>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
                 <input placeholder="Project Name" className={inputClass} value={proj.name} onChange={(e) => handleArrayItemChange("projects", idx, "name", e.target.value)} />
                 <input placeholder="Link (optional)" className={inputClass} value={proj.link} onChange={(e) => handleArrayItemChange("projects", idx, "link", e.target.value)} />
@@ -623,14 +615,14 @@ const ResumeGenerator = () => {
         <div className={`${sectionClass} mb-8`}>
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-rose-500/20 rounded-xl flex items-center justify-center text-rose-400"><Award size={20} /></div>
-              <h3 className="text-xl font-black text-slate-200">Certifications</h3>
+              <div className="w-10 h-10 bg-rose-500/10 dark:bg-rose-500/20 rounded-xl flex items-center justify-center text-rose-600 dark:text-rose-400 transition-colors"><Award size={20} /></div>
+              <h3 className="text-xl font-black text-slate-900 dark:text-slate-200 transition-colors">Certifications</h3>
             </div>
-            <button onClick={() => handleAddItem("certifications")} className="flex items-center gap-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg font-bold text-xs transition-all text-slate-300"><Plus size={14} /> Add</button>
+            <button onClick={() => handleAddItem("certifications")} className="flex items-center gap-1 px-4 py-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-lg font-bold text-xs transition-all text-slate-600 dark:text-slate-300"><Plus size={14} /> Add</button>
           </div>
           {resumeData.certifications.map((cert, idx) => (
-            <div key={idx} className="relative mb-6 pb-6 border-b border-slate-600 last:border-0 last:pb-0 last:mb-0">
-              <button onClick={() => handleRemoveItem("certifications", idx)} className="absolute top-0 right-0 p-2 text-slate-400 hover:text-red-400 rounded-lg transition-all"><Trash2 size={16} /></button>
+            <div key={idx} className="relative mb-6 pb-6 border-b border-slate-100 dark:border-slate-600 last:border-0 last:pb-0 last:mb-0">
+              <button onClick={() => handleRemoveItem("certifications", idx)} className="absolute top-0 right-0 p-2 text-slate-400 hover:text-red-600 dark:hover:text-red-400 rounded-lg transition-all"><Trash2 size={16} /></button>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <input placeholder="Certificate Name" className={inputClass} value={cert.name} onChange={(e) => handleArrayItemChange("certifications", idx, "name", e.target.value)} />
                 <input placeholder="Issuer" className={inputClass} value={cert.issuer} onChange={(e) => handleArrayItemChange("certifications", idx, "issuer", e.target.value)} />
@@ -644,16 +636,16 @@ const ResumeGenerator = () => {
           <div className={sectionClass}>
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-cyan-500/20 rounded-xl flex items-center justify-center text-cyan-400"><Languages size={20} /></div>
-                <h3 className="text-xl font-black text-slate-200">Languages</h3>
+                <div className="w-10 h-10 bg-cyan-500/10 dark:bg-cyan-500/20 rounded-xl flex items-center justify-center text-cyan-600 dark:text-cyan-400 transition-colors"><Languages size={20} /></div>
+                <h3 className="text-xl font-black text-slate-900 dark:text-slate-200 transition-colors">Languages</h3>
               </div>
-              <button onClick={() => handleAddItem("languages")} className="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-all text-slate-300"><Plus size={16} /></button>
+              <button onClick={() => handleAddItem("languages")} className="p-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-lg transition-all text-slate-600 dark:text-slate-300 transition-colors"><Plus size={16} /></button>
             </div>
             <div className="flex flex-wrap gap-3">
               {resumeData.languages.map((lang, idx) => (
                 <div key={idx} className="relative group">
-                  <input className="px-4 py-2 bg-[#0F172A] border-2 border-transparent rounded-xl focus:border-indigo-500 transition-all font-bold outline-none text-sm min-w-[100px] text-slate-200" value={lang} onChange={(e) => handleArrayItemChange("languages", idx, null, e.target.value)} />
-                  <button onClick={() => handleRemoveItem("languages", idx)} className="absolute -top-1 -right-1 p-1 bg-red-500/20 text-red-400 rounded-full opacity-0 group-hover:opacity-100 transition-all"><Trash2 size={10} /></button>
+                  <input className="px-4 py-2 bg-slate-50 dark:bg-[#0F172A] border-2 border-transparent rounded-xl focus:border-indigo-500 transition-all font-bold outline-none text-sm min-w-[100px] text-slate-900 dark:text-slate-200 transition-colors" value={lang} onChange={(e) => handleArrayItemChange("languages", idx, null, e.target.value)} />
+                  <button onClick={() => handleRemoveItem("languages", idx)} className="absolute -top-1 -right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-all shadow-md"><Trash2 size={10} /></button>
                 </div>
               ))}
             </div>
@@ -662,16 +654,16 @@ const ResumeGenerator = () => {
           <div className={sectionClass}>
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-pink-500/20 rounded-xl flex items-center justify-center text-pink-400"><Heart size={20} /></div>
-                <h3 className="text-xl font-black text-slate-200">Interests</h3>
+                <div className="w-10 h-10 bg-pink-500/10 dark:bg-pink-500/20 rounded-xl flex items-center justify-center text-pink-600 dark:text-pink-400 transition-colors"><Heart size={20} /></div>
+                <h3 className="text-xl font-black text-slate-900 dark:text-slate-200 transition-colors">Interests</h3>
               </div>
-              <button onClick={() => handleAddItem("interests")} className="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-all text-slate-300"><Plus size={16} /></button>
+              <button onClick={() => handleAddItem("interests")} className="p-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-lg transition-all text-slate-600 dark:text-slate-300 transition-colors"><Plus size={16} /></button>
             </div>
             <div className="flex flex-wrap gap-3">
               {resumeData.interests.map((interest, idx) => (
                 <div key={idx} className="relative group">
-                  <input className="px-4 py-2 bg-[#0F172A] border-2 border-transparent rounded-xl focus:border-indigo-500 transition-all font-bold outline-none text-sm min-w-[100px] text-slate-200" value={interest} onChange={(e) => handleArrayItemChange("interests", idx, null, e.target.value)} />
-                  <button onClick={() => handleRemoveItem("interests", idx)} className="absolute -top-1 -right-1 p-1 bg-red-500/20 text-red-400 rounded-full opacity-0 group-hover:opacity-100 transition-all"><Trash2 size={10} /></button>
+                  <input className="px-4 py-2 bg-slate-50 dark:bg-[#0F172A] border-2 border-transparent rounded-xl focus:border-indigo-500 transition-all font-bold outline-none text-sm min-w-[100px] text-slate-900 dark:text-slate-200 transition-colors" value={interest} onChange={(e) => handleArrayItemChange("interests", idx, null, e.target.value)} />
+                  <button onClick={() => handleRemoveItem("interests", idx)} className="absolute -top-1 -right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-all shadow-md"><Trash2 size={10} /></button>
                 </div>
               ))}
             </div>
@@ -701,19 +693,19 @@ const ResumeGenerator = () => {
 
       <div className="flex flex-col md:flex-row justify-center items-center gap-6 mb-8">
 
-        <div className="bg-[#1E293B] shadow-lg shadow-black/20 p-2 rounded-2xl shadow-sm border border-slate-600 flex flex-wrap justify-center gap-2">
+        <div className="bg-white dark:bg-[#1E293B] shadow-xl dark:shadow-black/20 p-2 rounded-2xl border border-slate-200 dark:border-slate-600 flex flex-wrap justify-center gap-2 transition-colors">
           {Object.entries(themes).map(([key, t]) => (
             <button
               key={key}
               onClick={() => setTheme(key)}
-              className={`px-5 py-2.5 rounded-xl text-sm font-black transition-all duration-300 ${theme === key ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700'}`}
+              className={`px-5 py-2.5 rounded-xl text-sm font-black transition-all duration-300 ${theme === key ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20' : 'text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700'}`}
             >
               {t.name}
             </button>
           ))}
         </div>
 
-        <div className="bg-[#1E293B] shadow-lg shadow-black/20 p-2 rounded-2xl shadow-sm border border-slate-600 flex flex-wrap justify-center gap-2">
+        <div className="bg-white dark:bg-[#1E293B] shadow-xl dark:shadow-black/20 p-2 rounded-2xl border border-slate-200 dark:border-slate-600 flex flex-wrap justify-center gap-2 transition-colors">
           {[
             { id: "auto", label: "Auto (Default)" },
             { id: "compact", label: "1-Page Compact" },
@@ -722,7 +714,7 @@ const ResumeGenerator = () => {
             <button
               key={m.id}
               onClick={() => setPageMode(m.id)}
-              className={`px-5 py-2.5 rounded-xl text-sm font-black transition-all duration-300 ${pageMode === m.id ? 'bg-cyan-500 text-slate-900 shadow-md shadow-cyan-500/20' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700'}`}
+              className={`px-5 py-2.5 rounded-xl text-sm font-black transition-all duration-300 ${pageMode === m.id ? 'bg-cyan-500 text-slate-900 shadow-md shadow-cyan-500/20' : 'text-slate-500 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700'}`}
             >
               {m.label}
             </button>
@@ -731,7 +723,7 @@ const ResumeGenerator = () => {
       </div>
 
       {pageMode === "compact" && (
-        <p className="text-center text-xs font-bold text-slate-400 mb-8 uppercase tracking-widest animate-pulse">1-page compact resumes are ideal for freshers and short profiles</p>
+        <p className="text-center text-xs font-bold text-slate-500 dark:text-slate-400 mb-8 uppercase tracking-widest animate-pulse transition-colors">1-page compact resumes are ideal for freshers and short profiles</p>
       )}
 
       <div className="bg-white rounded-[40px] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] border border-gray-50 overflow-hidden mb-10 transition-colors duration-500">
@@ -863,23 +855,23 @@ const ResumeGenerator = () => {
       <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pb-12">
         <button
           onClick={() => setCurrentStep("form")}
-          className="flex items-center gap-2 px-8 py-4 bg-[#1E293B] border-2 border-slate-600 text-slate-200 rounded-2xl font-black text-sm hover:bg-slate-700 hover:border-slate-600 transition-all shadow-sm"
+          className="flex items-center gap-2 px-8 py-4 bg-white dark:bg-[#1E293B] border-2 border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 rounded-2xl font-black text-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition-all shadow-sm"
         >
           <Edit3 size={18} /> Edit Resume
         </button>
         <button
           onClick={() => { setCurrentStep("input"); setDescription(""); setResumeData({ fullName: "", email: "", phone: "", linkedin: "", github: "", location: "", portfolio: "", summary: "", skills: [""], experience: [{ company: "", role: "", period: "", description: "" }], education: [{ school: "", degree: "", period: "" }], certifications: [{ name: "", issuer: "", date: "" }], projects: [{ name: "", description: "", technologies: "", link: "" }], languages: [""], interests: [""] }); }}
-          className="flex items-center gap-2 px-8 py-4 bg-[#0F172A] text-slate-200 rounded-2xl font-black text-sm hover:bg-[#1E293B] transition-all shadow-lg border border-slate-600"
+          className="flex items-center gap-2 px-8 py-4 bg-slate-100 dark:bg-[#0F172A] text-slate-600 dark:text-slate-200 rounded-2xl font-black text-sm hover:bg-slate-200 dark:hover:bg-[#1E293B] transition-all shadow-md border border-slate-200 dark:border-slate-600"
         >
-          <RefreshCw size={18} /> Generate Another Resume
+          <RefreshCw size={18} /> Generate Another
         </button>
         <button
           onClick={() => handleExportPDF('preview')}
           disabled={loading}
-          className="flex items-center gap-2 px-8 py-4 bg-[#1E293B] border-2 border-cyan-500/30 text-cyan-400 rounded-2xl font-black text-sm hover:bg-cyan-500/10 hover:border-cyan-500/50 transition-all shadow-sm disabled:opacity-50"
+          className="flex items-center gap-2 px-8 py-4 bg-white dark:bg-[#1E293B] border-2 border-cyan-500/30 text-cyan-600 dark:text-cyan-400 rounded-2xl font-black text-sm hover:bg-cyan-50 dark:hover:bg-cyan-500/10 hover:border-cyan-500/50 transition-all shadow-sm disabled:opacity-50"
         >
           {loading ? <Loader2 className="animate-spin" size={18} /> : <FileText size={18} />}
-          Preview Resume
+          Preview PDF
         </button>
         <button
           onClick={() => handleExportPDF('download')}
@@ -887,7 +879,7 @@ const ResumeGenerator = () => {
           className="flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-indigo-500 to-violet-600 text-white rounded-2xl font-black text-sm hover:brightness-110 hover:scale-105 active:scale-95 transition-all shadow-xl shadow-indigo-500/20 disabled:opacity-50"
         >
           {loading ? <Loader2 className="animate-spin" size={18} /> : <Download size={18} />}
-          Download Resume
+          Download PDF
         </button>
       </div>
     </div>
@@ -895,7 +887,7 @@ const ResumeGenerator = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0F172A] relative pb-20 overflow-x-hidden">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0F172A] relative pb-20 overflow-x-hidden transition-colors duration-500">
       {loading && currentStep === "input" && (
         <div className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-black/80 backdrop-blur-xl">
           <div className="relative">

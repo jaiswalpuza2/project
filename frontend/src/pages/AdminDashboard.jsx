@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Users, FileText, Activity, AlertCircle, BarChart3, ShieldCheck, LogOut, TrendingUp, DollarSign, Briefcase, CheckCircle, Sparkles } from "lucide-react";
-
-import axios from "axios";
+import api from "../utils/api";
 import { useAuth } from "../context/AuthContext";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
@@ -22,9 +21,9 @@ import {
 import DashboardLayout from "../components/DashboardLayout";
 
 const AdminDashboard = () => {
-  const { token, logout } = useAuth();
+  const { logout } = useAuth();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("overview"); // overview, users, jobs
+  const [activeTab, setActiveTab] = useState("overview"); 
   const [fraudReports, setFraudReports] = useState([]);
   const [users, setUsers] = useState([]);
   const [jobs, setJobs] = useState([]);
@@ -47,7 +46,6 @@ const AdminDashboard = () => {
 
   const [blogLoading, setBlogLoading] = useState(false);
   const [loading, setLoading] = useState(true);
-
   const { user } = useAuth();
 
   useEffect(() => {
@@ -71,9 +69,7 @@ const AdminDashboard = () => {
 
   const fetchChartData = async () => {
     try {
-      const chartRes = await axios.get(`${import.meta.env.VITE_API_URL}/api/admin/chart-stats?period=${timeRange.toLowerCase()}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const chartRes = await api.get(`/admin/chart-stats?period=${timeRange.toLowerCase()}`);
       setChartData(chartRes.data.data);
     } catch (err) {
       console.error("Failed to load chart data");
@@ -84,12 +80,8 @@ const AdminDashboard = () => {
     setLoading(true);
     try {
       const [fraudRes, statsRes] = await Promise.all([
-        axios.get(import.meta.env.VITE_API_URL + "/api/admin/fraud-reports", {
-          headers: { Authorization: `Bearer ${token}` }
-        }),
-        axios.get(import.meta.env.VITE_API_URL + "/api/admin/stats", {
-          headers: { Authorization: `Bearer ${token}` }
-        })
+        api.get("/admin/fraud-reports"),
+        api.get("/admin/stats")
       ]);
       setFraudReports(fraudRes.data.data);
       setStatsData(statsRes.data.data);
@@ -104,9 +96,7 @@ const AdminDashboard = () => {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(import.meta.env.VITE_API_URL + "/api/admin/users", {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get("/admin/users");
       setUsers(res.data.data);
     } catch (err) {
       toast.error("Failed to load users");
@@ -118,7 +108,7 @@ const AdminDashboard = () => {
   const fetchBlogs = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(import.meta.env.VITE_API_URL + "/api/blogs");
+      const res = await api.get("/blogs");
       setBlogs(res.data.data);
     } catch (err) {
       toast.error("Failed to load blogs");
@@ -130,9 +120,7 @@ const AdminDashboard = () => {
   const fetchJobs = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(import.meta.env.VITE_API_URL + "/api/admin/jobs", {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get("/admin/jobs");
       setJobs(res.data.data);
     } catch (err) {
       toast.error("Failed to load jobs");
@@ -146,9 +134,7 @@ const AdminDashboard = () => {
     e.preventDefault();
     setBlogLoading(true);
     try {
-      await axios.post(import.meta.env.VITE_API_URL + "/api/blogs", blogForm, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.post("/blogs", blogForm);
       toast.success("Blog post created successfully!");
       setBlogForm({ 
         title: "", 
@@ -169,9 +155,7 @@ const AdminDashboard = () => {
   const handleDeleteBlog = async (id) => {
     if (!window.confirm("Delete this blog post?")) return;
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/api/blogs/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.delete(`/blogs/${id}`);
       toast.success("Blog deleted successfully");
       fetchBlogs();
     } catch (err) {
@@ -183,9 +167,7 @@ const AdminDashboard = () => {
   const handleDeleteUser = async (id) => {
     if (!window.confirm("Are you sure you want to delete this user? This action cannot be undone.")) return;
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/api/admin/users/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.delete(`/admin/users/${id}`);
       toast.success("User deleted successfully");
       fetchUsers();
     } catch (err) {
@@ -195,9 +177,7 @@ const AdminDashboard = () => {
 
   const handleToggleUserStatus = async (id) => {
     try {
-      await axios.put(`${import.meta.env.VITE_API_URL}/api/admin/users/${id}/toggle-status`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.put(`/admin/users/${id}/toggle-status`, {});
       toast.success("User status updated");
       fetchUsers();
     } catch (err) {
@@ -208,9 +188,7 @@ const AdminDashboard = () => {
   const handleDeleteJob = async (id) => {
     if (!window.confirm("Are you sure you want to delete this job post?")) return;
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/api/admin/jobs/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.delete(`/admin/jobs/${id}`);
       toast.success("Job deleted successfully");
       fetchJobs();
     } catch (err) {
@@ -246,10 +224,10 @@ const AdminDashboard = () => {
     switch (activeTab) {
       case "users":
         return (
-          <div className="bg-[#1E293B] shadow-2xl rounded-2xl md:rounded-[2.5rem] border border-slate-700/50 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="p-6 md:p-10 border-b border-slate-700/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-800/20">
-              <h3 className="text-xl md:text-2xl font-black text-slate-100 uppercase tracking-tight">Platform Users ({users.length})</h3>
-              <div className="px-4 py-2 bg-indigo-500/10 border border-indigo-500/20 rounded-xl text-indigo-400 text-xs font-black uppercase tracking-widest">
+          <div className="bg-white dark:bg-[#1E293B] shadow-xl dark:shadow-2xl rounded-2xl md:rounded-[2.5rem] border border-slate-100 dark:border-slate-700/50 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="p-6 md:p-10 border-b border-slate-100 dark:border-slate-700/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-50 dark:bg-slate-800/20">
+              <h3 className="text-lg md:text-xl font-black text-slate-900 dark:text-slate-100 uppercase tracking-tight">Platform Users ({users.length})</h3>
+              <div className="px-4 py-2 bg-indigo-500/10 border border-indigo-500/20 rounded-xl text-indigo-600 dark:text-indigo-400 text-xs font-black uppercase tracking-widest">
                 System Users List
               </div>
             </div>
@@ -263,12 +241,12 @@ const AdminDashboard = () => {
                     <th className="pb-6 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="text-sm text-slate-300">
+                <tbody className="text-sm text-slate-600 dark:text-slate-300">
                   {users.map((u) => (
-                    <tr key={u._id} className="border-b border-slate-700/30 last:border-0 hover:bg-slate-700/20 transition group">
+                    <tr key={u._id} className="border-b border-slate-100 dark:border-slate-700/30 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-700/20 transition group">
                       <td className="py-4 md:py-6">
-                        <div className="font-bold text-slate-200 group-hover:text-indigo-400 transition-colors uppercase tracking-tight">{u.name}</div>
-                        <div className="text-xs text-slate-500 font-medium">{u.email}</div>
+                        <div className="font-bold text-slate-900 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors uppercase tracking-tight">{u.name}</div>
+                        <div className="text-xs text-slate-400 dark:text-slate-500 font-medium">{u.email}</div>
                       </td>
                       <td className="py-4 md:py-6">
                         <span className={`px-3 md:px-5 py-1.5 md:py-2 rounded-lg md:rounded-xl text-[10px] md:text-xs font-black uppercase tracking-widest border ${
@@ -306,9 +284,9 @@ const AdminDashboard = () => {
         );
       case "jobs":
         return (
-          <div className="bg-[#1E293B] shadow-2xl rounded-2xl md:rounded-[2.5rem] border border-slate-700/50 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="p-6 md:p-8 border-b border-slate-700/50 flex justify-between items-center bg-slate-800/20">
-              <h3 className="text-lg md:text-xl font-black text-slate-100 uppercase tracking-tight">Active Job Posts ({jobs.length})</h3>
+          <div className="bg-white dark:bg-[#1E293B] shadow-xl dark:shadow-2xl rounded-2xl md:rounded-[2.5rem] border border-slate-100 dark:border-slate-700/50 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="p-6 md:p-8 border-b border-slate-100 dark:border-slate-700/50 flex justify-between items-center bg-slate-50 dark:bg-slate-800/20">
+              <h3 className="text-lg md:text-xl font-black text-slate-900 dark:text-slate-100 uppercase tracking-tight">Active Job Posts ({jobs.length})</h3>
             </div>
             <div className="p-4 md:p-8 overflow-x-auto">
               <table className="w-full text-left min-w-[500px]">
@@ -320,17 +298,17 @@ const AdminDashboard = () => {
                     <th className="pb-6 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="text-sm text-slate-300">
+                <tbody className="text-sm text-slate-600 dark:text-slate-300">
                   {jobs.map((job) => (
-                    <tr key={job._id} className="border-b border-slate-700/30 last:border-0 hover:bg-slate-700/20 transition group">
-                      <td className="py-4 md:py-6 font-bold text-slate-200 group-hover:text-amber-400 transition-colors uppercase tracking-tight">{job.title}</td>
+                    <tr key={job._id} className="border-b border-slate-100 dark:border-slate-700/30 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-700/20 transition group">
+                      <td className="py-4 md:py-6 font-bold text-slate-900 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors uppercase tracking-tight">{job.title}</td>
                       <td className="py-4 md:py-6">
                         <div className="flex flex-col">
-                          <span className="font-extrabold text-[#F1F5F9]">{job.employer?.name}</span>
-                          <span className="text-[10px] text-slate-500 font-bold">{job.employer?.email}</span>
+                          <span className="font-extrabold text-slate-800 dark:text-[#F1F5F9]">{job.employer?.name}</span>
+                          <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold">{job.employer?.email}</span>
                         </div>
                       </td>
-                      <td className="py-4 md:py-6 font-black text-emerald-400 text-xs md:text-sm">{formatNPR(job.budget)}</td>
+                      <td className="py-4 md:py-6 font-black text-emerald-600 dark:text-emerald-400 text-xs md:text-sm">{formatNPR(job.budget)}</td>
                       <td className="py-4 md:py-6 text-right">
                         <button 
                           onClick={() => handleDeleteJob(job._id)}
@@ -351,28 +329,28 @@ const AdminDashboard = () => {
         return (
           <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
             {/* Create Blog Form */}
-            <div className="bg-[#1E293B] shadow-2xl rounded-[2.5rem] border border-slate-700/50 overflow-hidden">
-               <div className="p-10 border-b border-slate-700/50 bg-slate-800/20">
-                 <h3 className="text-2xl font-black text-slate-100 uppercase tracking-tight">Create New Insight Story</h3>
+            <div className="bg-white dark:bg-[#1E293B] shadow-xl dark:shadow-2xl rounded-[2.5rem] border border-slate-100 dark:border-slate-700/50 overflow-hidden">
+               <div className="p-8 md:p-10 border-b border-slate-100 dark:border-slate-700/50 bg-slate-50 dark:bg-slate-800/20">
+                 <h3 className="text-lg md:text-xl font-black text-slate-900 dark:text-slate-100 uppercase tracking-tight">Create New Insight Story</h3>
                </div>
-               <form onSubmit={handleCreateBlog} className="p-10 grid grid-cols-1 md:grid-cols-2 gap-8">
+               <form onSubmit={handleCreateBlog} className="p-6 md:p-10 grid grid-cols-1 md:grid-cols-2 gap-8">
                  <div className="space-y-2">
-                   <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-2">Title</label>
+                   <label className="text-sm md:text-base font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest px-2">Title</label>
                    <input 
                      type="text" 
                      value={blogForm.title}
                      onChange={(e) => setBlogForm({...blogForm, title: e.target.value})}
-                     className="w-full bg-slate-900 border border-slate-800 rounded-2xl py-4 px-6 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/50 transition-all"
+                     className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl py-4 md:py-5 px-6 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/50 transition-all placeholder:text-slate-400 text-base font-bold"
                      placeholder="How to land your first gig..."
                      required
                    />
                  </div>
                  <div className="space-y-2">
-                   <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-2">Category</label>
+                   <label className="text-sm md:text-base font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest px-2">Category</label>
                    <select 
                      value={blogForm.category}
                      onChange={(e) => setBlogForm({...blogForm, category: e.target.value})}
-                     className="w-full bg-slate-900 border border-slate-800 rounded-2xl py-4 px-6 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/50 transition-all font-bold"
+                     className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl py-4 md:py-5 px-6 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/50 transition-all font-bold text-base"
                    >
                      <option>Freelancing Tips</option>
                      <option>Market Trends</option>
@@ -381,33 +359,33 @@ const AdminDashboard = () => {
                    </select>
                  </div>
                  <div className="md:col-span-2 space-y-2">
-                   <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-2">Image URL</label>
+                   <label className="text-sm md:text-base font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest px-2">Image URL</label>
                    <input 
                      type="text" 
                      value={blogForm.image}
                      onChange={(e) => setBlogForm({...blogForm, image: e.target.value})}
-                     className="w-full bg-slate-900 border border-slate-800 rounded-2xl py-4 px-6 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/50 transition-all font-mono text-sm"
+                     className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl py-4 md:py-5 px-6 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/50 transition-all font-mono text-base placeholder:text-slate-400"
                      placeholder="https://images.unsplash.com/..."
                      required
                    />
                  </div>
 
                  <div className="md:col-span-2 space-y-2">
-                   <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-2">Excerpt (Short Summary)</label>
+                   <label className="text-sm md:text-base font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest px-2">Excerpt (Short Summary)</label>
                    <textarea 
                      value={blogForm.excerpt}
                      onChange={(e) => setBlogForm({...blogForm, excerpt: e.target.value})}
-                     className="w-full bg-slate-900 border border-slate-800 rounded-2xl py-4 px-6 text-white h-24 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/50 transition-all"
+                     className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl py-4 md:py-5 px-6 text-slate-900 dark:text-white h-24 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/50 transition-all placeholder:text-slate-400 text-base font-medium resize-none"
                      placeholder="A brief summary of the story..."
                      required
                    />
                  </div>
                  <div className="md:col-span-2 space-y-2">
-                   <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-2">Main Content</label>
+                   <label className="text-sm md:text-base font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest px-2">Main Content</label>
                    <textarea 
                      value={blogForm.content}
                      onChange={(e) => setBlogForm({...blogForm, content: e.target.value})}
-                     className="w-full bg-slate-900 border border-slate-800 rounded-2xl py-4 px-6 text-white h-48 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/50 transition-all"
+                     className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl py-4 md:py-5 px-6 text-slate-900 dark:text-white h-48 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/50 transition-all placeholder:text-slate-400 text-base font-medium resize-none"
                      placeholder="Write the full story here..."
                      required
                    />
@@ -417,37 +395,37 @@ const AdminDashboard = () => {
                    disabled={blogLoading}
                    className="md:col-span-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-black uppercase tracking-widest py-5 rounded-2xl transition-all shadow-xl shadow-indigo-500/20 flex items-center justify-center gap-3"
                  >
-                   {blogLoading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Sparkles size={18} />}
+                   {blogLoading && <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
                    Publish Story
                  </button>
                </form>
             </div>
 
             {/* Blogs List */}
-            <div className="bg-[#1E293B] shadow-2xl rounded-[2.5rem] border border-slate-700/50 overflow-hidden">
-               <div className="p-10 border-b border-slate-700/50 bg-slate-800/20">
-                 <h3 className="text-2xl font-black text-slate-100 uppercase tracking-tight">Existing Stories</h3>
+            <div className="bg-white dark:bg-[#1E293B] shadow-xl dark:shadow-2xl rounded-[2.5rem] border border-slate-100 dark:border-slate-700/50 overflow-hidden">
+               <div className="p-8 md:p-10 border-b border-slate-100 dark:border-slate-700/50 bg-slate-50 dark:bg-slate-800/20">
+                 <h3 className="text-lg md:text-xl font-black text-slate-900 dark:text-slate-100 uppercase tracking-tight">Existing Stories</h3>
                </div>
                <div className="p-8 overflow-x-auto">
                  <table className="w-full text-left min-w-[600px]">
                    <thead>
-                     <tr className="text-xs text-slate-500 uppercase tracking-widest font-black border-b border-slate-700/50">
+                     <tr className="text-sm md:text-base text-slate-500 dark:text-slate-400 uppercase tracking-widest font-black border-b border-slate-700/50">
                        <th className="pb-6">Title</th>
                        <th className="pb-6">Category</th>
                        <th className="pb-6">Date</th>
                        <th className="pb-6 text-right">Actions</th>
                      </tr>
                    </thead>
-                   <tbody className="text-sm text-slate-300">
+                   <tbody className="text-base text-slate-600 dark:text-slate-300">
                      {blogs.map((b) => (
-                       <tr key={b._id} className="border-b border-slate-700/30 last:border-0 hover:bg-slate-700/20 transition group">
-                         <td className="py-6 pr-6 font-bold text-slate-200 group-hover:text-indigo-400 transition-colors tracking-tight line-clamp-1">{b.title}</td>
+                       <tr key={b._id} className="border-b border-slate-100 dark:border-slate-700/30 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-700/20 transition group">
+                         <td className="py-6 pr-6 font-bold text-slate-900 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors tracking-tight line-clamp-1">{b.title}</td>
                          <td className="py-6">
-                           <span className="px-3 py-1 bg-indigo-500/10 text-indigo-400 text-[10px] font-black uppercase tracking-widest rounded-lg border border-indigo-500/20">
+                           <span className="px-3 py-1 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-[10px] font-black uppercase tracking-widest rounded-lg border border-indigo-500/20">
                              {b.category}
                            </span>
                          </td>
-                         <td className="py-6 text-slate-500 text-xs font-black tracking-widest">{new Date(b.createdAt).toLocaleDateString()}</td>
+                         <td className="py-6 text-slate-400 dark:text-slate-500 text-xs font-black tracking-widest">{new Date(b.createdAt).toLocaleDateString()}</td>
                          <td className="py-6 text-right">
                            <button 
                              onClick={() => handleDeleteBlog(b._id)}
@@ -470,32 +448,34 @@ const AdminDashboard = () => {
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 mb-8 md:mb-10 overflow-visible">
               {stats.map((stat, i) => (
-                <div key={i} className="bg-[#1E293B] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] p-6 md:p-8 rounded-2xl md:rounded-[2.5rem] border border-slate-700/50 hover:border-indigo-500/50 transition-all duration-500 relative group overflow-hidden">
+                <div key={i} className="bg-white dark:bg-[#1E293B] shadow-lg dark:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] p-6 md:p-8 rounded-2xl md:rounded-[2.5rem] border border-slate-100 dark:border-slate-700/50 hover:border-indigo-500/50 transition-all duration-500 relative group overflow-hidden">
                   <div className={`absolute top-0 right-0 w-32 h-32 bg-${stat.color}-500/5 rounded-full -mr-16 -mt-16 blur-2xl group-hover:scale-150 transition-transform duration-700`}></div>
                   <div className="flex justify-between items-start mb-6 md:mb-8 relative z-10">
-                    <div className={`w-12 h-12 md:w-16 md:h-16 bg-slate-900 border border-slate-700/50 rounded-xl md:rounded-2xl flex items-center justify-center text-${stat.color}-400 shadow-inner group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300`}>{stat.icon}</div>
-                    <span className={`text-[9px] md:text-xs font-black px-3 md:px-4 py-1.5 md:py-2 rounded-lg md:rounded-xl uppercase tracking-widest border ${stat.trend.startsWith("+") || stat.trend === "Live" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-pink-500/10 text-pink-400 border-pink-500/20"}`}>
+                    <div className={`w-12 h-12 md:w-16 md:h-16 bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700/50 rounded-xl md:rounded-2xl flex items-center justify-center text-${stat.color}-600 dark:text-${stat.color}-400 shadow-inner group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300`}>{stat.icon}</div>
+                    <span className={`text-xs font-black px-3 md:px-4 py-1.5 md:py-2 rounded-lg md:rounded-xl uppercase tracking-widest border ${stat.trend.startsWith("+") || stat.trend === "Live" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-pink-500/10 text-pink-400 border-pink-500/20"}`}>
                       {stat.trend}
                     </span>
                   </div>
-                  <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-1 md:mb-2 relative z-10">{stat.label}</p>
-                  <h3 className="text-2xl md:text-3xl font-black text-[#F8FAFC] tracking-tight relative z-10">{stat.value}</h3>
+                  <p className="text-slate-400 dark:text-slate-500 text-xs font-black uppercase tracking-[0.2em] mb-1 md:mb-2 relative z-10">
+                    {stat.label}
+                  </p>
+                  <h3 className="text-xl md:text-2xl font-black text-slate-900 dark:text-[#F8FAFC] tracking-tight relative z-10">{stat.value}</h3>
                 </div>
               ))}
             </div>
             
             <div className="grid grid-cols-1 gap-6 md:gap-10 mb-8 md:mb-10 overflow-visible">
-              <div className="bg-[#1E293B] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.6)] p-6 md:p-10 rounded-2xl md:rounded-[3rem] border border-slate-700/50 relative overflow-hidden group">
+              <div className="bg-white dark:bg-[#1E293B] shadow-xl dark:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.6)] p-6 md:p-10 rounded-2xl md:rounded-[3rem] border border-slate-100 dark:border-slate-700/50 relative overflow-hidden group">
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 opacity-50"></div>
                 <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8 md:mb-12 relative z-10">
                   <div>
                     <div className="flex items-center gap-3 md:gap-4 mb-2">
                       <div className="w-2 h-6 md:w-2.5 md:h-8 bg-indigo-500 rounded-full"></div>
-                      <h3 className="text-lg md:text-2xl font-black text-slate-100 uppercase tracking-tight">Platform Growth</h3>
+                      <h3 className="text-base md:text-lg font-black text-slate-900 dark:text-slate-100 uppercase tracking-tight">Platform Growth</h3>
                     </div>
-                    <p className="text-slate-400 text-sm md:text-lg font-medium ml-5 md:ml-6">Real-time system engagement metrics.</p>
+                    <p className="text-slate-500 dark:text-slate-400 text-xs md:text-sm font-medium ml-5 md:ml-6">Real-time system engagement metrics.</p>
                   </div>
-                  <div className="flex bg-[#0F172A] p-1 rounded-xl md:p-1.5 md:rounded-2xl border border-slate-700/50 shadow-inner w-full sm:w-auto">
+                  <div className="flex bg-slate-50 dark:bg-[#0F172A] p-1 rounded-xl md:p-1.5 md:rounded-2xl border border-slate-200 dark:border-slate-700/50 shadow-inner w-full sm:w-auto">
                     {["Weekly", "Monthly", "Yearly"].map((range) => (
                       <button
                         key={range}
@@ -548,13 +528,13 @@ const AdminDashboard = () => {
                       />
                       <Tooltip 
                         contentStyle={{ 
-                          backgroundColor: '#0F172A', 
+                          backgroundColor: 'var(--tw-prose-bg, #0F172A)', 
                           border: '1px solid #334155', 
                           borderRadius: '1rem',
                           boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
                           padding: '0.75rem'
                         }}
-                        itemStyle={{ color: '#F8FAFC', fontWeight: 900, fontSize: '11px', textTransform: 'uppercase' }}
+                        itemStyle={{ color: 'var(--tw-prose-body, #F8FAFC)', fontWeight: 900, fontSize: '11px', textTransform: 'uppercase' }}
                         labelStyle={{ color: '#94A3B8', fontWeight: 900, marginBottom: '0.5rem', fontSize: '12px' }}
                       />
                       <Area 
@@ -579,28 +559,28 @@ const AdminDashboard = () => {
                   </ResponsiveContainer>
                 </div>
                 
-                <div className="flex flex-wrap items-center gap-4 md:gap-8 mt-8 md:mt-12 pt-6 md:pt-8 border-t border-slate-700/30 relative z-10">
+                <div className="flex flex-wrap items-center gap-4 md:gap-8 mt-8 md:mt-12 pt-6 md:pt-8 border-t border-slate-200 dark:border-slate-700/30 relative z-10 transition-colors">
                    <div className="flex items-center gap-2 md:gap-4">
                       <div className="w-3 h-3 md:w-4 md:h-4 rounded-full bg-indigo-500"></div>
-                      <span className="text-[10px] md:text-xs font-black text-slate-300 uppercase tracking-widest">Revenue</span>
+                      <span className="text-[10px] md:text-xs font-black text-slate-600 dark:text-slate-300 uppercase tracking-widest transition-colors">Revenue</span>
                    </div>
                    <div className="flex items-center gap-2 md:gap-4">
                       <div className="w-3 h-3 md:w-4 md:h-4 rounded-full bg-purple-500"></div>
-                      <span className="text-[10px] md:text-xs font-black text-slate-300 uppercase tracking-widest">Users</span>
+                      <span className="text-[10px] md:text-xs font-black text-slate-600 dark:text-slate-300 uppercase tracking-widest transition-colors">Users</span>
                    </div>
                    <div className="sm:ml-auto flex items-center gap-2 px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
                       <TrendingUp size={16} className="text-emerald-400" />
-                      <span className="text-[9px] md:text-xs font-black text-emerald-400 uppercase tracking-widest">+18.4% Growth</span>
+                      <span className="text-xs font-black text-emerald-400 uppercase tracking-widest">+18.4% Growth</span>
                    </div>
                 </div>
               </div>
             </div>
 
-            <div className="bg-[#1E293B] shadow-2xl rounded-2xl md:rounded-[3rem] border border-slate-700/50 overflow-hidden group">
-              <div className="p-6 md:p-8 border-b border-slate-700/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-800/20">
+            <div className="bg-white dark:bg-[#1E293B] shadow-xl dark:shadow-2xl rounded-2xl md:rounded-[3rem] border border-slate-100 dark:border-slate-700/50 overflow-hidden group">
+              <div className="p-6 md:p-8 border-b border-slate-100 dark:border-slate-700/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-50 dark:bg-slate-800/20">
                 <div className="flex items-center gap-3">
                   <div className="w-2 h-6 bg-pink-500 rounded-full"></div>
-                  <h3 className="text-lg md:text-2xl font-black text-slate-100 uppercase tracking-tight">Security & Fraud Monitoring</h3>
+                  <h3 className="text-base md:text-lg font-black text-slate-900 dark:text-slate-100 uppercase tracking-tight">Security & Fraud Monitoring</h3>
                 </div>
                 <button className="w-full sm:w-auto bg-indigo-500/10 hover:bg-indigo-500 text-indigo-400 hover:text-white px-5 py-2.5 rounded-xl transition-all duration-300 font-black text-[10px] uppercase border border-indigo-500/20 tracking-widest">
                   View Full Audit Logs
@@ -609,11 +589,11 @@ const AdminDashboard = () => {
               <div className="p-4 md:p-8">
                 {(fraudReports || []).length === 0 ? (
                   <div className="py-12 md:py-20 text-center flex flex-col items-center justify-center">
-                     <div className="w-16 h-16 md:w-20 md:h-20 bg-slate-900 border border-slate-700/50 rounded-2xl md:rounded-3xl flex items-center justify-center mb-6 shadow-inner">
-                        <ShieldCheck size={32} className="text-emerald-500/50 md:w-10 md:h-10" />
+                     <div className="w-16 h-16 md:w-20 md:h-20 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700/50 rounded-2xl md:rounded-3xl flex items-center justify-center mb-6 shadow-inner transition-colors">
+                        <ShieldCheck size={32} className="text-emerald-500/50 md:w-10 md:h-10 transition-colors" />
                      </div>
-                     <p className="text-slate-100 text-xs md:text-sm font-black uppercase tracking-widest mb-1">System Health: Green</p>
-                     <p className="text-slate-500 text-[10px] md:text-xs font-medium">No recent incidents detected.</p>
+                     <p className="text-slate-900 dark:text-slate-100 text-xs md:text-sm font-black uppercase tracking-widest mb-1 transition-colors">System Health: Green</p>
+                     <p className="text-slate-500 text-[10px] md:text-xs font-medium transition-colors">No recent incidents detected.</p>
                   </div>
                 ) : (
                 <div className="overflow-x-auto">
@@ -627,14 +607,14 @@ const AdminDashboard = () => {
                     </thead>
                     <tbody className="text-sm text-slate-300">
                       {(fraudReports || []).map((row, i) => (
-                        <tr key={i} className="border-b border-slate-700/30 last:border-0 hover:bg-slate-700/20 transition group">
+                        <tr key={i} className="border-b border-slate-100 dark:border-slate-700/30 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-700/20 transition group">
                           <td className="py-4 md:py-6">
-                            <span className="font-bold text-slate-200 group-hover:text-pink-400 transition-colors uppercase tracking-tight">{row.type}</span>
+                            <span className="font-bold text-slate-900 dark:text-slate-200 group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors uppercase tracking-tight">{row.type}</span>
                           </td>
                           <td className="py-4 md:py-6">
                             <div className="flex flex-col">
-                              <span className="text-slate-300 font-bold">{row.user}</span>
-                              <span className="text-slate-500 text-[10px]">{row.email}</span>
+                              <span className="text-slate-800 dark:text-slate-300 font-bold transition-colors">{row.user}</span>
+                              <span className="text-slate-500 text-[10px] transition-colors">{row.email}</span>
                             </div>
                           </td>
                           <td className="py-4 md:py-6 text-right">
@@ -662,10 +642,10 @@ const AdminDashboard = () => {
     >
       <div className="space-y-6 md:space-y-10">
         <header className="mb-6 md:mb-10 px-1 md:px-0">
-          <h2 className="text-xl md:text-2xl font-black text-slate-200 uppercase tracking-tight">
-            {activeTab === "overview" ? "System Insight" : activeTab === "users" ? "User Management" : "Job Management"}
+          <h2 className="text-lg md:text-xl font-black text-slate-900 dark:text-slate-200 uppercase tracking-tight transition-colors">
+            {activeTab === "overview" ? "System Insight" : activeTab === "users" ? "User Management" : activeTab === "jobs" ? "Job Management" : "Insights Blog"}
           </h2>
-          <p className="text-xs md:text-base text-slate-400 mt-1 font-bold">JobSphere real-time control panel</p>
+          <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 mt-1 font-bold transition-colors">JobSphere real-time control panel</p>
         </header>
         {renderContent()}
       </div>

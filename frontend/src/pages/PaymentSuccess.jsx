@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams, useNavigate, Link } from "react-router-dom";
-import axios from "axios";
+import api from "../utils/api";
 import { CheckCircle, ArrowRight, RefreshCw } from "lucide-react";
 import { toast } from "react-toastify";
 import Footer from "../components/Footer";
@@ -23,7 +23,7 @@ const PaymentSuccess = () => {
 
   const verifyPayment = async (encodedData) => {
     try {
-      await axios.get(`${import.meta.env.VITE_API_URL}/api/payments/verify-esewa?data=${encodedData}`);
+      await api.get(`/payments/verify-esewa?data=${encodedData}`);
       setStatus("success");
       toast.success("Payment verified and funds escrowed!");
     } catch (err) {

@@ -4,10 +4,26 @@ const path = require("path");
 const cors = require("cors");
 const morgan = require("morgan");
 const connectDB = require("./config/db");
+const compression = require("compression");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
 dotenv.config();
 connectDB();
 const app = express();
+
+// Performance & Security Middleware
+app.use(helmet());
+app.use(compression());
 app.use(cors());
+
+// Rate Limiting for Auth and OTP
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: "Too many requests from this IP, please try again after 15 minutes"
+});
+app.use("/api/auth", authLimiter);
+
 app.use(express.json());
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);

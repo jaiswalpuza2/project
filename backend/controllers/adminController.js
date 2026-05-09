@@ -103,55 +103,110 @@ exports.deleteJob = async (req, res, next) => {
 exports.getChartStats = async (req, res, next) => {
     try {
         const { period = 'monthly' } = req.query; 
-        const getMonthlyStats = async (Model, dateField = "createdAt", sumField = null) => {
+
+        const getStats = async (Model, dateField = "createdAt", sumField = null, matchStage = null) => {
+            let groupId = {};
+            if (period === 'yearly') {
+                groupId = { year: { $year: `$${dateField}` } };
+            } else if (period === 'weekly') {
+                groupId = { 
+                    year: { $isoWeekYear: `$${dateField}` }, 
+                    week: { $isoWeek: `$${dateField}` } 
+                };
+            } else {
+                groupId = { 
+                    year: { $year: `$${dateField}` }, 
+                    month: { $month: `$${dateField}` } 
+                };
+            }
+
             const group = {
-                _id: {
-                    year: { $year: `$${dateField}` },
-                    month: { $month: `$${dateField}` }
-                },
+                _id: groupId,
                 count: { $sum: 1 }
             };
-            if (sumField) {
-                group.total = { $sum: `$${sumField}` };
-            }
-            return await Model.aggregate([
-                { $group: group },
-                { $sort: { "_id.year": 1, "_id.month": 1 } }
-            ]);
+            
+            if (sumField) group.total = { $sum: `$${sumField}` };
+
+            const pipeline = [];
+            if (matchStage) pipeline.push({ $match: matchStage });
+            pipeline.push({ $group: group });
+            return await Model.aggregate(pipeline);
         };
-        const userGrowth = await getMonthlyStats(User);
-        const jobGrowth = await getMonthlyStats(Job);
-        const revenueGrowth = await getMonthlyStats(Payment, "createdAt", "amount");
-        const completedProjects = await Payment.aggregate([
-            { $match: { status: "released" } },
-            { $group: {
-                _id: {
-                    year: { $year: "$updatedAt" },
-                    month: { $month: "$updatedAt" }
-                },
-                count: { $sum: 1 }
-            }},
-            { $sort: { "_id.year": 1, "_id.month": 1 } }
-        ]);
-        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+        const userGrowth = await getStats(User);
+        const jobGrowth = await getStats(Job);
+        const revenueGrowth = await getStats(Payment, "createdAt", "amount");
+        const completedProjects = await getStats(Payment, "updatedAt", null, { status: "released" });
+
         const chartData = [];
         const now = new Date();
-        for (let i = 11; i >= 0; i--) {
-            const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-            const m = d.getMonth() + 1;
-            const y = d.getFullYear();
-            const userData = userGrowth.find(u => u._id.month === m && u._id.year === y);
-            const jobData = jobGrowth.find(j => j._id.month === m && j._id.year === y);
-            const revData = revenueGrowth.find(r => r._id.month === m && r._id.year === y);
-            const compData = completedProjects.find(c => c._id.month === m && c._id.year === y);
-            chartData.push({
-                name: months[d.getMonth()],
-                users: userData ? userData.count : 0,
-                jobs: jobData ? jobData.count : 0,
-                revenue: revData ? revData.total : 0,
-                completed: compData ? compData.count : 0
-            });
+
+        if (period === 'yearly') {
+            for (let i = 4; i >= 0; i--) {
+                const y = now.getFullYear() - i;
+                const userData = userGrowth.find(u => u._id.year === y);
+                const jobData = jobGrowth.find(j => j._id.year === y);
+                const revData = revenueGrowth.find(r => r._id.year === y);
+                const compData = completedProjects.find(c => c._id.year === y);
+                
+                chartData.push({
+                    name: y.toString(),
+                    users: userData ? userData.count : 0,
+                    jobs: jobData ? jobData.count : 0,
+                    revenue: revData ? revData.total : 0,
+                    completed: compData ? compData.count : 0
+                });
+            }
+        } else if (period === 'weekly') {
+            const getWeekNumber = (d) => {
+                const date = new Date(d.getTime());
+                date.setHours(0, 0, 0, 0);
+                date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
+                const week1 = new Date(date.getFullYear(), 0, 4);
+                return 1 + Math.round(((date.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
+            };
+
+            for (let i = 7; i >= 0; i--) {
+                const d = new Date(now.getTime() - i * 7 * 24 * 60 * 60 * 1000);
+                const w = getWeekNumber(d);
+                // Approximate isoWeekYear for finding in array (safe enough for recent weeks)
+                const y = new Date(d.getTime() + 3 * 24 * 60 * 60 * 1000).getFullYear();
+
+                const userData = userGrowth.find(u => u._id.week === w && u._id.year === y);
+                const jobData = jobGrowth.find(j => j._id.week === w && j._id.year === y);
+                const revData = revenueGrowth.find(r => r._id.week === w && r._id.year === y);
+                const compData = completedProjects.find(c => c._id.week === w && c._id.year === y);
+                
+                chartData.push({
+                    name: `W${w}`,
+                    users: userData ? userData.count : 0,
+                    jobs: jobData ? jobData.count : 0,
+                    revenue: revData ? revData.total : 0,
+                    completed: compData ? compData.count : 0
+                });
+            }
+        } else {
+            const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            for (let i = 11; i >= 0; i--) {
+                const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                const m = d.getMonth() + 1;
+                const y = d.getFullYear();
+                
+                const userData = userGrowth.find(u => u._id.month === m && u._id.year === y);
+                const jobData = jobGrowth.find(j => j._id.month === m && j._id.year === y);
+                const revData = revenueGrowth.find(r => r._id.month === m && r._id.year === y);
+                const compData = completedProjects.find(c => c._id.month === m && c._id.year === y);
+                
+                chartData.push({
+                    name: months[d.getMonth()],
+                    users: userData ? userData.count : 0,
+                    jobs: jobData ? jobData.count : 0,
+                    revenue: revData ? revData.total : 0,
+                    completed: compData ? compData.count : 0
+                });
+            }
         }
+
         res.status(200).json({
             success: true,
             data: chartData

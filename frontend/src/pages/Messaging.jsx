@@ -2,13 +2,13 @@ import React, { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useSocket } from "../context/SocketContext";
-import axios from "axios";
+import api from "../utils/api";
 import { toast } from "react-toastify";
 import { Send, User, MessageSquare, Search, CheckCheck, MoreHorizontal, Paperclip, Image, FileText, MapPin, X, Trash2, Info, Reply, Smile, Download, Forward, Pin, Bookmark, ChevronDown, Clock, Check, ChevronRight, Phone, Video, Ban, Flag, BellOff, Palette, Camera } from "lucide-react";
 import CallOverlay from "../components/CallOverlay";
 const Messaging = () => {
   const location = useLocation();
-  const { user, token } = useAuth();
+  const { user } = useAuth();
   const { messages, sendMessage, setMessages, typingStatus, sendTyping, deleteMessage, editMessage, pinMessage, reactMessage, callUser } = useSocket();
   const [activeChat, setActiveChat] = useState(null);
   const [newMessage, setNewMessage] = useState("");
@@ -32,7 +32,7 @@ const Messaging = () => {
   const imageInputRef = useRef(null);
   const fileInputRef = useRef(null);
   useEffect(() => {
-    fetchContacts();
+    if (user?._id) fetchContacts();
     if (location.state?.initialContact) {
       const contact = location.state.initialContact;
       setActiveChat(contact);
@@ -42,7 +42,7 @@ const Messaging = () => {
         return prev;
       });
     }
-  }, [location.state]);
+  }, [location.state, user?._id]);
   useEffect(() => {
     if (activeChat) {
       fetchChatHistory(activeChat._id);
@@ -50,20 +50,16 @@ const Messaging = () => {
     }
   }, [activeChat]);
   useEffect(() => {
-    scrollToBottom();
+    if (messages.length > 0) scrollToBottom();
   }, [messages, typingStatus]);
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
   const fetchContacts = async () => {
     try {
-      const res = await axios.get(import.meta.env.VITE_API_URL + "/api/chat/contacts", {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get("/chat/contacts");
       setContacts(res.data.data);
-      const userRes = await axios.get(import.meta.env.VITE_API_URL + "/api/auth/me", {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const userRes = await api.get("/auth/me");
       if (userRes.data.success) {
         setMutedContacts(userRes.data.data.mutedUsers || []);
       }
@@ -73,9 +69,7 @@ const Messaging = () => {
   };
   const fetchMedia = async (userId) => {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/chat/${userId}/media`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get(`/chat/${userId}/media`);
       setMediaData(res.data.data);
     } catch (err) {
       console.error("Failed to fetch media:", err);
@@ -83,9 +77,7 @@ const Messaging = () => {
   };
   const fetchChatHistory = async (userId) => {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/chat/${userId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get(`/chat/${userId}`);
       setMessages(res.data.data.map(m => ({
         _id: m._id,
         senderId: m.sender,
@@ -132,10 +124,8 @@ const Messaging = () => {
   };
   const handleUpdateMessage = async () => {
     try {
-      const res = await axios.put(`${import.meta.env.VITE_API_URL}/api/chat/message/${editingMessageId}`, {
+      const res = await api.put(`/chat/message/${editingMessageId}`, {
         content: newMessage
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
       });
       if (res.data.success) {
         editMessage(editingMessageId, newMessage, activeChat._id);
@@ -151,9 +141,7 @@ const Messaging = () => {
   const handleClearChat = async () => {
     if (!window.confirm("Are you sure you want to clear this chat? This cannot be undone.")) return;
     try {
-      const res = await axios.delete(`${import.meta.env.VITE_API_URL}/api/chat/${activeChat._id}/clear`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.delete(`/chat/${activeChat._id}/clear`);
       if (res.data.success) {
         setMessages([]);
         toast.success("Chat history cleared");
@@ -166,9 +154,7 @@ const Messaging = () => {
   };
   const handleMuteToggle = async () => {
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/chat/${activeChat._id}/mute`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.post(`/chat/${activeChat._id}/mute`, {});
       if (res.data.success) {
         setMutedContacts(prev => 
           res.data.isMuted 
@@ -186,9 +172,7 @@ const Messaging = () => {
   const handleBlockUser = async () => {
     if (!window.confirm(`Are you sure you want to block ${activeChat.name}?`)) return;
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/chat/${activeChat._id}/block`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.post(`/chat/${activeChat._id}/block`, {});
       if (res.data.success) {
         toast.success(res.data.isBlocked ? "User blocked" : "User unblocked");
         setShowHeaderMenu(false);
@@ -202,9 +186,7 @@ const Messaging = () => {
     const reason = window.prompt("Why are you reporting this user?");
     if (!reason) return;
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/chat/${activeChat._id}/report`, { reason }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.post(`/chat/${activeChat._id}/report`, { reason });
       if (res.data.success) {
         toast.success("User reported. Our team will review this message.");
         setShowHeaderMenu(false);
@@ -221,9 +203,8 @@ const Messaging = () => {
     formData.append("chatAttachment", file);
     try {
       toast.info(`Uploading ${type}...`);
-      const res = await axios.post(import.meta.env.VITE_API_URL + "/api/upload/chat-attachment", formData, {
+      const res = await api.post("/upload/chat-attachment", formData, {
         headers: { 
-          Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data"
         }
       });
@@ -276,9 +257,7 @@ const Messaging = () => {
   const handleDeleteMessage = async (messageId) => {
     if (!window.confirm("Are you sure you want to unsend this message?")) return;
     try {
-      const res = await axios.delete(`${import.meta.env.VITE_API_URL}/api/chat/message/${messageId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.delete(`/chat/message/${messageId}`);
       if (res.data.success) {
         deleteMessage(messageId, res.data.recipientId);
         toast.success("Message unsent");
@@ -297,9 +276,7 @@ const Messaging = () => {
   };
   const handlePinMessage = async (msg) => {
     try {
-      const res = await axios.patch(`${import.meta.env.VITE_API_URL}/api/chat/message/${msg._id}/pin`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.patch(`/chat/message/${msg._id}/pin`, {});
       if (res.data.success) {
         pinMessage(msg._id, !msg.isPinned, activeChat._id);
         toast.success(msg.isPinned ? "Message unpinned" : "Message pinned");
@@ -367,9 +344,7 @@ const Messaging = () => {
   };
   const handleAddReaction = async (msgId, emoji) => {
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/chat/message/${msgId}/react`, { emoji }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.post(`/chat/message/${msgId}/react`, { emoji });
       if (res.data.success) {
         setMessages(prev => prev.map(m => m._id === msgId ? { ...m, reactions: res.data.data } : m));
         reactMessage(msgId, res.data.data, activeChat._id);
@@ -381,14 +356,14 @@ const Messaging = () => {
   };
   return (
     <div className="flex-1 flex overflow-hidden h-[calc(100vh-80px)] -m-8">
-      <aside className="w-96 border-r border-slate-600 flex flex-col bg-[#0F172A] shrink-0">
-        <div className="p-6 border-b border-slate-600 bg-[#1E293B]">
+      <aside className="w-96 border-r border-slate-200 dark:border-slate-600 flex flex-col bg-slate-50 dark:bg-[#0F172A] shrink-0 transition-colors">
+        <div className="p-6 border-b border-slate-200 dark:border-slate-600 bg-white dark:bg-[#1E293B] transition-colors">
           <div className="relative">
             <Search className="absolute left-4 top-3 text-slate-400" size={20} />
             <input
               type="text"
               placeholder="Search conversations..."
-              className="w-full pl-12 pr-4 py-3 bg-[#0F172A] border border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-base transition font-black text-slate-200 placeholder:text-slate-400"
+              className="w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-[#0F172A] border border-slate-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-base transition font-black text-slate-900 dark:text-slate-200 placeholder:text-slate-400"
             />
           </div>
         </div>
@@ -398,67 +373,67 @@ const Messaging = () => {
               <div
                 key={contact._id}
                 onClick={() => setActiveChat(contact)}
-                className={`p-4 flex items-center gap-4 cursor-pointer hover:bg-[#1E293B] transition border-l-4 ${
-                  activeChat?._id === contact._id ? "bg-[#1E293B] border-indigo-500 shadow-sm" : "border-transparent"
+                className={`p-4 flex items-center gap-4 cursor-pointer hover:bg-slate-100 dark:hover:bg-[#1E293B] transition border-l-4 ${
+                  activeChat?._id === contact._id ? "bg-slate-100 dark:bg-[#1E293B] border-indigo-600 dark:border-indigo-500 shadow-sm" : "border-transparent"
                 }`}
               >
                 <div className="relative">
-                  <div className="h-14 w-14 bg-[#1E293B] text-[#E2E8F0] rounded-2xl flex items-center justify-center font-black text-xl shadow-inner uppercase border border-white/5">
+                  <div className="h-14 w-14 bg-white dark:bg-[#1E293B] text-slate-900 dark:text-[#E2E8F0] rounded-2xl flex items-center justify-center font-black text-xl shadow-inner uppercase border border-slate-200 dark:border-white/5 transition-colors">
                     {contact.name[0]}
                   </div>
-                  <div className="absolute -bottom-1 -right-1 h-3.5 w-3.5 bg-green-500 border-2 border-[#0F172A] rounded-full"></div>
+                  <div className="absolute -bottom-1 -right-1 h-3.5 w-3.5 bg-green-500 border-2 border-slate-50 dark:border-[#0F172A] rounded-full transition-colors"></div>
                 </div>
                  <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-baseline mb-1">
-                    <h4 className="font-black text-slate-200 truncate tracking-tight text-lg">{contact.name}</h4>
-                    <span className="text-xs text-slate-400 font-black uppercase">10:45 AM</span>
+                    <h4 className="font-black text-slate-900 dark:text-slate-200 truncate tracking-tight text-lg transition-colors">{contact.name}</h4>
+                    <span className="text-xs text-slate-500 dark:text-slate-400 font-black uppercase">10:45 AM</span>
                   </div>
-                  <p className="text-xs text-slate-400 font-black uppercase tracking-[0.15em]">{contact.role}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-black uppercase tracking-[0.15em] transition-colors">{contact.role}</p>
                 </div>
               </div>
             ))
           ) : (
-            <div className="p-12 text-center text-slate-400">
-              <div className="p-6 bg-[#1E293B] shadow-lg shadow-black/20 rounded-3xl shadow-sm mb-6 inline-block border border-slate-600">
-                <MessageSquare size={48} className="text-indigo-400 opacity-20" />
+            <div className="p-12 text-center">
+              <div className="p-6 bg-white dark:bg-[#1E293B] shadow-lg dark:shadow-black/20 rounded-3xl mb-6 inline-block border border-slate-100 dark:border-slate-600 transition-colors">
+                <MessageSquare size={48} className="text-indigo-600 dark:text-indigo-400 opacity-20" />
               </div>
-              <p className="text-sm font-bold text-slate-400 uppercase tracking-widest opacity-40">No Messages</p>
+              <p className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest opacity-60">No Messages</p>
             </div>
           )}
         </div>
       </aside>
-      <main className="flex-1 flex flex-col bg-[#0F172A] min-w-0">
+      <main className="flex-1 flex flex-col bg-white dark:bg-[#0F172A] min-w-0 transition-colors">
         {activeChat ? (
           <>
-            <header className="px-8 py-5 border-b border-slate-600 flex items-center justify-between bg-[#1E293B] z-10 shadow-sm relative">
+            <header className="px-8 py-5 border-b border-slate-200 dark:border-slate-600 flex items-center justify-between bg-white dark:bg-[#1E293B] z-10 shadow-sm relative transition-colors">
               <div className="flex items-center gap-4 flex-1">
                 {!showSearch ? (
                   <>
-                     <div className="h-14 w-14 bg-gradient-to-r from-indigo-500 to-violet-600 rounded-2xl flex items-center justify-center text-white font-black text-xl uppercase shadow-[0_10px_25px_-5px_rgba(79,70,229,0.4)]">
+                     <div className="h-14 w-14 bg-gradient-to-r from-indigo-500 to-violet-600 rounded-2xl flex items-center justify-center text-white font-black text-xl uppercase shadow-lg dark:shadow-[0_10px_25px_-5px_rgba(79,70,229,0.4)] transition-all">
                       {activeChat.name[0]}
                     </div>
                     <div>
-                      <h3 className="font-black text-[#E2E8F0] tracking-tight text-xl">{activeChat.name}</h3>
+                      <h3 className="font-black text-slate-900 dark:text-[#E2E8F0] tracking-tight text-xl transition-colors">{activeChat.name}</h3>
                       <div className="flex items-center gap-3 mt-1">
                         <div className="h-2.5 w-2.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div>
-                        <p className="text-xs text-green-400 font-black uppercase tracking-[0.2em]">Active Now</p>
+                        <p className="text-xs text-green-600 dark:text-green-400 font-black uppercase tracking-[0.2em] transition-colors">Active Now</p>
                       </div>
                     </div>
                   </>
                 ) : (
-                  <div className="flex items-center gap-3 bg-[#0F172A] px-4 py-2.5 rounded-2xl w-full mr-4 border border-slate-600 animate-in slide-in-from-left-4 duration-200">
-                    <Search size={18} className="text-slate-400" />
+                  <div className="flex items-center gap-3 bg-slate-50 dark:bg-[#0F172A] px-4 py-2.5 rounded-2xl w-full mr-4 border border-slate-200 dark:border-slate-600 animate-in slide-in-from-left-4 duration-200 transition-colors">
+                    <Search size={18} className="text-slate-500 dark:text-slate-400" />
                     <input 
                       type="text" 
                       placeholder="Search in conversation..."
-                      className="bg-transparent border-none focus:ring-0 text-sm font-bold text-slate-200 w-full placeholder:text-slate-400"
+                      className="bg-transparent border-none focus:ring-0 text-sm font-bold text-slate-900 dark:text-slate-200 w-full placeholder:text-slate-400"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       autoFocus
                     />
                     <button 
                       onClick={() => { setShowSearch(false); setSearchTerm(""); }}
-                      className="p-1.5 hover:bg-slate-700 rounded-xl transition text-slate-400"
+                      className="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition text-slate-400 dark:text-slate-500"
                     >
                       <X size={16} />
                     </button>
@@ -468,19 +443,19 @@ const Messaging = () => {
               <div className="flex items-center gap-2">
                  <button 
                   onClick={() => callUser(activeChat._id, 'audio')}
-                  className="p-3 hover:bg-slate-700 rounded-2xl transition text-slate-400 hover:text-indigo-400"
+                  className="p-3 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-2xl transition text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400"
                 >
                   <Phone size={24} />
                 </button>
                 <button 
                   onClick={() => callUser(activeChat._id, 'video')}
-                  className="p-3 hover:bg-slate-700 rounded-2xl transition text-slate-400 hover:text-green-400"
+                  className="p-3 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-2xl transition text-slate-400 dark:text-slate-500 hover:text-green-600 dark:hover:text-green-400"
                 >
                   <Video size={24} />
                 </button>
                 <button 
                   onClick={() => setShowHeaderMenu(!showHeaderMenu)}
-                  className={`p-3 hover:bg-slate-700 rounded-2xl transition ${showHeaderMenu ? 'bg-slate-700 text-slate-200' : 'text-slate-400'}`}
+                  className={`p-3 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-2xl transition ${showHeaderMenu ? 'bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-slate-200' : 'text-slate-500 dark:text-slate-400'}`}
                 >
                   <MoreHorizontal size={20} />
                 </button>
@@ -490,37 +465,37 @@ const Messaging = () => {
                       className="fixed inset-0 z-20" 
                       onClick={() => setShowHeaderMenu(false)}
                     ></div>
-                    <div className="absolute right-8 top-20 w-72 bg-slate-800/90 backdrop-blur-xl border border-slate-600 rounded-3xl shadow-2xl z-30 py-3 animate-in fade-in zoom-in duration-200 origin-top-right">
-                      <div className="px-4 py-2 mb-2 border-b border-slate-700/50">
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Conversation Options</p>
+                    <div className="absolute right-8 top-20 w-72 bg-white dark:bg-slate-800/90 backdrop-blur-xl border border-slate-200 dark:border-slate-600 rounded-3xl shadow-2xl z-30 py-3 animate-in fade-in zoom-in duration-200 origin-top-right transition-colors">
+                      <div className="px-4 py-2 mb-2 border-b border-slate-100 dark:border-slate-700/50">
+                        <p className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">Conversation Options</p>
                       </div>
                       <button 
                         onClick={() => { setShowMediaSidebar(!showMediaSidebar); setShowHeaderMenu(false); }}
                         className="w-full px-4 py-2.5 flex items-center gap-3 hover:bg-slate-700/50 transition text-left group"
                       >
-                        <div className="p-2 bg-violet-500/20 text-violet-400 rounded-xl group-hover:bg-violet-600 group-hover:text-white transition">
+                        <div className="p-2 bg-violet-500/20 text-violet-600 dark:text-violet-400 rounded-xl group-hover:bg-violet-600 group-hover:text-white transition">
                           <Image size={16} />
                         </div>
-                        <span className="text-sm font-bold text-slate-300">Media, Links, and Docs</span>
+                        <span className="text-sm font-bold text-slate-700 dark:text-slate-300">Media, Links, and Docs</span>
                       </button>
                       <button 
                         onClick={() => { setShowSearch(true); setShowHeaderMenu(false); }}
                         className="w-full px-4 py-2.5 flex items-center gap-3 hover:bg-slate-700/50 transition text-left group"
                       >
-                        <div className="p-2 bg-amber-500/20 text-amber-400 rounded-xl group-hover:bg-amber-600 group-hover:text-white transition">
+                        <div className="p-2 bg-amber-500/20 text-amber-600 dark:text-amber-400 rounded-xl group-hover:bg-amber-600 group-hover:text-white transition">
                           <Search size={16} />
                         </div>
-                        <span className="text-sm font-bold text-slate-300">Message Search</span>
+                        <span className="text-sm font-bold text-slate-700 dark:text-slate-300">Message Search</span>
                       </button>
                       <div className="h-px bg-slate-700/50 my-2 mx-4"></div>
                       <button 
                         onClick={handleMuteToggle}
                         className="w-full px-4 py-2.5 flex items-center gap-3 hover:bg-slate-700/50 transition text-left group"
                       >
-                        <div className={`p-2 rounded-xl transition ${mutedContacts.includes(activeChat._id) ? 'bg-red-500 text-white' : 'bg-slate-700 text-slate-400 group-hover:bg-slate-600 group-hover:text-white'}`}>
+                        <div className={`p-2 rounded-xl transition ${mutedContacts.includes(activeChat._id) ? 'bg-red-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 group-hover:bg-slate-200 dark:group-hover:bg-slate-600 dark:group-hover:text-white'}`}>
                           <BellOff size={16} />
                         </div>
-                        <span className="text-sm font-bold text-slate-300">
+                        <span className="text-sm font-bold text-slate-700 dark:text-slate-300">
                           {mutedContacts.includes(activeChat._id) ? "Unmute Notifications" : "Mute Notifications"}
                         </span>
                       </button>
@@ -539,7 +514,7 @@ const Messaging = () => {
                 )}
               </div>
             </header>
-            <div className="flex-1 px-8 py-6 overflow-y-auto space-y-6 bg-slate-900/50">
+            <div className="flex-1 px-8 py-6 overflow-y-auto space-y-6 bg-slate-50/50 dark:bg-slate-900/50 transition-colors">
               {messages.filter(m => 
                 ((m.senderId === (user.id || user._id) && m.recipientId === activeChat._id) || 
                 (m.senderId === activeChat._id && m.recipientId === (user.id || user._id))) &&
@@ -553,8 +528,8 @@ const Messaging = () => {
                     <div
                       className={`px-6 py-4 rounded-[1.5rem] shadow-lg w-fit break-words relative transition-all duration-300 ${
                         msg.senderId === (user.id || user._id)
-                          ? "bg-[#1E293B] text-[#E2E8F0] rounded-tr-none border border-slate-600/50 hover:border-slate-500/50 shadow-black/40"
-                          : "bg-gradient-to-br from-indigo-500 to-violet-600 text-white rounded-tl-none shadow-indigo-500/20"
+                          ? "bg-white dark:bg-[#1E293B] text-slate-900 dark:text-[#E2E8F0] rounded-tr-none border border-slate-200 dark:border-slate-600/50 hover:border-indigo-200 dark:hover:border-slate-500/50 shadow-slate-200 dark:shadow-black/40"
+                          : "bg-gradient-to-br from-indigo-500 to-violet-600 text-white rounded-tl-none shadow-lg dark:shadow-indigo-500/20"
                       }`}
                     >
                       {msg.isPinned && (
@@ -563,10 +538,10 @@ const Messaging = () => {
                         </div>
                       )}
                       {msg.replyTo && (
-                        <div className={`mb-3 p-3 rounded-lg border-l-4 text-sm ${
-                          msg.senderId === (user.id || user._id) ? "bg-[#0F172A] border-indigo-500/30" : "bg-white/10 border-white/30"
+                        <div className={`mb-3 p-3 rounded-lg border-l-4 text-sm transition-colors ${
+                          msg.senderId === (user.id || user._id) ? "bg-slate-50 dark:bg-[#0F172A] border-indigo-600/30 dark:border-indigo-500/30" : "bg-white/10 border-white/30"
                         }`}>
-                          <p className="font-black opacity-60 uppercase tracking-widest text-xs mb-1.5">Replying to</p>
+                          <p className="font-black opacity-60 uppercase tracking-widest text-xs mb-1.5 transition-colors">Replying to</p>
                           <p className="line-clamp-2 opacity-90 italic">
                             {typeof msg.replyTo === 'object' ? msg.replyTo.content : "Original message..."}
                           </p>
@@ -597,7 +572,7 @@ const Messaging = () => {
                           </div>
                           <div className="min-w-0">
                             <p className="text-sm font-black truncate max-w-[180px]">Document</p>
-                             <p className={`text-xs uppercase font-black tracking-widest mt-1 ${msg.senderId === (user.id || user._id) ? "text-slate-400" : "text-indigo-100"}`}>Click to view</p>
+                             <p className={`text-xs uppercase font-black tracking-widest mt-1 transition-colors ${msg.senderId === (user.id || user._id) ? "text-slate-500 dark:text-slate-400" : "text-indigo-100"}`}>Click to view</p>
                           </div>
                         </a>
                       )}
@@ -614,7 +589,7 @@ const Messaging = () => {
                             </div>
                             <div>
                               <p className="text-sm font-black">Shared Location</p>
-                               <p className={`text-xs uppercase font-black tracking-widest mt-1 ${msg.senderId === (user.id || user._id) ? "text-slate-400" : "text-indigo-100"}`}>View on Maps</p>
+                               <p className={`text-xs uppercase font-black tracking-widest mt-1 transition-colors ${msg.senderId === (user.id || user._id) ? "text-slate-500 dark:text-slate-400" : "text-indigo-100"}`}>View on Maps</p>
                             </div>
                           </div>
                           <p className="text-xs font-black opacity-60 italic">{msg.location.address}</p>
@@ -639,29 +614,29 @@ const Messaging = () => {
                           <MoreHorizontal size={14} />
                         </button>
                         {menuOpenId === msg._id && (
-                          <div className={`absolute w-52 bg-[#1E293B] shadow-lg shadow-black/20 rounded-2xl shadow-2xl border border-slate-600 py-2 z-[200] animate-in fade-in zoom-in duration-200 ${
+                          <div className={`absolute w-52 bg-white dark:bg-[#1E293B] shadow-2xl rounded-2xl border border-slate-200 dark:border-slate-600 py-2 z-[200] animate-in fade-in zoom-in duration-200 transition-colors ${
                             msg.senderId === (user.id || user._id) ? "right-0" : "left-0"
                           } ${
                             idx > messages.length / 2 ? "bottom-full mb-2 origin-bottom" : "top-full mt-2 origin-top"
                           } ${
                             msg.senderId === (user.id || user._id) ? (idx > messages.length / 2 ? "origin-bottom-right" : "origin-top-right") : (idx > messages.length / 2 ? "origin-bottom-left" : "origin-top-left")
                           }`}>
-                            <button onClick={() => handleAction("Message info", msg)} className="w-full flex items-center gap-3 px-4 py-2 hover:bg-slate-700 transition text-slate-300">
-                              <Info size={16} className="text-slate-400" />
+                            <button onClick={() => handleAction("Message info", msg)} className="w-full flex items-center gap-3 px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 transition text-slate-700 dark:text-slate-300">
+                              <Info size={16} className="text-slate-500 dark:text-slate-400" />
                               <span className="text-sm font-medium">Message info</span>
                             </button>
                             {msg.senderId === (user.id || user._id) && msg.type === "text" && (
-                              <button onClick={() => handleAction("Edit", msg)} className="w-full flex items-center gap-3 px-4 py-2 hover:bg-slate-700 transition text-slate-300">
-                                <FileText size={16} className="text-slate-400" />
+                              <button onClick={() => handleAction("Edit", msg)} className="w-full flex items-center gap-3 px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 transition text-slate-700 dark:text-slate-300">
+                                <FileText size={16} className="text-slate-500 dark:text-slate-400" />
                                 <span className="text-sm font-medium">Edit</span>
                               </button>
                             )}
-                            <button onClick={() => handleAction("Reply", msg)} className="w-full flex items-center gap-3 px-4 py-2 hover:bg-slate-700 transition text-slate-300">
-                              <Reply size={16} className="text-slate-400" />
+                            <button onClick={() => handleAction("Reply", msg)} className="w-full flex items-center gap-3 px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 transition text-slate-700 dark:text-slate-300">
+                              <Reply size={16} className="text-slate-500 dark:text-slate-400" />
                               <span className="text-sm font-medium">Reply</span>
                             </button>
-                            <button onClick={() => handleAction("React", msg)} className="w-full flex items-center gap-3 px-4 py-2 hover:bg-slate-700 transition text-slate-300">
-                              <Smile size={16} className="text-slate-400" />
+                            <button onClick={() => handleAction("React", msg)} className="w-full flex items-center gap-3 px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 transition text-slate-700 dark:text-slate-300">
+                              <Smile size={16} className="text-slate-500 dark:text-slate-400" />
                               <span className="text-sm font-medium">React</span>
                             </button>
                             {msg.type !== "text" && (
@@ -670,19 +645,19 @@ const Messaging = () => {
                                 <span className="text-sm font-medium">Download</span>
                               </button>
                             )}
-                            <button onClick={() => handleAction("Forward", msg)} className="w-full flex items-center gap-3 px-4 py-2 hover:bg-slate-700 transition text-slate-300">
-                              <Forward size={16} className="text-slate-400" />
+                            <button onClick={() => handleAction("Forward", msg)} className="w-full flex items-center gap-3 px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 transition text-slate-700 dark:text-slate-300">
+                              <Forward size={16} className="text-slate-500 dark:text-slate-400" />
                               <span className="text-sm font-medium">Forward</span>
                             </button>
-                            <button onClick={() => handleAction("Pin", msg)} className="w-full flex items-center gap-3 px-4 py-2 hover:bg-slate-700 transition text-slate-300">
-                              <Pin size={16} className={msg.isPinned ? "text-yellow-500" : "text-gray-400"} />
+                            <button onClick={() => handleAction("Pin", msg)} className="w-full flex items-center gap-3 px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 transition text-slate-700 dark:text-slate-300">
+                              <Pin size={16} className={msg.isPinned ? "text-yellow-600 dark:text-yellow-500" : "text-slate-500 dark:text-gray-400"} />
                               <span className="text-sm font-medium">{msg.isPinned ? "Unpin" : "Pin"}</span>
                             </button>
-                            <button onClick={() => handleAction("Keep", msg)} className="w-full flex items-center gap-3 px-4 py-2 hover:bg-slate-700 transition text-slate-300">
-                              <Bookmark size={16} className="text-slate-400" />
+                            <button onClick={() => handleAction("Keep", msg)} className="w-full flex items-center gap-3 px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 transition text-slate-700 dark:text-slate-300">
+                              <Bookmark size={16} className="text-slate-500 dark:text-slate-400" />
                               <span className="text-sm font-medium">Keep</span>
                             </button>
-                            <div className="h-px bg-slate-700 my-1 mx-4"></div>
+                            <div className="h-px bg-slate-100 dark:bg-slate-700 my-1 mx-4"></div>
                             {msg.senderId === (user.id || user._id) && (
                               <button 
                                 onClick={() => handleDeleteMessage(msg._id)}
@@ -709,8 +684,8 @@ const Messaging = () => {
                               onClick={() => handleAddReaction(msg._id, emoji)}
                               className={`px-2 py-1 rounded-full text-xs flex items-center gap-1.5 shadow-sm border transition ${
                                msg.reactions.some(r => r.user === user.id && r.emoji === emoji)
-                                ? "bg-indigo-500/20 border-indigo-500/30 text-indigo-300"
-                                : "bg-[#1E293B] border-slate-600 text-slate-400"
+                                ? "bg-indigo-500/20 border-indigo-600/30 dark:border-indigo-500/30 text-indigo-700 dark:text-indigo-300"
+                                : "bg-white dark:bg-[#1E293B] border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-400"
                               }`}
                             >
                               <span>{emoji}</span>
@@ -720,12 +695,12 @@ const Messaging = () => {
                         </div>
                       )}
                       {showEmojiPicker === msg._id && (
-                        <div className="absolute z-[300] bottom-full mb-2 left-0 bg-[#1E293B] shadow-2xl rounded-2xl p-2 border border-slate-600 flex gap-2 animate-in zoom-in duration-200">
+                        <div className="absolute z-[300] bottom-full mb-2 left-0 bg-white dark:bg-[#1E293B] shadow-2xl rounded-2xl p-2 border border-slate-200 dark:border-slate-600 flex gap-2 animate-in zoom-in duration-200 transition-colors">
                           {["👍", "❤️", "😂", "😮", "😢", "🔥"].map(emoji => (
                             <button 
                               key={emoji}
                               onClick={() => handleAddReaction(msg._id, emoji)}
-                              className="w-8 h-8 flex items-center justify-center hover:bg-slate-700 rounded-lg text-lg transition"
+                              className="w-8 h-8 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-lg transition"
                             >
                               {emoji}
                             </button>
@@ -740,69 +715,69 @@ const Messaging = () => {
                 </div>
               ))}
               {typingStatus[activeChat._id] && (
-                <div className="flex justify-start">
-                  <div className="bg-[#1E293B] border border-slate-600 p-4 rounded-2xl rounded-tl-none shadow-sm flex items-center gap-2">
+                <div className="flex justify-start transition-all">
+                  <div className="bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-600 p-4 rounded-2xl rounded-tl-none shadow-sm flex items-center gap-2 transition-colors">
                     <div className="flex space-x-1.5">
-                      <div className="w-1.5 h-1.5 bg-slate-500 rounded-full animate-bounce"></div>
-                      <div className="w-1.5 h-1.5 bg-slate-500 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
-                      <div className="w-1.5 h-1.5 bg-slate-500 rounded-full animate-bounce" style={{ animationDelay: "0.4s" }}></div>
+                      <div className="w-1.5 h-1.5 bg-slate-400 dark:bg-slate-500 rounded-full animate-bounce"></div>
+                      <div className="w-1.5 h-1.5 bg-slate-400 dark:bg-slate-500 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
+                      <div className="w-1.5 h-1.5 bg-slate-400 dark:bg-slate-500 rounded-full animate-bounce" style={{ animationDelay: "0.4s" }}></div>
                     </div>
                   </div>
                 </div>
               )}
               <div ref={messagesEndRef} />
             </div>
-            <footer className="p-6 bg-[#1E293B] border-t border-slate-600 relative">
+            <footer className="p-6 bg-white dark:bg-[#1E293B] border-t border-slate-200 dark:border-slate-600 relative transition-colors">
               {replyingTo && (
-                <div className="absolute bottom-full left-0 w-full p-4 bg-[#0F172A] border-t border-slate-600 flex items-center justify-between animate-in slide-in-from-bottom-2 duration-300">
+                <div className="absolute bottom-full left-0 w-full p-4 bg-slate-100 dark:bg-[#0F172A] border-t border-slate-200 dark:border-slate-600 flex items-center justify-between animate-in slide-in-from-bottom-2 duration-300 transition-colors">
                   <div className="flex items-center gap-3 border-l-4 border-indigo-500 pl-4">
-                    <Reply size={16} className="text-indigo-400" />
+                    <Reply size={16} className="text-indigo-600 dark:text-indigo-400" />
                     <div>
-                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Replying to {replyingTo.senderId === user.id ? "yourself" : replyingTo.senderName || "Contact"}</p>
-                      <p className="text-xs text-slate-400 line-clamp-1 italic">{replyingTo.content}</p>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 transition-colors">Replying to {replyingTo.senderId === user.id ? "yourself" : replyingTo.senderName || "Contact"}</p>
+                      <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-1 italic transition-colors">{replyingTo.content}</p>
                     </div>
                   </div>
-                  <button onClick={() => setReplyingTo(null)} className="p-2 hover:bg-slate-700 rounded-full text-slate-400 transition">
+                  <button onClick={() => setReplyingTo(null)} className="p-2 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full text-slate-400 dark:text-slate-500 transition">
                     <X size={16} />
                   </button>
                 </div>
               )}
               {showAttachmentMenu && (
-                <div className="absolute bottom-28 left-10 bg-[#1E293B] shadow-lg shadow-black/20 rounded-[2rem] shadow-2xl border border-slate-600 p-4 flex flex-col gap-2 z-20 animate-in slide-in-from-bottom-4 duration-300">
+                <div className="absolute bottom-28 left-10 bg-white dark:bg-[#1E293B] shadow-2xl rounded-[2rem] border border-slate-200 dark:border-slate-600 p-4 flex flex-col gap-2 z-20 animate-in slide-in-from-bottom-4 duration-300 transition-colors">
                   <button 
                     onClick={() => imageInputRef.current?.click()}
-                    className="flex items-center gap-3 p-4 hover:bg-slate-700 rounded-2xl transition group w-48 text-left"
+                    className="flex items-center gap-3 p-4 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-2xl transition group w-48 text-left transition-colors"
                   >
-                    <div className="h-10 w-10 bg-indigo-500/20 text-indigo-400 rounded-xl flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition">
+                    <div className="h-10 w-10 bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition">
                       <Image size={20} />
                     </div>
                     <div>
-                      <p className="text-sm font-black text-slate-200 leading-none">Photos</p>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase mt-1">Image or Video</p>
+                      <p className="text-sm font-black text-slate-900 dark:text-slate-200 leading-none transition-colors">Photos</p>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase mt-1 transition-colors">Image or Video</p>
                     </div>
                   </button>
                   <button 
                     onClick={() => fileInputRef.current?.click()}
-                    className="flex items-center gap-3 p-4 hover:bg-slate-700 rounded-2xl transition group w-48 text-left"
+                    className="flex items-center gap-3 p-4 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-2xl transition group w-48 text-left transition-colors"
                   >
-                    <div className="h-10 w-10 bg-amber-500/20 text-amber-400 rounded-xl flex items-center justify-center group-hover:bg-amber-600 group-hover:text-white transition">
+                    <div className="h-10 w-10 bg-amber-500/20 text-amber-600 dark:text-amber-400 rounded-xl flex items-center justify-center group-hover:bg-amber-600 group-hover:text-white transition">
                       <FileText size={20} />
                     </div>
                     <div>
-                      <p className="text-sm font-black text-slate-200 leading-none">Document</p>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase mt-1">PDF, DOC, etc.</p>
+                      <p className="text-sm font-black text-slate-900 dark:text-slate-200 leading-none transition-colors">Document</p>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase mt-1 transition-colors">PDF, DOC, etc.</p>
                     </div>
                   </button>
                   <button 
                     onClick={handleShareLocation}
-                    className="flex items-center gap-3 p-4 hover:bg-slate-700 rounded-2xl transition group w-48 text-left"
+                    className="flex items-center gap-3 p-4 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-2xl transition group w-48 text-left transition-colors"
                   >
-                    <div className="h-10 w-10 bg-emerald-500/20 text-emerald-400 rounded-xl flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white transition">
+                    <div className="h-10 w-10 bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-xl flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white transition">
                       <MapPin size={20} />
                     </div>
                     <div>
-                      <p className="text-sm font-black text-slate-200 leading-none">Location</p>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase mt-1">Share where you are</p>
+                      <p className="text-sm font-black text-slate-900 dark:text-slate-200 leading-none transition-colors">Location</p>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase mt-1 transition-colors">Share where you are</p>
                     </div>
                   </button>
                 </div>
@@ -826,7 +801,7 @@ const Messaging = () => {
                   type="button"
                   onClick={() => setShowAttachmentMenu(!showAttachmentMenu)}
                   className={`w-14 h-14 rounded-full flex items-center justify-center transition-all ${
-                    showAttachmentMenu ? "bg-cyan-400 text-slate-900" : "bg-slate-700 text-slate-400 hover:bg-slate-600"
+                    showAttachmentMenu ? "bg-cyan-400 text-slate-900" : "bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600"
                   }`}
                 >
                   <Paperclip size={24} className={showAttachmentMenu ? "rotate-45 transition-transform" : "transition-transform"} />
@@ -834,7 +809,7 @@ const Messaging = () => {
                 <button
                   type="button"
                   onClick={() => imageInputRef.current?.click()}
-                  className="w-14 h-14 bg-slate-700 text-slate-400 hover:bg-slate-600 rounded-full flex items-center justify-center transition-all shadow-lg"
+                  className="w-14 h-14 bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-full flex items-center justify-center transition-all shadow-lg transition-colors"
                 >
                   <Camera size={24} />
                 </button>
@@ -842,8 +817,8 @@ const Messaging = () => {
                   <input
                     type="text"
                     placeholder={editingMessageId ? "Edit your message..." : "Type your message..."}
-                    className={`w-full px-8 py-4 border-none rounded-[2rem] focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-medium text-slate-200 ${
-                      editingMessageId ? "bg-amber-500/10 pr-20" : "bg-[#0F172A] focus:bg-slate-700"
+                    className={`w-full px-8 py-4 border-none rounded-[2rem] focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-medium text-slate-900 dark:text-slate-200 ${
+                      editingMessageId ? "bg-amber-500/10 pr-20" : "bg-slate-50 dark:bg-[#0F172A] focus:bg-slate-100 dark:focus:bg-slate-700"
                     }`}
                     value={newMessage}
                     onChange={handleTyping}
@@ -878,39 +853,39 @@ const Messaging = () => {
             </footer>
           </>
         ) : (
-          <div className="flex-1 flex flex-col items-center justify-center p-20 text-slate-400 bg-slate-900/30">
-            <div className="p-8 bg-[#1E293B] shadow-lg shadow-black/20 rounded-full shadow-sm mb-6 border border-slate-600">
-              <MessageSquare size={64} className="text-indigo-400 opacity-20" />
+          <div className="flex-1 flex flex-col items-center justify-center p-20 text-slate-500 dark:text-slate-400 bg-slate-50/50 dark:bg-slate-900/30 transition-colors">
+            <div className="p-8 bg-white dark:bg-[#1E293B] shadow-lg dark:shadow-black/20 rounded-full mb-6 border border-slate-100 dark:border-slate-600 transition-colors">
+              <MessageSquare size={64} className="text-indigo-600 dark:text-indigo-400 opacity-20" />
             </div>
-            <h3 className="text-xl font-bold text-slate-200 mb-2">Select a Conversation</h3>
-            <p className="text-sm text-slate-400 max-w-xs text-center">Choose someone from your contacts to start chatting in real-time.</p>
+            <h3 className="text-xl font-bold text-slate-900 dark:text-slate-200 mb-2 transition-colors">Select a Conversation</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400 max-w-xs text-center transition-colors">Choose someone from your contacts to start chatting in real-time.</p>
           </div>
         )}
       </main>
       {showMediaSidebar && (
-        <aside className="w-80 border-l border-slate-600 flex flex-col bg-[#0F172A] animate-in slide-in-from-right duration-300 shadow-2xl relative z-20">
-          <header className="p-6 border-b border-slate-600 bg-[#1E293B] flex items-center justify-between">
-            <h3 className="font-black text-slate-200 uppercase tracking-widest text-xs">Media & Files</h3>
-            <button onClick={() => setShowMediaSidebar(false)} className="p-2 hover:bg-slate-700 rounded-xl transition text-slate-400">
+        <aside className="w-80 border-l border-slate-200 dark:border-slate-600 flex flex-col bg-white dark:bg-[#0F172A] animate-in slide-in-from-right duration-300 shadow-2xl relative z-20 transition-colors">
+          <header className="p-6 border-b border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-[#1E293B] flex items-center justify-between transition-colors">
+            <h3 className="font-black text-slate-900 dark:text-slate-200 uppercase tracking-widest text-xs transition-colors">Media & Files</h3>
+            <button onClick={() => setShowMediaSidebar(false)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition text-slate-500 dark:text-slate-400">
               <X size={18} />
             </button>
           </header>
-          <div className="flex border-b border-slate-600 bg-slate-900/50">
+          <div className="flex border-b border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/50 transition-colors">
             {["media", "links", "docs"].map(tab => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`flex-1 py-3 text-[10px] font-black uppercase tracking-widest transition border-b-2 ${
                   activeTab === tab 
-                    ? "text-indigo-400 border-indigo-400 bg-indigo-400/5" 
-                    : "text-slate-500 border-transparent hover:text-slate-300 hover:bg-slate-800/50"
+                    ? "text-indigo-600 dark:text-indigo-400 border-indigo-600 dark:border-indigo-400 bg-indigo-500/10 dark:bg-indigo-400/5" 
+                    : "text-slate-500 border-transparent hover:text-slate-900 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/50"
                 }`}
               >
                 {tab}
               </button>
             ))}
           </div>
-          <div className="flex-1 overflow-y-auto p-4 custom-scrollbar bg-slate-900/20">
+          <div className="flex-1 overflow-y-auto p-4 custom-scrollbar bg-white dark:bg-slate-900/20 transition-colors">
             {activeTab === "media" && (
               <div className="grid grid-cols-3 gap-2">
                 {mediaData.media.map((m, i) => (
@@ -924,10 +899,10 @@ const Messaging = () => {
                 ))}
                 {mediaData.media.length === 0 && (
                   <div className="col-span-3 text-center py-12">
-                    <div className="p-4 bg-slate-800/50 rounded-2xl inline-block mb-3 border border-slate-700">
-                      <Image size={24} className="text-slate-600" />
+                    <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl inline-block mb-3 border border-slate-100 dark:border-slate-700 transition-colors">
+                      <Image size={24} className="text-slate-400 dark:text-slate-600" />
                     </div>
-                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest opacity-60">No media found</p>
+                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest opacity-60 transition-colors">No media found</p>
                   </div>
                 )}
               </div>
@@ -935,14 +910,14 @@ const Messaging = () => {
             {activeTab === "links" && (
               <div className="space-y-3">
                 {mediaData.links.map((l, i) => (
-                  <a key={i} href={l.url} target="_blank" rel="noopener noreferrer" className="block p-4 bg-[#1E293B] border border-slate-600 rounded-2xl hover:border-indigo-500 transition-all group shadow-sm">
+                  <a key={i} href={l.url} target="_blank" rel="noopener noreferrer" className="block p-4 bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-600 rounded-2xl hover:border-indigo-500 transition-all group shadow-sm transition-colors">
                     <div className="flex items-center gap-3">
-                      <div className="p-2 bg-indigo-500/10 text-indigo-400 rounded-xl group-hover:bg-indigo-500 group-hover:text-white transition">
+                      <div className="p-2 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-xl group-hover:bg-indigo-600 group-hover:text-white transition">
                         <Paperclip size={16} />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-xs font-bold text-slate-200 truncate group-hover:text-indigo-400 transition">{l.url.replace(/^https?:\/\//, '')}</p>
-                        <p className="text-[9px] text-slate-500 mt-1 uppercase font-black tracking-tighter">Shared Link</p>
+                        <p className="text-xs font-bold text-slate-900 dark:text-slate-200 truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{l.url.replace(/^https?:\/\//, '')}</p>
+                        <p className="text-xs text-slate-500 mt-1 uppercase font-black tracking-tighter transition-colors">Shared Link</p>
                       </div>
                     </div>
                   </a>
@@ -960,14 +935,14 @@ const Messaging = () => {
             {activeTab === "docs" && (
               <div className="space-y-3">
                 {mediaData.docs.map((d, i) => (
-                  <a key={i} href={d.fileUrl} target="_blank" rel="noopener noreferrer" className="block p-4 bg-[#1E293B] border border-slate-600 rounded-2xl hover:border-violet-500 transition-all group shadow-sm">
+                  <a key={i} href={d.fileUrl} target="_blank" rel="noopener noreferrer" className="block p-4 bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-600 rounded-2xl hover:border-violet-500 transition-all group shadow-sm transition-colors">
                     <div className="flex items-center gap-3">
-                      <div className="p-2 bg-violet-500/10 text-violet-400 rounded-xl group-hover:bg-violet-600 group-hover:text-white transition">
+                      <div className="p-2 bg-violet-500/10 text-violet-600 dark:text-violet-400 rounded-xl group-hover:bg-violet-600 group-hover:text-white transition">
                         <FileText size={16} />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-xs font-bold text-slate-200 truncate group-hover:text-violet-400 transition">Document</p>
-                        <p className="text-[9px] text-slate-500 mt-1 uppercase font-black tracking-tighter">Click to download</p>
+                        <p className="text-xs font-bold text-slate-900 dark:text-slate-200 truncate group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">Document</p>
+                        <p className="text-xs text-slate-500 mt-1 uppercase font-black tracking-tighter transition-colors">Click to download</p>
                       </div>
                     </div>
                   </a>
@@ -986,16 +961,16 @@ const Messaging = () => {
         </aside>
       )}
       {forwardingMessage && (
-        <div className="fixed inset-0 z-[500] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-          <div className="bg-[#1E293B] shadow-lg shadow-black/20 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in duration-300 border border-slate-600">
-            <div className="p-6 border-b border-slate-600 flex items-center justify-between bg-slate-900/50">
-              <h3 className="text-xl font-black text-slate-200">Forward Message</h3>
-              <button onClick={() => setForwardingMessage(null)} className="p-2 hover:bg-slate-700 rounded-full transition text-slate-400">
+        <div className="fixed inset-0 z-[500] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-[#1E293B] shadow-2xl rounded-3xl w-full max-w-md overflow-hidden animate-in zoom-in duration-300 border border-slate-200 dark:border-slate-600 transition-colors">
+            <div className="p-6 border-b border-slate-200 dark:border-slate-600 flex items-center justify-between bg-slate-50 dark:bg-slate-900/50 transition-colors">
+              <h3 className="text-xl font-black text-slate-900 dark:text-slate-200 transition-colors">Forward Message</h3>
+              <button onClick={() => setForwardingMessage(null)} className="p-2 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition text-slate-500 dark:text-slate-400">
                 <X size={20} />
               </button>
             </div>
-            <div className="p-4 max-h-[60vh] overflow-y-auto">
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 px-2">Select Contact</p>
+            <div className="p-4 max-h-[60vh] overflow-y-auto transition-colors">
+              <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-4 px-2 transition-colors">Select Contact</p>
               <div className="space-y-1">
                 {contacts.map(contact => (
                   <button 
@@ -1004,17 +979,17 @@ const Messaging = () => {
                     className="w-full flex items-center gap-4 p-3 hover:bg-slate-700/50 rounded-2xl transition group"
                   >
                     <div className="relative">
-                      {contact.profileImage ? (
-                        <img src={contact.profileImage} alt={contact.name} className="w-12 h-12 rounded-2xl object-cover ring-2 ring-slate-700 shadow-sm" />
+                      {contact.profileImage && contact.profileImage !== 'no-photo.jpg' ? (
+                        <img src={contact.profileImage} alt={contact.name} className="w-12 h-12 rounded-2xl object-cover ring-2 ring-slate-100 dark:ring-slate-700 shadow-sm" />
                       ) : (
-                        <div className="w-12 h-12 rounded-2xl bg-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold text-lg">
+                        <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 dark:bg-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-lg transition-colors">
                           {contact.name.charAt(0)}
                         </div>
                       )}
                     </div>
                     <div className="text-left">
-                      <p className="font-bold text-slate-200 group-hover:text-indigo-400 transition">{contact.name}</p>
-                      <p className="text-xs text-slate-400 uppercase tracking-tighter font-medium">{contact.role}</p>
+                      <p className="font-bold text-slate-900 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{contact.name}</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-tighter font-medium transition-colors">{contact.role}</p>
                     </div>
                     <ChevronRight size={16} className="ml-auto text-slate-600 group-hover:text-indigo-400 transition" />
                   </button>
@@ -1025,36 +1000,36 @@ const Messaging = () => {
         </div>
       )}
       {showInfoMessage && (
-        <div className="fixed inset-0 z-[500] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-          <div className="bg-[#1E293B] shadow-lg shadow-black/20 rounded-3xl w-full max-w-sm shadow-2xl overflow-hidden animate-in zoom-in duration-300 border border-slate-600">
-            <div className="p-6 border-b border-slate-600 flex items-center justify-between">
-              <h3 className="text-xl font-bold text-slate-200">Message Info</h3>
-              <button onClick={() => setShowInfoMessage(null)} className="p-2 hover:bg-slate-700 rounded-full transition text-slate-400">
+        <div className="fixed inset-0 z-[500] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-[#1E293B] shadow-2xl rounded-3xl w-full max-w-sm overflow-hidden animate-in zoom-in duration-300 border border-slate-200 dark:border-slate-600 transition-colors">
+            <div className="p-6 border-b border-slate-200 dark:border-slate-600 flex items-center justify-between transition-colors">
+              <h3 className="text-xl font-bold text-slate-900 dark:text-slate-200 transition-colors">Message Info</h3>
+              <button onClick={() => setShowInfoMessage(null)} className="p-2 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition text-slate-500 dark:text-slate-400">
                 <X size={20} />
               </button>
             </div>
             <div className="p-6 space-y-6">
               <div className="flex items-center gap-4">
-                <div className="p-3 bg-[#0F172A] rounded-2xl text-slate-400 border border-slate-600">
+                <div className="p-3 bg-slate-50 dark:bg-[#0F172A] rounded-2xl text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-600 transition-colors">
                   <Clock size={24} />
                 </div>
                 <div>
-                  <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Sent</p>
-                  <p className="font-medium text-slate-200">{new Date(showInfoMessage.createdAt).toLocaleString()}</p>
+                  <p className="text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest transition-colors">Sent</p>
+                  <p className="font-medium text-slate-900 dark:text-slate-200 transition-colors">{new Date(showInfoMessage.createdAt).toLocaleString()}</p>
                 </div>
               </div>
               <div className="flex items-center gap-4">
-                <div className="p-3 bg-[#0F172A] rounded-2xl text-slate-400 border border-slate-600">
-                  <Check size={24} className={showInfoMessage.read ? "text-cyan-400" : "text-slate-600"} />
+                <div className="p-3 bg-slate-50 dark:bg-[#0F172A] rounded-2xl text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-600 transition-colors">
+                  <Check size={24} className={showInfoMessage.read ? "text-cyan-600 dark:text-cyan-400" : "text-slate-300 dark:text-slate-600"} />
                 </div>
                 <div>
-                  <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Status</p>
-                  <p className="font-medium text-slate-200">{showInfoMessage.read ? "Read" : "Delivered"}</p>
+                  <p className="text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest transition-colors">Status</p>
+                  <p className="font-medium text-slate-900 dark:text-slate-200 transition-colors">{showInfoMessage.read ? "Read" : "Delivered"}</p>
                 </div>
               </div>
-              <div className="pt-4 border-t border-slate-600">
-                 <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Message Content</p>
-                 <div className="p-4 bg-[#0F172A] rounded-2xl text-sm text-slate-400 italic border border-slate-600">
+              <div className="pt-4 border-t border-slate-200 dark:border-slate-600 transition-colors">
+                 <p className="text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 transition-colors">Message Content</p>
+                 <div className="p-4 bg-slate-50 dark:bg-[#0F172A] rounded-2xl text-sm text-slate-700 dark:text-slate-400 italic border border-slate-200 dark:border-slate-600 transition-colors">
                     "{showInfoMessage.content}"
                  </div>
               </div>

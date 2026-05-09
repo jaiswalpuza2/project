@@ -1,8 +1,8 @@
 
 export const formatNPR = (amount) => {
-  if (amount === undefined || amount === null) return "NRP 0";
+  if (amount === undefined || amount === null) return "NPR 0";
   const converted = Math.round(amount * 133);
-  return `NRP ${converted.toLocaleString()}`;
+  return `NPR ${converted.toLocaleString()}`;
 };
 
 export const formatUSD = (amount) => {

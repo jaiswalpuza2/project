@@ -1,19 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Bell, Check, Trash2, HelpCircle } from 'lucide-react';
-import axios from 'axios';
+import api from '../utils/api';
 import { useAuth } from '../context/AuthContext';
+
 const NotificationDropdown = () => {
-  const { token } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(false);
   const dropdownRef = useRef(null);
+
   const fetchNotifications = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(import.meta.env.VITE_API_URL + "/api/notifications", {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get("/notifications");
       setNotifications(res.data.data);
     } catch (err) {
       console.error("Failed to fetch notifications:", err);
@@ -21,11 +20,11 @@ const NotificationDropdown = () => {
       setLoading(false);
     }
   };
+
   useEffect(() => {
-    if (token) {
-      fetchNotifications();
-    }
-  }, [token]);
+    fetchNotifications();
+  }, []);
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -35,21 +34,19 @@ const NotificationDropdown = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
   const markAsRead = async (id) => {
     try {
-      await axios.put(`${import.meta.env.VITE_API_URL}/api/notifications/${id}/read`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.put(`/notifications/${id}/read`, {});
       setNotifications(notifications.map(n => n._id === id ? { ...n, isRead: true } : n));
     } catch (err) {
       console.error(err);
     }
   };
+
   const markAllAsRead = async () => {
     try {
-      await axios.put(`${import.meta.env.VITE_API_URL}/api/notifications/read-all`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.put("/notifications/read-all", {});
       setNotifications(notifications.map(n => ({ ...n, isRead: true })));
     } catch (err) {
       console.error(err);
@@ -60,7 +57,7 @@ const NotificationDropdown = () => {
     <div className="relative" ref={dropdownRef}>
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="p-2.5 text-slate-400 hover:text-indigo-400 hover:bg-slate-800/50 rounded-xl transition-all relative active:scale-95 group"
+        className="p-2.5 text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-xl transition-all relative active:scale-95 group transition-colors duration-300"
       >
         <Bell size={24} className="group-hover:rotate-12 transition-transform" />
         {(notifications || []).length > 0 && (
@@ -70,10 +67,10 @@ const NotificationDropdown = () => {
         )}
       </button>
       {isOpen && (
-        <div className="fixed md:absolute inset-x-4 md:inset-x-auto md:right-0 top-20 md:top-full mt-2 md:mt-4 w-auto md:w-96 bg-[#0F172A]/95 backdrop-blur-2xl rounded-[2rem] md:rounded-3xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] border border-slate-700/50 z-[60] overflow-hidden flex flex-col max-h-[70vh] md:max-h-[32rem] animate-in fade-in slide-in-from-top-2 duration-200">
-          <div className="p-4 md:p-6 bg-slate-800/30 border-b border-slate-700/50 flex justify-between items-center">
+        <div className="fixed md:absolute inset-x-4 md:inset-x-auto md:right-0 top-20 md:top-full mt-2 md:mt-4 w-auto md:w-96 bg-white/95 dark:bg-[#0F172A]/95 backdrop-blur-2xl rounded-[2rem] md:rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-700/50 z-[60] overflow-hidden flex flex-col max-h-[70vh] md:max-h-[32rem] animate-in fade-in slide-in-from-top-2 duration-200 transition-colors duration-300">
+          <div className="p-4 md:p-6 bg-slate-50 dark:bg-slate-800/30 border-b border-slate-200 dark:border-slate-700/50 flex justify-between items-center transition-colors duration-300">
             <div>
-              <h3 className="text-lg md:text-xl font-black text-slate-100 tracking-tight">Notifications</h3>
+              <h3 className="text-lg md:text-xl font-black text-slate-900 dark:text-slate-100 tracking-tight">Notifications</h3>
               <p className="text-[10px] md:text-xs text-slate-500 font-bold uppercase tracking-widest mt-0.5 md:mt-1">Activity Updates</p>
             </div>
             {notifications.length > 0 && (
@@ -83,7 +80,7 @@ const NotificationDropdown = () => {
                 className={`text-[10px] md:text-xs font-black transition uppercase tracking-widest px-4 md:px-5 py-2 md:py-2.5 rounded-xl border active:scale-95 ${
                   unreadCount > 0 
                   ? 'text-white bg-indigo-500 hover:bg-indigo-600 border-indigo-400/20 shadow-lg shadow-indigo-500/20' 
-                  : 'text-white/30 bg-slate-800/50 border-slate-700/50 cursor-not-allowed'
+                  : 'text-slate-400 dark:text-white/30 bg-slate-100 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700/50 cursor-not-allowed'
                 }`}
               >
                 Mark all
@@ -97,11 +94,11 @@ const NotificationDropdown = () => {
                   <p className="text-xs md:text-sm font-black text-slate-500 uppercase tracking-widest">Loading...</p>
                 </div>
             ) : notifications.length > 0 ? (
-              <ul className="divide-y divide-slate-800/50">
+              <ul className="divide-y divide-slate-100 dark:divide-slate-800/50 transition-colors duration-300">
                 {(notifications || []).map((notif) => (
                   <li 
                     key={notif._id} 
-                    className={`p-4 md:p-5 hover:bg-slate-800/40 transition cursor-pointer flex gap-3 md:gap-4 relative group ${!notif.isRead ? 'bg-indigo-500/10' : ''}`}
+                    className={`p-4 md:p-5 hover:bg-slate-100 dark:hover:bg-slate-800/40 transition cursor-pointer flex gap-3 md:gap-4 relative group transition-colors duration-300 ${!notif.isRead ? 'bg-indigo-500/10' : ''}`}
                     onClick={() => !notif.isRead && markAsRead(notif._id)}
                   >
                     {!notif.isRead && (
@@ -128,16 +125,16 @@ const NotificationDropdown = () => {
                         }`}>
                           {notif.type}
                         </span>
-                        <span className="text-[9px] md:text-xs text-slate-500 font-black bg-slate-800/50 px-2 md:px-2.5 py-0.5 md:py-1 rounded-md">
+                        <span className="text-xs text-slate-500 font-black bg-slate-100 dark:bg-slate-800/50 px-2 md:px-2.5 py-0.5 md:py-1 rounded-md transition-colors duration-300">
                           {new Date(notif.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </span>
                       </div>
-                       <p className={`text-sm md:text-base leading-relaxed ${!notif.isRead ? 'font-black text-slate-100' : 'text-slate-400 font-bold opacity-80'}`}>
+                       <p className={`text-sm md:text-base leading-relaxed transition-colors duration-300 ${!notif.isRead ? 'font-black text-slate-900 dark:text-slate-100' : 'text-slate-500 dark:text-slate-400 font-bold opacity-80'}`}>
                         {notif.message}
                       </p>
                        <div className="flex items-center gap-1.5 md:gap-2 mt-2 md:mt-3">
                         <div className="w-1 md:w-1.5 h-1 md:h-1.5 rounded-full bg-slate-700"></div>
-                        <p className="text-[9px] md:text-xs text-slate-600 font-black uppercase tracking-widest">
+                        <p className="text-xs text-slate-600 font-black uppercase tracking-widest">
                           {new Date(notif.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                         </p>
                       </div>
@@ -157,7 +154,7 @@ const NotificationDropdown = () => {
           </div>
            <div className="p-4 md:p-6 bg-slate-800/30 border-t border-slate-700/50 text-center flex items-center justify-center gap-3 md:gap-4 group/footer">
              <div className="w-1.5 md:w-2 h-1.5 md:h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-             <p className="text-[9px] md:text-xs font-black text-slate-500 uppercase tracking-[0.2em]">
+             <p className="text-xs font-black text-slate-500 uppercase tracking-[0.2em]">
                 System Online
              </p>
           </div>

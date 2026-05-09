@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Send, Bot, User, Sparkles, Zap, MessageCircle } from "lucide-react";
-import axios from "axios";
+import api from "../utils/api";
 import { toast } from "react-toastify";
 import ReactMarkdown from "react-markdown";
 
@@ -30,7 +30,7 @@ const AIChatbot = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post(import.meta.env.VITE_API_URL + "/api/ai/chatbot", {
+      const response = await api.post("/ai/chatbot", {
         message: userMessage,
         context: "Jobsphere dedicated AI Chatbot page. Providing comprehensive career guidance and platform support.",
       });
@@ -49,20 +49,20 @@ const AIChatbot = () => {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-120px)] max-h-[850px] bg-[#0F172A] rounded-3xl border border-slate-800 shadow-2xl overflow-hidden">
+    <div className="flex flex-col h-[calc(100vh-160px)] max-h-[850px] mt-4 bg-white dark:bg-[#0F172A] rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden transition-colors duration-500">
 
-      <div className="p-6 bg-[#1E293B] border-b border-slate-800 flex items-center justify-between">
+      <div className="p-6 bg-slate-50 dark:bg-[#1E293B] border-b border-slate-200 dark:border-slate-800 flex items-center justify-between transition-colors">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-indigo-500/10 rounded-2xl border border-indigo-500/20 flex items-center justify-center text-indigo-400">
+          <div className="w-12 h-12 bg-indigo-500/10 dark:bg-indigo-500/20 rounded-2xl border border-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
             <Bot size={28} />
           </div>
           <div>
-            <h2 className="text-xl font-black text-slate-100 flex items-center gap-2">
-              Jobsphere AI Assistant <Sparkles size={18} className="text-yellow-400 fill-yellow-400" />
+            <h2 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-2">
+              Jobsphere AI Assistant
             </h2>
             <div className="flex items-center gap-2 mt-1">
               <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Online & Ready to Help</span>
+              <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Online & Ready to Help</span>
             </div>
           </div>
         </div>
@@ -76,7 +76,7 @@ const AIChatbot = () => {
               <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 shadow-lg ${
                 msg.role === "user" 
                 ? "bg-indigo-600 text-white" 
-                : "bg-slate-700 text-indigo-400 border border-slate-600"
+                : "bg-slate-100 dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 border border-slate-200 dark:border-slate-600"
               }`}>
                 {msg.role === "user" ? <User size={16} /> : <Bot size={16} />}
               </div>
@@ -84,14 +84,14 @@ const AIChatbot = () => {
               <div className={`p-4 rounded-2xl shadow-xl transition-all ${
                 msg.role === "user" 
                 ? "bg-indigo-600 text-white rounded-tr-none font-medium" 
-                : "bg-[#1E293B] text-slate-200 border border-slate-700 rounded-tl-none"
+                : "bg-slate-50 dark:bg-[#1E293B] text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-tl-none"
               }`}>
                 {msg.role === "bot" ? (
-                  <div className="prose prose-invert prose-sm max-w-none prose-p:leading-relaxed prose-headings:text-indigo-300 prose-strong:text-indigo-400 prose-code:bg-slate-800 prose-code:p-1 prose-code:rounded">
+                  <div className="prose dark:prose-invert prose-sm max-w-none prose-p:leading-relaxed prose-headings:text-indigo-600 dark:prose-headings:text-indigo-300 prose-strong:text-indigo-700 dark:prose-strong:text-indigo-400 prose-code:bg-slate-100 dark:prose-code:bg-slate-800 prose-code:p-1 prose-code:rounded">
                     <ReactMarkdown>{msg.content}</ReactMarkdown>
                   </div>
                 ) : (
-                  <p className="text-sm leading-relaxed">{msg.content}</p>
+                  <p className={`text-sm leading-relaxed ${msg.role === "user" ? "text-white" : "text-slate-200"}`}>{msg.content}</p>
                 )}
               </div>
             </div>
@@ -101,16 +101,16 @@ const AIChatbot = () => {
         {isLoading && (
           <div className="flex justify-start">
             <div className="flex gap-3 max-w-[80%] items-center">
-               <div className="w-8 h-8 rounded-lg bg-slate-700 text-indigo-400 border border-slate-600 flex items-center justify-center shrink-0 animate-pulse">
+               <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 border border-slate-200 dark:border-slate-600 flex items-center justify-center shrink-0 animate-pulse">
                 <Bot size={16} />
               </div>
-              <div className="bg-[#1E293B] border border-slate-700 p-4 rounded-2xl rounded-tl-none flex items-center gap-3">
+              <div className="bg-slate-50 dark:bg-[#1E293B] border border-slate-200 dark:border-slate-700 p-4 rounded-2xl rounded-tl-none flex items-center gap-3 shadow-sm">
                 <div className="flex space-x-1">
                   <div className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce"></div>
                   <div className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: "0.15s" }}></div>
                   <div className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: "0.3s" }}></div>
                 </div>
-                <span className="text-xs font-black text-slate-500 uppercase tracking-widest">Thinking...</span>
+                <span className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Thinking...</span>
               </div>
             </div>
           </div>
@@ -118,7 +118,7 @@ const AIChatbot = () => {
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="px-6 py-3 bg-[#1E293B]/50 border-t border-slate-800/50 flex gap-2 overflow-x-auto no-scrollbar">
+      <div className="px-6 py-3 bg-slate-50 dark:bg-[#1E293B]/50 border-t border-slate-200 dark:border-slate-800/50 flex gap-2 overflow-x-auto no-scrollbar transition-colors">
           {[
             "How can I improve my resume?",
             "Tips for job interviews?",
@@ -131,7 +131,7 @@ const AIChatbot = () => {
                 setInput(prompt);
 
               }}
-              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-xs font-bold text-slate-300 whitespace-nowrap transition-colors flex items-center gap-2 group"
+              className="px-4 py-2 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 whitespace-nowrap transition-colors flex items-center gap-2 group shadow-sm"
             >
               <Zap size={12} className="text-yellow-500 group-hover:scale-125 transition-transform" />
               {prompt}
@@ -139,14 +139,14 @@ const AIChatbot = () => {
           ))}
       </div>
 
-      <div className="p-6 bg-[#1E293B] border-t border-slate-800">
+      <div className="p-6 bg-slate-50 dark:bg-[#1E293B] border-t border-slate-200 dark:border-slate-800 transition-colors">
         <form onSubmit={handleSend} className="relative group">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Type your message here..."
-            className="w-full bg-[#0F172A] border-2 border-slate-700 rounded-2xl px-6 py-4 pr-16 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 transition-all font-medium shadow-inner"
+            className="w-full bg-white dark:bg-[#0F172A] border-2 border-slate-200 dark:border-slate-700 rounded-2xl px-6 py-4 pr-16 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 transition-all font-medium shadow-inner"
             disabled={isLoading}
           />
           <button

@@ -2,11 +2,10 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { toast } from "react-toastify";
-import axios from "axios";
+import api from "../utils/api";
 import { ArrowLeft, Lock, Eye, EyeOff } from "lucide-react";
 
 const ChangePassword = () => {
-  const { token } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
@@ -34,11 +33,9 @@ const ChangePassword = () => {
 
     setLoading(true);
     try {
-      await axios.put(import.meta.env.VITE_API_URL + "/api/auth/change-password", {
+      await api.put("/auth/change-password", {
         currentPassword: formData.currentPassword,
         newPassword: formData.newPassword
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
       });
       toast.success("Password changed successfully!");
       navigate(-1);

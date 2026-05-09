@@ -88,32 +88,9 @@ class AIService {
                 }
             }
 
-            if (this.openRouterApiKey) {
-                try {
-                    console.log("Switching to OpenRouter fallback (NVIDIA nemotron-3-super)...");
-                    const response = await axios.post("https://openrouter.ai/api/v1/chat/completions", {
-                        model: "nvidia/nemotron-3-super-120b-a12b:free",
-                        messages: [{ role: "user", content: prompt }]
-                    }, {
-                        headers: { 
-                            "Authorization": `Bearer ${this.openRouterApiKey}`,
-                            "Content-Type": "application/json"
-                        },
-                        timeout: 20000
-                    });
-                    if (response.data.error) {
-                        throw new Error(response.data.error.message || response.data.error);
-                    }
-                    return response.data.choices[0].message.content;
-                } catch (err) {
-                    console.warn("OpenRouter fallback failed:", err.response?.data?.error?.message || err.message);
-                    lastError = err;
-                }
-            }
-
             if (this.groqApiKey) {
                 try {
-                    console.log("Switching to Groq fallback...");
+                    console.log("AI Service: Using Groq (Llama 3)...");
                     const response = await axios.post("https://api.groq.com/openai/v1/chat/completions", {
                         model: "llama-3.3-70b-versatile",
                         messages: [{ role: "user", content: prompt }]
@@ -123,7 +100,30 @@ class AIService {
                     });
                     return response.data.choices[0].message.content;
                 } catch (err) {
-                    console.warn("Groq fallback failed:", err.message);
+                    console.warn("AI Service: Groq failed:", err.message);
+                    lastError = err;
+                }
+            }
+
+            if (this.openRouterApiKey) {
+                try {
+                    console.log("AI Service: Using OpenRouter fallback (NVIDIA)...");
+                    const response = await axios.post("https://openrouter.ai/api/v1/chat/completions", {
+                        model: "nvidia/nemotron-3-super-120b-a12b:free",
+                        messages: [{ role: "user", content: prompt }]
+                    }, {
+                        headers: { 
+                            "Authorization": `Bearer ${this.openRouterApiKey}`,
+                            "Content-Type": "application/json"
+                        },
+                        timeout: 30000
+                    });
+                    if (response.data.error) {
+                        throw new Error(response.data.error.message || response.data.error);
+                    }
+                    return response.data.choices[0].message.content;
+                } catch (err) {
+                    console.warn("AI Service: OpenRouter failed:", err.response?.data?.error?.message || err.message);
                     lastError = err;
                 }
             }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../utils/api";
 import { useAuth } from "../context/AuthContext";
 import { toast } from "react-toastify";
 import Cropper from "react-easy-crop";
@@ -27,7 +27,7 @@ import {
 } from "lucide-react";
 
 const EditProfile = () => {
-  const { user, token, setMe } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -59,13 +59,11 @@ const EditProfile = () => {
 
   useEffect(() => {
     fetchProfile();
-  }, [token]);
+  }, []);
 
   const fetchProfile = async () => {
     try {
-      const res = await axios.get(import.meta.env.VITE_API_URL + "/api/auth/me", {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get("/auth/me");
       const data = res.data.data;
       setFormData({
         name: data.name || "",
@@ -153,10 +151,9 @@ const EditProfile = () => {
     uploadData.append("profileImage", imageFile);
 
     try {
-      const res = await axios.post(import.meta.env.VITE_API_URL + "/api/upload/profile-image", uploadData, {
+      const res = await api.post("/upload/profile-image", uploadData, {
         headers: {
           "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`,
         },
       });
       return res.data.data;
@@ -174,10 +171,9 @@ const EditProfile = () => {
     uploadData.append("resume", resumeFile);
 
     try {
-      const res = await axios.post(import.meta.env.VITE_API_URL + "/api/upload/resume", uploadData, {
+      const res = await api.post("/upload/resume", uploadData, {
         headers: {
           "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`,
         },
       });
       return res.data.data;
@@ -203,13 +199,7 @@ const EditProfile = () => {
         mentorExperience: formData.mentorExperience,
       };
 
-      const res = await axios.put(
-        import.meta.env.VITE_API_URL + "/api/auth/update-profile",
-        updatedData,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      await api.put("/auth/update-profile", updatedData);
       toast.success("Profile updated successfully!");
       navigate(user?.role === "employer" ? "/employer-dashboard" : "/freelancer-dashboard");
     } catch (err) {
@@ -221,7 +211,7 @@ const EditProfile = () => {
 
   if (loading) return (
     <div className="flex items-center justify-center p-20">
-      <RefreshCw className="animate-spin text-indigo-400" size={32} />
+      <RefreshCw className="animate-spin text-indigo-600 dark:text-indigo-400" size={32} />
     </div>
   );
 
@@ -230,14 +220,14 @@ const EditProfile = () => {
       <div className="max-w-3xl mx-auto">
         <button
           onClick={() => navigate(-1)}
-          className="inline-flex items-center gap-2 text-slate-400 hover:text-indigo-400 font-bold mb-8 group transition"
+          className="inline-flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 font-bold mb-8 group transition transition-colors"
         >
           <ChevronLeft className="group-hover:-translate-x-1 transition" /> Back to Dashboard
         </button>
 
-        <div className="bg-[#1E293B] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] rounded-[3rem] border border-slate-600/50 overflow-hidden">
+        <div className="bg-white dark:bg-[#1E293B] shadow-xl dark:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] rounded-[3rem] border border-slate-100 dark:border-slate-600/50 overflow-hidden transition-colors">
           <header className="bg-gradient-to-r from-indigo-500 to-violet-600 p-12 text-white relative pb-24">
-            <h1 className="text-5xl font-black tracking-tight">Edit Profile</h1>
+            <h1 className="text-3xl md:text-4xl font-black tracking-tight">Edit Profile</h1>
             <p className="text-indigo-100 font-black uppercase tracking-widest text-xs mt-3">Refine your professional presence on JobSphere</p>
           </header>
 
@@ -245,7 +235,7 @@ const EditProfile = () => {
             <div className="flex flex-col items-center -mt-16 mb-8 relative z-10">
               <div className="relative group">
                 <div
-                  className="w-32 h-32 rounded-full overflow-hidden border-4 border-slate-800 shadow-2xl bg-[#0F172A] flex items-center justify-center cursor-pointer active:scale-95 transition"
+                  className="w-32 h-32 rounded-full overflow-hidden border-4 border-white dark:border-slate-800 shadow-2xl bg-slate-50 dark:bg-[#0F172A] flex items-center justify-center cursor-pointer active:scale-95 transition transition-colors"
                   onClick={() => imagePreview && imagePreview !== "no-photo.jpg" && setShowPhotoModal(true)}
                 >
                   {imagePreview && imagePreview !== "no-photo.jpg" ? (
@@ -256,20 +246,20 @@ const EditProfile = () => {
                       onError={(e) => {
                         e.target.onerror = null;
                         e.target.style.display = 'none';
-                        e.target.parentElement.innerHTML = '<div class="text-slate-400"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>';
+                        e.target.parentElement.innerHTML = '<div class="text-slate-400 transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>';
                       }}
                     />
                   ) : (
-                    <User size={48} className="text-slate-400" />
+                    <User size={48} className="text-slate-400 dark:text-slate-500 transition-colors" />
                   )}
                 </div>
 
-                <label className="absolute bottom-0 right-0 bg-gradient-to-r from-indigo-500 to-violet-600 text-white p-2.5 rounded-full shadow-lg border-2 border-slate-800 cursor-pointer hover:brightness-110 transition active:scale-95 group-hover:scale-110">
+                <label className="absolute bottom-0 right-0 bg-gradient-to-r from-indigo-500 to-violet-600 text-white p-2.5 rounded-full shadow-lg border-2 border-white dark:border-slate-800 cursor-pointer hover:brightness-110 transition active:scale-95 group-hover:scale-110 transition-colors">
                    <Camera size={22} />
                   <input type="file" className="hidden" accept="image/*" onChange={handleImageChange} />
                 </label>
               </div>
-              <p className="mt-4 text-xs font-black uppercase tracking-widest text-slate-400">Profile Picture</p>
+              <p className="mt-4 text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 transition-colors">Profile Picture</p>
             </div>
 
             {showCropModal && (
@@ -369,12 +359,12 @@ const EditProfile = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
                <div className="space-y-4">
-                <label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Full Name</label>
+                <label className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 ml-1 transition-colors">Full Name</label>
                 <div className="relative group/input">
-                  <User size={22} className="absolute left-6 top-6 text-slate-400 group-focus-within/input:text-indigo-400 transition-colors" />
+                  <User size={22} className="absolute left-6 top-6 text-slate-400 dark:text-slate-500 group-focus-within/input:text-indigo-600 dark:group-focus-within/input:text-indigo-400 transition-colors" />
                   <input
                     type="text"
-                    className="w-full pl-16 pr-8 py-6 bg-[#0F172A] border border-slate-600/50 focus:border-indigo-500/50 rounded-2xl outline-none font-black transition text-base text-[#E2E8F0] placeholder:text-slate-500 shadow-inner"
+                    className="w-full pl-16 pr-8 py-6 bg-slate-50 dark:bg-[#0F172A] border border-slate-200 dark:border-slate-600/50 focus:border-indigo-500/50 rounded-2xl outline-none font-black transition text-base text-slate-900 dark:text-[#E2E8F0] placeholder:text-slate-400 dark:placeholder:text-slate-500 shadow-inner transition-colors"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   />
@@ -382,12 +372,12 @@ const EditProfile = () => {
               </div>
 
                <div className="space-y-4">
-                <label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Location</label>
+                <label className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 ml-1 transition-colors">Location</label>
                 <div className="relative group/input">
-                  <MapPin size={22} className="absolute left-6 top-6 text-slate-400 group-focus-within/input:text-indigo-400 transition-colors" />
+                  <MapPin size={22} className="absolute left-6 top-6 text-slate-400 dark:text-slate-500 group-focus-within/input:text-indigo-600 dark:group-focus-within/input:text-indigo-400 transition-colors" />
                   <input
                     type="text"
-                    className="w-full pl-16 pr-8 py-6 bg-[#0F172A] border border-slate-600/50 focus:border-indigo-500/50 rounded-2xl outline-none font-black transition text-base text-[#E2E8F0] placeholder:text-slate-500 shadow-inner"
+                    className="w-full pl-16 pr-8 py-6 bg-slate-50 dark:bg-[#0F172A] border border-slate-200 dark:border-slate-600/50 focus:border-indigo-500/50 rounded-2xl outline-none font-black transition text-base text-slate-900 dark:text-[#E2E8F0] placeholder:text-slate-400 dark:placeholder:text-slate-500 shadow-inner transition-colors"
                     value={formData.location}
                     onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                   />
@@ -395,12 +385,12 @@ const EditProfile = () => {
               </div>
 
               <div className="space-y-3">
-                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Phone Number</label>
+                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 ml-1 transition-colors">Phone Number</label>
                 <div className="relative group/input">
-                  <Phone size={18} className="absolute left-5 top-5 text-slate-400 group-focus-within/input:text-indigo-400 transition-colors" />
+                  <Phone size={18} className="absolute left-5 top-5 text-slate-400 dark:text-slate-500 group-focus-within/input:text-indigo-600 dark:group-focus-within/input:text-indigo-400 transition-colors" />
                   <input
                     type="text"
-                    className="w-full pl-14 pr-6 py-5 bg-[#0F172A] border border-slate-600/50 focus:border-indigo-500/50 rounded-2xl outline-none font-bold transition text-[#E2E8F0] placeholder:text-slate-500 shadow-inner"
+                    className="w-full pl-14 pr-6 py-5 bg-slate-50 dark:bg-[#0F172A] border border-slate-200 dark:border-slate-600/50 focus:border-indigo-500/50 rounded-2xl outline-none font-bold transition text-slate-900 dark:text-[#E2E8F0] placeholder:text-slate-400 dark:placeholder:text-slate-500 shadow-inner transition-colors"
                     placeholder="+1 234 567 890"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
@@ -409,12 +399,12 @@ const EditProfile = () => {
               </div>
 
               <div className="space-y-3">
-                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Personal Website</label>
+                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 ml-1 transition-colors">Personal Website</label>
                 <div className="relative group/input">
-                  <Globe size={18} className="absolute left-5 top-5 text-slate-400 group-focus-within/input:text-indigo-400 transition-colors" />
+                  <Globe size={18} className="absolute left-5 top-5 text-slate-400 dark:text-slate-500 group-focus-within/input:text-indigo-600 dark:group-focus-within/input:text-indigo-400 transition-colors" />
                   <input
                     type="url"
-                    className="w-full pl-14 pr-6 py-5 bg-[#0F172A] border border-slate-600/50 focus:border-indigo-500/50 rounded-2xl outline-none font-bold transition text-[#E2E8F0] placeholder:text-slate-500 shadow-inner"
+                    className="w-full pl-14 pr-6 py-5 bg-slate-50 dark:bg-[#0F172A] border border-slate-200 dark:border-slate-600/50 focus:border-indigo-500/50 rounded-2xl outline-none font-bold transition text-slate-900 dark:text-[#E2E8F0] placeholder:text-slate-400 dark:placeholder:text-slate-500 shadow-inner transition-colors"
                     placeholder="https://yourwebsite.com"
                     value={formData.website}
                     onChange={(e) => setFormData({ ...formData, website: e.target.value })}
@@ -423,12 +413,12 @@ const EditProfile = () => {
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">GitHub Profile</label>
-                <div className="relative">
-                  <Github size={18} className="absolute left-4 top-4 text-slate-400" />
+                <label className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 ml-1 transition-colors">GitHub Profile</label>
+                <div className="relative group/input">
+                  <Github size={18} className="absolute left-4 top-4 text-slate-400 dark:text-slate-500 transition-colors" />
                   <input
                     type="url"
-                    className="w-full pl-12 pr-4 py-4 bg-[#0F172A] border border-slate-600 focus:border-indigo-500 rounded-2xl outline-none font-bold transition text-slate-200 placeholder:text-slate-400"
+                    className="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-[#0F172A] border border-slate-200 dark:border-slate-600 focus:border-indigo-500 rounded-2xl outline-none font-bold transition text-slate-900 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500 transition-colors"
                     placeholder="https://github.com/username"
                     value={formData.github}
                     onChange={(e) => setFormData({ ...formData, github: e.target.value })}
@@ -437,12 +427,12 @@ const EditProfile = () => {
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">LinkedIn Profile</label>
-                <div className="relative">
-                  <Linkedin size={18} className="absolute left-4 top-4 text-slate-400" />
+                <label className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 ml-1 transition-colors">LinkedIn Profile</label>
+                <div className="relative group/input">
+                  <Linkedin size={18} className="absolute left-4 top-4 text-slate-400 dark:text-slate-500 transition-colors" />
                   <input
                     type="url"
-                    className="w-full pl-12 pr-4 py-4 bg-[#0F172A] border border-slate-600 focus:border-indigo-500 rounded-2xl outline-none font-bold transition text-slate-200 placeholder:text-slate-400"
+                    className="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-[#0F172A] border border-slate-200 dark:border-slate-600 focus:border-indigo-500 rounded-2xl outline-none font-bold transition text-slate-900 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500 transition-colors"
                     placeholder="https://linkedin.com/in/username"
                     value={formData.linkedin}
                     onChange={(e) => setFormData({ ...formData, linkedin: e.target.value })}
@@ -452,9 +442,9 @@ const EditProfile = () => {
             </div>
 
             <div className="space-y-3">
-              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Professional Bio</label>
+              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 ml-1 transition-colors">Professional Bio</label>
               <textarea
-                className="w-full p-8 bg-[#0F172A] border border-slate-600/50 focus:border-indigo-500/50 rounded-[2rem] h-48 outline-none font-medium text-slate-300 leading-relaxed transition placeholder:text-slate-500 shadow-inner"
+                className="w-full p-8 bg-slate-50 dark:bg-[#0F172A] border border-slate-200 dark:border-slate-600/50 focus:border-indigo-500/50 rounded-[2rem] h-48 outline-none font-medium text-slate-700 dark:text-slate-300 leading-relaxed transition placeholder:text-slate-400 dark:placeholder:text-slate-500 shadow-inner transition-colors resize-none"
                 placeholder="Tell your professional story..."
                 value={formData.bio}
                 onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
@@ -464,23 +454,23 @@ const EditProfile = () => {
             {user?.role === "freelancer" && (
               <>
                 <div className="space-y-4 mb-8">
-                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Professional Resume (PDF/DOC)</label>
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-4 p-6 bg-[#0F172A] border border-slate-600/50 rounded-2xl shadow-inner">
-                    <div className="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center text-emerald-400 flex-shrink-0">
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 ml-1 transition-colors">Professional Resume (PDF/DOC)</label>
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-4 p-6 bg-slate-50 dark:bg-[#0F172A] border border-slate-200 dark:border-slate-600/50 rounded-2xl shadow-inner transition-colors">
+                    <div className="w-12 h-12 bg-emerald-500/10 dark:bg-emerald-500/20 rounded-xl flex items-center justify-center text-emerald-600 dark:text-emerald-400 flex-shrink-0 transition-colors">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-file-text"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-slate-200 font-bold mb-1 truncate text-sm">Upload New Resume</p>
-                      <p className="text-slate-400 text-xs truncate">
+                      <p className="text-slate-900 dark:text-slate-200 font-bold mb-1 truncate text-sm transition-colors">Upload New Resume</p>
+                      <p className="text-slate-500 dark:text-slate-400 text-xs truncate transition-colors">
                         {resumeFile ? resumeFile.name : (formData.resumeUrl ? "Current resume attached. Select file to replace it." : "No resume uploaded yet")}
                       </p>
                       {formData.resumeUrl && !resumeFile && (
-                        <a href={formData.resumeUrl} target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:text-indigo-300 text-xs font-bold mt-1 inline-block transition">
+                        <a href={formData.resumeUrl} target="_blank" rel="noopener noreferrer" className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 text-xs font-bold mt-1 inline-block transition transition-colors">
                           View Current Resume
                         </a>
                       )}
                     </div>
-                    <label className="cursor-pointer bg-slate-700 hover:bg-slate-600 px-6 py-3 rounded-xl text-slate-200 font-bold text-sm transition-all shadow-md active:scale-95 whitespace-nowrap text-center">
+                    <label className="cursor-pointer bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 px-6 py-3 rounded-xl text-slate-700 dark:text-slate-200 font-bold text-sm transition-all shadow-md active:scale-95 whitespace-nowrap text-center transition-colors">
                       Choose File
                       <input 
                         type="file" 
@@ -493,11 +483,11 @@ const EditProfile = () => {
                 </div>
 
                 <div className="space-y-4">
-                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Expertise & Skills</label>
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 ml-1 transition-colors">Expertise & Skills</label>
                   <div className="flex gap-4">
                   <input
                     type="text"
-                    className="flex-1 pl-6 pr-6 py-5 bg-[#0F172A] border border-slate-600/50 focus:border-indigo-500/50 rounded-2xl outline-none font-bold transition text-[#E2E8F0] placeholder:text-slate-500 shadow-inner"
+                    className="flex-1 pl-6 pr-6 py-5 bg-slate-50 dark:bg-[#0F172A] border border-slate-200 dark:border-slate-600/50 focus:border-indigo-500/50 rounded-2xl outline-none font-bold transition text-slate-900 dark:text-[#E2E8F0] placeholder:text-slate-400 dark:placeholder:text-slate-500 shadow-inner transition-colors"
                     placeholder="Add a skill (e.g. React, Python)"
                     value={formData.skillInput}
                     onChange={(e) => setFormData({ ...formData, skillInput: e.target.value })}
@@ -506,31 +496,31 @@ const EditProfile = () => {
                   <button
                     type="button"
                     onClick={addSkill}
-                    className="bg-indigo-500/10 text-indigo-400 px-8 rounded-2xl font-black border border-indigo-500/20 hover:bg-gradient-to-r hover:from-indigo-500 hover:to-violet-600 hover:text-white transition-all duration-300 active:scale-95 shadow-lg shadow-indigo-500/10"
+                    className="bg-indigo-600 dark:bg-indigo-500/10 text-white dark:text-indigo-400 px-8 rounded-2xl font-black border border-transparent dark:border-indigo-500/20 hover:bg-indigo-700 dark:hover:bg-gradient-to-r dark:hover:from-indigo-500 dark:hover:to-violet-600 dark:hover:text-white transition-all duration-300 active:scale-95 shadow-lg shadow-indigo-500/10 transition-colors"
                   >
                     <Plus size={24} />
                   </button>
                 </div>
                 <div className="flex flex-wrap gap-2 pt-2">
                   {formData.skills.map(skill => (
-                    <span key={skill} className="bg-indigo-500/20 text-indigo-300 px-5 py-2.5 rounded-xl font-black text-sm border border-indigo-500/30 flex items-center gap-3">
+                    <span key={skill} className="bg-indigo-50 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 px-5 py-2.5 rounded-xl font-black text-sm border border-indigo-100 dark:border-indigo-500/30 flex items-center gap-3 transition-colors">
                       {skill}
-                      <X size={14} className="cursor-pointer hover:text-red-400 transition" onClick={() => removeSkill(skill)} />
+                      <X size={14} className="cursor-pointer hover:text-red-500 dark:hover:text-red-400 transition transition-colors" onClick={() => removeSkill(skill)} />
                     </span>
                   ))}
                 </div>
               </div>
 
-              <div className="pt-8 mt-4 border-t border-slate-700/50">
-                <div className="bg-slate-800/20 rounded-[2rem] p-8 border border-slate-700/50">
+              <div className="pt-8 mt-4 border-t border-slate-100 dark:border-slate-700/50 transition-colors">
+                <div className="bg-slate-50 dark:bg-slate-800/20 rounded-[2rem] p-8 border border-slate-200 dark:border-slate-700/50 transition-colors">
                   <div className="flex items-center justify-between gap-6 mb-8">
                     <div className="flex items-center gap-4">
-                      <div className={`p-3 rounded-2xl ${formData.isMentor ? 'bg-indigo-500/20 text-indigo-400' : 'bg-slate-700/50 text-slate-500'}`}>
+                      <div className={`p-3 rounded-2xl transition-colors ${formData.isMentor ? 'bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400' : 'bg-slate-200 dark:bg-slate-700/50 text-slate-500 dark:text-slate-500'}`}>
                         <ShieldCheck size={28} />
                       </div>
                       <div>
-                        <h3 className="text-xl font-black text-slate-200 uppercase tracking-tight">Become a Mentor</h3>
-                        <p className="text-slate-400 text-xs font-bold mt-1">Share your expertise and guide others in their career</p>
+                        <h3 className="text-xl font-black text-slate-900 dark:text-slate-200 uppercase tracking-tight transition-colors">Become a Mentor</h3>
+                        <p className="text-slate-500 dark:text-slate-400 text-xs font-bold mt-1 transition-colors">Share your expertise and guide others in their career</p>
                       </div>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
@@ -540,16 +530,16 @@ const EditProfile = () => {
                         checked={formData.isMentor}
                         onChange={(e) => setFormData({ ...formData, isMentor: e.target.checked })}
                       />
-                      <div className="w-16 h-8 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-indigo-600"></div>
+                      <div className="w-16 h-8 bg-slate-300 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-indigo-600 transition-colors"></div>
                     </label>
                   </div>
 
                   {formData.isMentor && (
                     <div className="space-y-6 animate-in slide-in-from-top-4 duration-300">
                       <div className="space-y-3">
-                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-400 ml-1">Mentor Professional Bio</label>
+                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-600 dark:text-indigo-400 ml-1 transition-colors">Mentor Professional Bio</label>
                         <textarea
-                          className="w-full p-6 bg-[#0F172A] border border-indigo-500/20 focus:border-indigo-500/50 rounded-2xl h-32 outline-none font-medium text-slate-300 leading-relaxed transition shadow-inner"
+                          className="w-full p-6 bg-slate-100 dark:bg-[#0F172A] border border-indigo-200 dark:border-indigo-500/20 focus:border-indigo-500/50 rounded-2xl h-32 outline-none font-medium text-slate-700 dark:text-slate-300 leading-relaxed transition shadow-inner transition-colors"
                           placeholder="What specific guidance can you offer to mentees?"
                           value={formData.mentorBio}
                           onChange={(e) => setFormData({ ...formData, mentorBio: e.target.value })}
@@ -557,12 +547,12 @@ const EditProfile = () => {
                       </div>
 
                       <div className="space-y-3">
-                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-400 ml-1">Years of Mentorship Experience</label>
+                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-600 dark:text-indigo-400 ml-1 transition-colors">Years of Mentorship Experience</label>
                         <div className="relative group/input">
-                          <Award size={18} className="absolute left-5 top-5 text-slate-400 group-focus-within/input:text-indigo-400 transition-colors" />
+                          <Award size={18} className="absolute left-5 top-5 text-slate-400 dark:text-slate-500 group-focus-within/input:text-indigo-600 dark:group-focus-within/input:text-indigo-400 transition-colors" />
                           <input
                             type="number"
-                            className="w-full pl-14 pr-6 py-5 bg-[#0F172A] border border-indigo-500/20 focus:border-indigo-500/50 rounded-xl outline-none font-bold transition text-[#E2E8F0] shadow-inner"
+                            className="w-full pl-14 pr-6 py-5 bg-slate-100 dark:bg-[#0F172A] border border-indigo-200 dark:border-indigo-500/20 focus:border-indigo-500/50 rounded-xl outline-none font-bold transition text-slate-900 dark:text-[#E2E8F0] shadow-inner transition-colors"
                             value={formData.mentorExperience}
                             onChange={(e) => setFormData({ ...formData, mentorExperience: parseInt(e.target.value) || 0 })}
                           />
@@ -575,8 +565,8 @@ const EditProfile = () => {
               </>
             )}
 
-            <div className="pt-8 border-t border-slate-600 flex items-center justify-between">
-              <p className="text-slate-400 text-sm font-medium italic">All changes are updated instantly across the platform.</p>
+            <div className="pt-8 border-t border-slate-100 dark:border-slate-600 flex items-center justify-between transition-colors">
+              <p className="text-slate-500 dark:text-slate-400 text-sm font-medium italic transition-colors">All changes are updated instantly across the platform.</p>
               <button
                 type="submit"
                 disabled={saving}
