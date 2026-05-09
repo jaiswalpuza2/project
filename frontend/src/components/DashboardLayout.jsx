@@ -106,7 +106,7 @@ const DashboardLayout = ({ children, setActiveTab, activeTab }) => {
                   ? (link.activeTab ? activeTab === link.activeTab : activeTab === "overview")
                   : isActive;
 
-                return `flex items-center gap-4 p-4 rounded-xl font-bold text-sm md:text-lg lg:text-xl transition ${
+                return `flex items-center gap-4 p-4 rounded-xl font-bold text-sm md:text-base lg:text-lg transition ${
                   isItemActive 
                     ? 'bg-gradient-to-r from-indigo-500 to-violet-600 text-white shadow-lg shadow-indigo-500/30' 
                     : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80 hover:text-indigo-600 dark:hover:text-white'

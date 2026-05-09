@@ -81,16 +81,16 @@ const ProfileWizard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#0F172A] flex items-center justify-center p-4 font-['Plus_Jakarta_Sans'] transition-colors duration-500">
-      <div className="max-w-3xl w-full bg-white dark:bg-[#1E293B] shadow-2xl dark:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] rounded-[3rem] overflow-hidden border border-slate-100 dark:border-slate-600/50 relative transition-colors duration-500">
-        <div className="bg-gradient-to-r from-indigo-500 to-violet-600 p-12 text-white relative overflow-hidden">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0F172A] flex items-center justify-center p-2 md:p-4 font-['Plus_Jakarta_Sans'] transition-colors duration-500">
+      <div className="max-w-3xl w-full bg-white dark:bg-[#1E293B] shadow-2xl dark:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] rounded-2xl md:rounded-[3rem] overflow-hidden border border-slate-100 dark:border-slate-600/50 relative transition-colors duration-500">
+        <div className="bg-gradient-to-r from-indigo-500 to-violet-600 p-8 md:p-12 text-white relative overflow-hidden">
 
           <div className="flex items-center gap-3 mb-4">
 
              <h2 className="text-2xl font-black tracking-tighter uppercase text-cyan-400">JobSphere</h2>
           </div>
-          <h2 className="text-3xl font-black tracking-tight">{isEmployer ? "Employer Hub" : "Freelancer Setup"}</h2>
-          <p className="mt-2 text-indigo-100 font-medium italic">
+          <h2 className="text-xl md:text-3xl font-black tracking-tight">{isEmployer ? "Employer Hub" : "Freelancer Setup"}</h2>
+          <p className="mt-1 md:mt-2 text-xs md:text-base text-indigo-100 font-medium italic">
             {isEmployer ? "Build your company presence." : "Let's highlight your professional excellence."}
           </p>
           <div className="mt-8 flex gap-3">
@@ -105,20 +105,20 @@ const ProfileWizard = () => {
           </div>
         </div>
 
-        <div className="p-10">
+        <div className="p-6 md:p-10">
           {step === 1 && (
             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <div className="flex items-center gap-6 mb-10">
-                <div className="p-5 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-2xl border border-indigo-500/20 shadow-lg shadow-indigo-500/5 transition-colors">
-                  <FileText size={28} />
+              <div className="flex items-center gap-4 md:gap-6 mb-6 md:mb-10">
+                <div className="p-3 md:p-5 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-xl md:rounded-2xl border border-indigo-500/20 shadow-lg shadow-indigo-500/5 transition-colors">
+                  <FileText size={24} className="md:w-7 md:h-7" />
                 </div>
                 <div>
-                  <h3 className="text-3xl font-black text-slate-900 dark:text-[#E2E8F0] leading-tight tracking-tight transition-colors">Professional Bio</h3>
-                  <p className="text-slate-500 dark:text-slate-400 font-medium italic mt-1 transition-colors">Summarize your journey and expertise.</p>
+                  <h3 className="text-xl md:text-3xl font-black text-slate-900 dark:text-[#E2E8F0] leading-tight tracking-tight transition-colors">Professional Bio</h3>
+                  <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 font-medium italic mt-1 transition-colors">Summarize your journey and expertise.</p>
                 </div>
               </div>
               <textarea
-                className="w-full p-8 border border-slate-200 dark:border-slate-600/50 bg-slate-50 dark:bg-[#0F172A] rounded-[2.5rem] h-56 resize-none focus:border-indigo-500/50 outline-none transition font-medium text-slate-800 dark:text-slate-300 leading-relaxed placeholder:text-slate-400 dark:placeholder:text-slate-500 shadow-inner"
+                className="w-full p-6 md:p-8 border border-slate-200 dark:border-slate-600/50 bg-slate-50 dark:bg-[#0F172A] rounded-2xl md:rounded-[2.5rem] h-48 md:h-56 resize-none focus:border-indigo-500/50 outline-none transition font-medium text-sm md:text-base text-slate-800 dark:text-slate-300 leading-relaxed placeholder:text-slate-400 dark:placeholder:text-slate-500 shadow-inner"
                 placeholder={isEmployer ? "Describe your company values and culture..." : "Write a compelling summary of your career highlights..."}
                 value={formData.bio}
                 onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
@@ -137,17 +137,17 @@ const ProfileWizard = () => {
                   <p className="text-slate-500 dark:text-slate-400 text-sm font-medium italic transition-colors">Add skills to get matched with the right jobs.</p>
                 </div>
               </div>
-              <form onSubmit={addSkill} className="flex gap-4 transition-colors">
+              <form onSubmit={addSkill} className="flex flex-col sm:flex-row gap-3 md:gap-4 transition-colors">
                 <input
                   type="text"
-                  className="flex-1 p-5 border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-[#0F172A] rounded-2xl outline-none focus:border-violet-500 transition font-bold text-slate-800 dark:text-slate-200 placeholder:text-slate-400"
+                  className="flex-1 p-4 md:p-5 border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-[#0F172A] rounded-xl md:rounded-2xl outline-none focus:border-violet-500 transition font-bold text-sm md:text-base text-slate-800 dark:text-slate-200 placeholder:text-slate-400"
                   placeholder="E.g. Full-Stack Dev, UI/UX..."
                   value={formData.skillInput}
                   onChange={(e) => setFormData({ ...formData, skillInput: e.target.value })}
                 />
                 <button
                   type="submit"
-                  className="bg-gradient-to-r from-indigo-500 to-violet-600 text-white px-8 rounded-2xl font-black hover:brightness-110 transition shadow-lg shadow-indigo-500/20"
+                  className="bg-gradient-to-r from-indigo-500 to-violet-600 text-white px-8 py-4 md:py-0 rounded-xl md:rounded-2xl font-black hover:brightness-110 transition shadow-lg shadow-indigo-500/20 uppercase tracking-widest text-xs"
                 >
                   Add
                 </button>
@@ -286,12 +286,12 @@ const ProfileWizard = () => {
             )}
             <div className="ml-auto">
               {step < totalSteps ? (
-                <button
-                  onClick={handleNext}
-                  className="bg-gradient-to-r from-indigo-500 to-violet-600 text-white px-12 py-5 rounded-[1.5rem] font-black hover:brightness-110 transition flex items-center gap-3 shadow-xl shadow-indigo-500/20 active:scale-95 uppercase tracking-widest text-xs"
-                >
-                  Continue <ChevronRight size={20} />
-                </button>
+                  <button
+                    onClick={handleNext}
+                    className="bg-gradient-to-r from-indigo-500 to-violet-600 text-white px-8 md:px-12 py-4 md:py-5 rounded-xl md:rounded-[1.5rem] font-black hover:brightness-110 transition flex items-center gap-3 shadow-xl shadow-indigo-500/20 active:scale-95 uppercase tracking-widest text-[10px] md:text-xs"
+                  >
+                    Continue <ChevronRight size={18} />
+                  </button>
               ) : (
                 <button
                   onClick={handleSubmit}

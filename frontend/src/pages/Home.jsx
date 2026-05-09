@@ -76,10 +76,10 @@ const Home = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-black text-slate-900 dark:text-white leading-[1.05] mb-8 md:mb-14 tracking-tighter transition-colors duration-300"
+            className="text-[32px] sm:text-4xl md:text-6xl lg:text-8xl font-black text-slate-900 dark:text-white leading-tight md:leading-[1.1] mb-8 md:mb-14 tracking-tight transition-colors duration-300"
           >
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-cyan-500">Hire talent</span> <br className="hidden md:block" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-cyan-500">smarter,</span><br className="md:hidden" /> 
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-cyan-500"> smarter,</span><br className="md:hidden" /> 
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-cyan-500"> work faster.</span>
           </motion.h1>
 
@@ -87,7 +87,7 @@ const Home = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-base md:text-xl lg:text-2xl text-slate-600 dark:text-slate-300 max-w-4xl mb-12 md:mb-20 leading-relaxed font-medium px-4 transition-colors duration-300"
+            className="text-[15px] md:text-xl lg:text-2xl text-slate-600 dark:text-slate-300 max-w-4xl mb-12 md:mb-20 leading-relaxed font-medium px-4 transition-colors duration-300"
           >
             JobSphere connects top freelancers with elite employers using AI-driven matching, 
             automated proposal generation, and real-time collaboration.
@@ -99,10 +99,10 @@ const Home = () => {
             transition={{ delay: 0.3 }}
             className="flex flex-col sm:flex-row gap-4 md:gap-10 w-full sm:w-auto px-4 sm:px-0"
           >
-            <Link to="/register" className="group px-6 md:px-10 py-4 md:py-6 bg-gradient-to-r from-indigo-500 to-violet-600 text-white rounded-2xl md:rounded-3xl font-black text-sm md:text-lg lg:text-xl hover:brightness-110 transition-all flex items-center justify-center gap-3 shadow-[0_20px_50px_rgba(79,70,229,0.3)] active:scale-95">
+            <Link to="/register" className="group px-6 md:px-10 py-5 md:py-6 bg-gradient-to-r from-indigo-500 to-violet-600 text-white rounded-2xl md:rounded-3xl font-black text-base md:text-lg lg:text-xl hover:brightness-110 transition-all flex items-center justify-center gap-3 shadow-[0_20px_50px_rgba(79,70,229,0.3)] active:scale-95">
               Post a Job <ChevronRight className="group-hover:translate-x-1 transition-transform" />
             </Link>
-            <Link to="/jobs" className="px-8 md:px-10 py-4 md:py-6 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white rounded-2xl md:rounded-3xl font-black text-base md:text-xl hover:bg-slate-200 dark:hover:bg-[#1E293B] transition-all backdrop-blur-xl active:scale-95 text-center">
+            <Link to="/jobs" className="px-8 md:px-10 py-5 md:py-6 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white rounded-2xl md:rounded-3xl font-black text-base md:text-xl hover:bg-slate-200 dark:hover:bg-[#1E293B] transition-all backdrop-blur-xl active:scale-95 text-center">
               Browse Work
             </Link>
           </motion.div>
@@ -113,9 +113,9 @@ const Home = () => {
       </section>
       <section id="features" className="py-40 px-8 bg-slate-50 dark:bg-[#0F172A] relative border-t border-slate-200 dark:border-slate-700/30 transition-colors duration-300">
         <div className="max-w-7xl mx-auto">
-          <header className="text-center mb-16 md:mb-24 px-4">
-            <h2 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white mb-6 md:mb-8 leading-tight transition-colors duration-300">Built for <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-cyan-500">Excellence</span></h2>
-            <p className="text-slate-600 dark:text-slate-300 text-base md:text-xl max-w-4xl mx-auto font-medium leading-relaxed transition-colors duration-300">Everything you need to thrive in the modern freelancer economy.</p>
+          <header className="text-center mb-20 md:mb-24 px-4">
+            <h2 className="text-lg md:text-5xl font-black text-slate-900 dark:text-white mb-6 md:mb-8 transition-colors duration-300">Built for <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-cyan-500">Excellence</span></h2>
+            <p className="text-slate-600 dark:text-slate-300 text-[15px] md:text-xl max-w-4xl mx-auto font-medium leading-relaxed transition-colors duration-300">Everything you need to thrive in the modern freelancer economy.</p>
           </header>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 px-4 md:px-0">
             {[
@@ -140,11 +140,11 @@ const Home = () => {
       </section>
 
       {/* How it Works Section */}
-      <section id="how-it-works" className="py-24 md:py-40 px-6 md:px-8 bg-white dark:bg-slate-900 relative border-t border-slate-200 dark:border-slate-700/30 overflow-hidden transition-colors duration-300">
+      <section id="how-it-works" className="py-20 md:py-40 px-6 md:px-8 bg-white dark:bg-slate-900 relative border-t border-slate-200 dark:border-slate-700/30 overflow-hidden transition-colors duration-300">
         <div className="max-w-7xl mx-auto relative z-10">
-          <header className="text-center mb-16 md:mb-24 px-4">
-            <h2 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white mb-6 md:mb-8 transition-colors duration-300">How it <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-500 to-indigo-500">Works</span></h2>
-            <p className="text-slate-600 dark:text-slate-300 text-base md:text-lg max-w-4xl mx-auto font-medium leading-relaxed transition-colors duration-300">Four simple steps to transform the way you work and hire.</p>
+          <header className="text-center mb-20 md:mb-24 px-4">
+            <h2 className="text-lg md:text-5xl font-black text-slate-900 dark:text-white mb-6 md:mb-8 transition-colors duration-300">How it <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-500 to-indigo-500">Works</span></h2>
+            <p className="text-slate-600 dark:text-slate-300 text-[15px] md:text-lg max-w-4xl mx-auto font-medium leading-relaxed transition-colors duration-300">Four simple steps to transform the way you work and hire.</p>
           </header>
           
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 relative">
@@ -160,13 +160,13 @@ const Home = () => {
               <motion.div 
                 key={i}
                 whileHover={{ y: -10 }}
-                className="relative bg-slate-50 dark:bg-[#0F172A] p-8 rounded-[2.5rem] border border-slate-200 dark:border-slate-700 hover:border-violet-500/50 transition-all group shadow-xl"
+                className="relative bg-slate-50 dark:bg-[#0F172A] p-10 rounded-[2.5rem] border border-slate-200 dark:border-slate-700 hover:border-violet-500/50 transition-all group shadow-xl"
               >
-                <div className="h-20 w-20 bg-white dark:bg-slate-800 rounded-3xl flex items-center justify-center mb-8 mx-auto group-hover:scale-110 transition-transform duration-500 shadow-lg border border-slate-200 dark:border-white/5 group-hover:bg-slate-100 dark:group-hover:bg-[#1E293B]">
+                <div className="h-20 w-20 bg-white dark:bg-slate-800 rounded-3xl flex items-center justify-center mb-10 mx-auto group-hover:scale-110 transition-transform duration-500 shadow-lg border border-slate-200 dark:border-white/5 group-hover:bg-slate-100 dark:group-hover:bg-[#1E293B]">
                   {step.icon}
                 </div>
-                <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-4 tracking-tight text-center transition-colors duration-300">{step.title}</h3>
-                <p className="text-slate-600 dark:text-slate-400 text-lg leading-relaxed font-medium text-center transition-colors duration-300">{step.desc}</p>
+                <h3 className="text-base md:text-2xl font-bold text-slate-900 dark:text-white mb-4 tracking-tight text-center transition-colors duration-300">{step.title}</h3>
+                <p className="text-slate-600 dark:text-slate-400 text-[15px] md:text-lg leading-relaxed font-medium text-center transition-colors duration-300">{step.desc}</p>
               </motion.div>
             ))}
           </div>

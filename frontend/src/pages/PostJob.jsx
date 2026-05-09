@@ -111,12 +111,12 @@ const PostJob = () => {
           <div className="space-y-4">
             <label className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 ml-1 transition-colors">Job Title</label>
             <div className="relative group/input">
-              <Briefcase className="absolute left-6 top-6 text-slate-400 group-focus-within/input:text-indigo-400 transition-colors" size={24} />
+              <Briefcase className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within/input:text-indigo-400 transition-colors" size={20} />
               <input
                 name="title"
                 required
-                className="w-full pl-12 md:pl-16 pr-6 md:pr-8 py-3.5 md:py-5 bg-slate-50 dark:bg-[#0F172A] border border-slate-200 dark:border-slate-600/50 focus:border-indigo-500/50 rounded-xl md:rounded-2xl outline-none font-black transition text-sm md:text-base text-slate-900 dark:text-[#E2E8F0] placeholder:text-slate-400 dark:placeholder:text-slate-500 shadow-inner"
-                placeholder="e.g. Full-Stack Developer for SaaS Platform"
+                className="w-full pl-14 md:pl-16 pr-6 md:pr-8 py-4 md:py-5 bg-slate-50 dark:bg-[#0F172A] border border-slate-200 dark:border-slate-600/50 focus:border-indigo-500/50 rounded-xl md:rounded-2xl outline-none font-bold transition text-sm md:text-base text-slate-900 dark:text-[#E2E8F0] placeholder:text-slate-400 dark:placeholder:text-slate-500 shadow-inner"
+                placeholder="e.g. Full-Stack Developer"
                 value={formData.title}
                 onChange={handleChange}
               />
@@ -127,12 +127,12 @@ const PostJob = () => {
             <div className="space-y-4">
               <label className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 ml-1 transition-colors">Budget (NPR)</label>
               <div className="relative group/input">
-                <span className="absolute left-6 top-6 text-slate-900 dark:text-[#E2E8F0] font-black group-focus-within/input:text-indigo-600 dark:group-focus-within/input:text-indigo-400 transition-colors text-lg">NPR</span>
+                <span className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-900 dark:text-[#E2E8F0] font-black group-focus-within/input:text-indigo-600 dark:group-focus-within/input:text-indigo-400 transition-colors text-sm md:text-base">NPR</span>
                 <input
                   name="budget"
                   type="number"
                   required
-                  className="w-full pl-14 md:pl-18 pr-6 md:pr-8 py-3.5 md:py-5 bg-slate-50 dark:bg-[#0F172A] border border-slate-200 dark:border-slate-600/50 focus:border-indigo-500/50 rounded-xl md:rounded-2xl outline-none font-black transition text-sm md:text-base text-slate-900 dark:text-[#E2E8F0] placeholder:text-slate-400 dark:placeholder:text-slate-500 shadow-inner"
+                  className="w-full pl-20 md:pl-24 pr-6 md:pr-8 py-4 md:py-5 bg-slate-50 dark:bg-[#0F172A] border border-slate-200 dark:border-slate-600/50 focus:border-indigo-500/50 rounded-xl md:rounded-2xl outline-none font-black transition text-sm md:text-base text-slate-900 dark:text-[#E2E8F0] placeholder:text-slate-400 dark:placeholder:text-slate-500 shadow-inner"
                   placeholder="5000"
                   value={formData.budget}
                   onChange={handleChange}
@@ -144,7 +144,7 @@ const PostJob = () => {
               <div className="relative group/input">
                 <select
                   name="category"
-                  className="w-full px-8 py-6 bg-slate-50 dark:bg-[#0F172A] border border-slate-200 dark:border-slate-600/50 focus:border-indigo-500/50 rounded-2xl outline-none font-black transition appearance-none text-base text-slate-900 dark:text-[#E2E8F0] shadow-inner"
+                  className="w-full pl-6 pr-12 py-4 md:py-5 bg-slate-50 dark:bg-[#0F172A] border border-slate-200 dark:border-slate-600/50 focus:border-indigo-500/50 rounded-xl md:rounded-2xl outline-none font-black transition appearance-none text-sm md:text-base text-slate-900 dark:text-[#E2E8F0] shadow-inner"
                   value={formData.category}
                   onChange={handleChange}
                 >
@@ -152,8 +152,8 @@ const PostJob = () => {
                     <option key={c} value={c}>{c}</option>
                   ))}
                 </select>
-                <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500">
-                   <ChevronRight size={24} className="rotate-90" />
+                <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                   <ChevronRight size={20} className="rotate-90" />
                 </div>
               </div>
               {formData.category === "Other" && (
@@ -170,31 +170,41 @@ const PostJob = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="space-y-2">
-              <label className="text-sm font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider transition-colors">Job Type</label>
-              <select
-                name="jobType"
-                className="w-full px-4 py-3 bg-slate-50 dark:bg-[#0F172A] border border-slate-200 dark:border-slate-600 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition appearance-none text-slate-900 dark:text-slate-200"
-                value={formData.jobType}
-                onChange={handleChange}
-              >
-                <option value="Remote">Remote</option>
-                <option value="Fixed">Fixed Price</option>
-                <option value="Hourly">Hourly</option>
-              </select>
+            <div className="space-y-4">
+              <label className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 ml-1 transition-colors">Job Type</label>
+              <div className="relative group/input">
+                <select
+                  name="jobType"
+                  className="w-full pl-6 pr-12 py-4 md:py-5 bg-slate-50 dark:bg-[#0F172A] border border-slate-200 dark:border-slate-600/50 focus:border-indigo-500/50 rounded-xl md:rounded-2xl outline-none font-black transition appearance-none text-sm md:text-base text-slate-900 dark:text-[#E2E8F0] shadow-inner"
+                  value={formData.jobType}
+                  onChange={handleChange}
+                >
+                  <option value="Remote">Remote</option>
+                  <option value="Fixed">Fixed Price</option>
+                  <option value="Hourly">Hourly</option>
+                </select>
+                <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                   <ChevronRight size={20} className="rotate-90" />
+                </div>
+              </div>
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider transition-colors">Experience Level</label>
-              <select
-                name="experienceLevel"
-                className="w-full px-4 py-3 bg-slate-50 dark:bg-[#0F172A] border border-slate-200 dark:border-slate-600 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition appearance-none text-slate-900 dark:text-slate-200"
-                value={formData.experienceLevel}
-                onChange={handleChange}
-              >
-                <option value="Entry">Entry Level</option>
-                <option value="Intermediate">Intermediate</option>
-                <option value="Expert">Expert</option>
-              </select>
+            <div className="space-y-4">
+              <label className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 ml-1 transition-colors">Experience Level</label>
+              <div className="relative group/input">
+                <select
+                  name="experienceLevel"
+                  className="w-full pl-6 pr-12 py-4 md:py-5 bg-slate-50 dark:bg-[#0F172A] border border-slate-200 dark:border-slate-600/50 focus:border-indigo-500/50 rounded-xl md:rounded-2xl outline-none font-black transition appearance-none text-sm md:text-base text-slate-900 dark:text-[#E2E8F0] shadow-inner"
+                  value={formData.experienceLevel}
+                  onChange={handleChange}
+                >
+                  <option value="Entry">Entry Level</option>
+                  <option value="Intermediate">Intermediate</option>
+                  <option value="Expert">Expert</option>
+                </select>
+                <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                   <ChevronRight size={20} className="rotate-90" />
+                </div>
+              </div>
             </div>
           </div>
 

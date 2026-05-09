@@ -226,12 +226,12 @@ const EditProfile = () => {
         </button>
 
         <div className="bg-white dark:bg-[#1E293B] shadow-xl dark:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] rounded-[3rem] border border-slate-100 dark:border-slate-600/50 overflow-hidden transition-colors">
-          <header className="bg-gradient-to-r from-indigo-500 to-violet-600 p-12 text-white relative pb-24">
-            <h1 className="text-3xl md:text-4xl font-black tracking-tight">Edit Profile</h1>
-            <p className="text-indigo-100 font-black uppercase tracking-widest text-xs mt-3">Refine your professional presence on JobSphere</p>
+          <header className="bg-gradient-to-r from-indigo-500 to-violet-600 p-8 md:p-12 text-white relative pb-16 md:pb-24">
+            <h1 className="text-2xl md:text-4xl font-black tracking-tight">Edit Profile</h1>
+            <p className="text-indigo-100 font-black uppercase tracking-widest text-[10px] md:text-xs mt-2 md:mt-3 px-1">Refine your professional presence on JobSphere</p>
           </header>
 
-          <form onSubmit={handleSubmit} className="p-10 pt-0 space-y-8 relative">
+          <form onSubmit={handleSubmit} className="p-6 md:p-10 pt-0 space-y-6 md:space-y-8 relative">
             <div className="flex flex-col items-center -mt-16 mb-8 relative z-10">
               <div className="relative group">
                 <div
@@ -484,10 +484,10 @@ const EditProfile = () => {
 
                 <div className="space-y-4">
                   <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 ml-1 transition-colors">Expertise & Skills</label>
-                  <div className="flex gap-4">
+                  <div className="flex gap-2 md:gap-4">
                   <input
                     type="text"
-                    className="flex-1 pl-6 pr-6 py-5 bg-slate-50 dark:bg-[#0F172A] border border-slate-200 dark:border-slate-600/50 focus:border-indigo-500/50 rounded-2xl outline-none font-bold transition text-slate-900 dark:text-[#E2E8F0] placeholder:text-slate-400 dark:placeholder:text-slate-500 shadow-inner transition-colors"
+                    className="flex-1 pl-4 md:pl-6 pr-4 md:pr-6 py-4 md:py-5 bg-slate-50 dark:bg-[#0F172A] border border-slate-200 dark:border-slate-600/50 focus:border-indigo-500/50 rounded-xl md:rounded-2xl outline-none font-bold transition text-sm md:text-base text-slate-900 dark:text-[#E2E8F0] placeholder:text-slate-400 dark:placeholder:text-slate-500 shadow-inner transition-colors"
                     placeholder="Add a skill (e.g. React, Python)"
                     value={formData.skillInput}
                     onChange={(e) => setFormData({ ...formData, skillInput: e.target.value })}
@@ -496,16 +496,16 @@ const EditProfile = () => {
                   <button
                     type="button"
                     onClick={addSkill}
-                    className="bg-indigo-600 dark:bg-indigo-500/10 text-white dark:text-indigo-400 px-8 rounded-2xl font-black border border-transparent dark:border-indigo-500/20 hover:bg-indigo-700 dark:hover:bg-gradient-to-r dark:hover:from-indigo-500 dark:hover:to-violet-600 dark:hover:text-white transition-all duration-300 active:scale-95 shadow-lg shadow-indigo-500/10 transition-colors"
+                    className="bg-indigo-600 dark:bg-indigo-500/10 text-white dark:text-indigo-400 px-5 md:px-8 rounded-xl md:rounded-2xl font-black border border-transparent dark:border-indigo-500/20 hover:bg-indigo-700 dark:hover:bg-gradient-to-r dark:hover:from-indigo-500 dark:hover:to-violet-600 dark:hover:text-white transition-all duration-300 active:scale-95 shadow-lg shadow-indigo-500/10 flex items-center justify-center transition-colors shrink-0"
                   >
-                    <Plus size={24} />
+                    <Plus size={20} className="md:w-6 md:h-6" />
                   </button>
                 </div>
                 <div className="flex flex-wrap gap-2 pt-2">
                   {formData.skills.map(skill => (
-                    <span key={skill} className="bg-indigo-50 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 px-5 py-2.5 rounded-xl font-black text-sm border border-indigo-100 dark:border-indigo-500/30 flex items-center gap-3 transition-colors">
+                    <span key={skill} className="bg-indigo-50 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 px-3 md:px-5 py-2 md:py-2.5 rounded-xl font-black text-xs md:text-sm border border-indigo-100 dark:border-indigo-500/30 flex items-center gap-2 md:gap-3 transition-colors">
                       {skill}
-                      <X size={14} className="cursor-pointer hover:text-red-500 dark:hover:text-red-400 transition transition-colors" onClick={() => removeSkill(skill)} />
+                      <X size={12} className="md:w-[14px] md:h-[14px] cursor-pointer hover:text-red-500 dark:hover:text-red-400 transition transition-colors" onClick={() => removeSkill(skill)} />
                     </span>
                   ))}
                 </div>
@@ -514,23 +514,23 @@ const EditProfile = () => {
               <div className="pt-8 mt-4 border-t border-slate-100 dark:border-slate-700/50 transition-colors">
                 <div className="bg-slate-50 dark:bg-slate-800/20 rounded-[2rem] p-8 border border-slate-200 dark:border-slate-700/50 transition-colors">
                   <div className="flex items-center justify-between gap-6 mb-8">
-                    <div className="flex items-center gap-4">
-                      <div className={`p-3 rounded-2xl transition-colors ${formData.isMentor ? 'bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400' : 'bg-slate-200 dark:bg-slate-700/50 text-slate-500 dark:text-slate-500'}`}>
-                        <ShieldCheck size={28} />
+                    <div className="flex items-center gap-3 md:gap-4 min-w-0 flex-1">
+                      <div className={`p-2.5 md:p-3 rounded-xl md:rounded-2xl transition-colors shrink-0 ${formData.isMentor ? 'bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400' : 'bg-slate-200 dark:bg-slate-700/50 text-slate-500 dark:text-slate-500'}`}>
+                        <ShieldCheck size={22} className="md:w-7 md:h-7" />
                       </div>
-                      <div>
-                        <h3 className="text-xl font-black text-slate-900 dark:text-slate-200 uppercase tracking-tight transition-colors">Become a Mentor</h3>
-                        <p className="text-slate-500 dark:text-slate-400 text-xs font-bold mt-1 transition-colors">Share your expertise and guide others in their career</p>
+                      <div className="min-w-0">
+                        <h3 className="text-sm md:text-xl font-black text-slate-900 dark:text-slate-200 uppercase tracking-tight transition-colors truncate">Become a Mentor</h3>
+                        <p className="text-[10px] md:text-xs text-slate-500 dark:text-slate-400 font-bold mt-0.5 transition-colors line-clamp-1 md:line-clamp-none">Share your expertise and guide others</p>
                       </div>
                     </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
+                    <label className="relative inline-flex items-center cursor-pointer shrink-0">
                       <input 
                         type="checkbox" 
                         className="sr-only peer"
                         checked={formData.isMentor}
                         onChange={(e) => setFormData({ ...formData, isMentor: e.target.checked })}
                       />
-                      <div className="w-16 h-8 bg-slate-300 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-indigo-600 transition-colors"></div>
+                      <div className="w-12 h-6 md:w-16 md:h-8 bg-slate-300 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] md:after:top-[4px] after:left-[2px] md:after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 md:after:h-6 after:w-5 md:after:w-6 after:transition-all peer-checked:bg-indigo-600 transition-colors"></div>
                     </label>
                   </div>
 
@@ -566,11 +566,11 @@ const EditProfile = () => {
             )}
 
             <div className="pt-8 border-t border-slate-100 dark:border-slate-600 flex items-center justify-between transition-colors">
-              <p className="text-slate-500 dark:text-slate-400 text-sm font-medium italic transition-colors">All changes are updated instantly across the platform.</p>
+              <p className="hidden md:block text-slate-500 dark:text-slate-400 text-sm font-medium italic transition-colors">All changes are updated instantly across the platform.</p>
               <button
                 type="submit"
                 disabled={saving}
-                className="bg-gradient-to-r from-indigo-500 to-violet-600 text-white px-10 py-4 rounded-[1.5rem] font-black hover:brightness-110 transition flex items-center gap-3 shadow-xl shadow-indigo-500/20 active:scale-95 disabled:opacity-50"
+                className="w-full md:w-auto bg-gradient-to-r from-indigo-500 to-violet-600 text-white px-10 py-4 md:py-5 rounded-xl md:rounded-[1.5rem] font-black hover:brightness-110 transition flex items-center justify-center gap-3 shadow-xl shadow-indigo-500/20 active:scale-95 disabled:opacity-50 uppercase tracking-widest text-xs md:text-sm"
               >
                 {saving ? <RefreshCw className="animate-spin" size={20} /> : <Save size={20} />}
                 Save Profile

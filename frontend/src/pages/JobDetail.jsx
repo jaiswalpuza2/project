@@ -71,50 +71,50 @@ const JobDetail = () => {
   );
   if (!job) return <div>Job not found</div>;
   return (
-    <div className="space-y-10">
-      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-8">
-          <div className="bg-white dark:bg-[#1E293B] shadow-xl dark:shadow-lg dark:shadow-black/20 p-8 rounded-3xl border border-slate-100 dark:border-slate-600 transition-colors">
+    <div className="space-y-10 md:space-y-16 px-4 md:px-0">
+      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-10 md:gap-8">
+        <div className="lg:col-span-2 space-y-10 md:space-y-12">
+          <div className="bg-white dark:bg-[#1E293B] shadow-xl dark:shadow-lg dark:shadow-black/20 p-8 md:p-12 rounded-[2rem] md:rounded-3xl border border-slate-100 dark:border-slate-600 transition-colors">
             <div className="flex items-center gap-6 mb-8">
-              <div className="h-20 w-20 min-w-[5rem] bg-gradient-to-br from-indigo-500 to-violet-600 rounded-[1.5rem] flex items-center justify-center text-white text-3xl font-black overflow-hidden shadow-inner uppercase shrink-0">
+              <div className="h-16 w-16 md:h-20 md:w-20 min-w-[4rem] md:min-w-[5rem] bg-gradient-to-br from-indigo-500 to-violet-600 rounded-xl md:rounded-[1.5rem] flex items-center justify-center text-white text-2xl md:text-3xl font-black overflow-hidden shadow-inner uppercase shrink-0 transition-all">
                 {job.employer?.companyLogo ? (
                   <img src={job.employer.companyLogo} alt="Logo" className="h-full w-full object-cover" />
                 ) : job.employer?.name[0]}
               </div>
               <div className="min-w-0">
-                <h1 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-slate-200 tracking-tight mb-2 transition-colors">
+                <h1 className="text-[26px] md:text-3xl font-black text-slate-900 dark:text-slate-200 tracking-tight mb-2 transition-colors leading-tight">
                   {job.title}
                 </h1>
-                <p className="text-slate-600 dark:text-slate-400 font-bold text-base transition-colors">
+                <p className="text-slate-600 dark:text-slate-400 font-medium text-[15px] md:text-lg transition-colors">
                   {job.employer?.name}
                 </p>
               </div>
             </div>
-            <div className="flex flex-nowrap items-center gap-x-6 py-5 border-y border-slate-100 dark:border-slate-600 mb-10 transition-colors overflow-x-auto no-scrollbar">
-              <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300 font-bold text-sm whitespace-nowrap transition-colors">
+            <div className="flex flex-wrap md:flex-nowrap items-center gap-y-4 gap-x-6 py-5 border-y border-slate-100 dark:border-slate-600 mb-8 md:mb-10 transition-colors">
+              <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300 font-bold text-xs md:text-sm whitespace-nowrap transition-colors">
                 <DollarSign size={18} className="text-emerald-600 dark:text-emerald-400 transition-colors" />
                 <span>Budget: {formatNPR(job.budget)}</span>
               </div>
-              <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300 font-bold text-sm whitespace-nowrap transition-colors border-l border-slate-100 dark:border-slate-600 pl-6">
+              <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300 font-bold text-xs md:text-sm whitespace-nowrap transition-colors md:border-l border-slate-100 dark:border-slate-600 md:pl-6">
                 <Calendar size={18} className="text-indigo-600 dark:text-indigo-400 transition-colors" />
                 <span>Posted: {new Date(job.createdAt).toLocaleDateString()}</span>
               </div>
-              <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300 font-bold text-sm whitespace-nowrap transition-colors border-l border-slate-100 dark:border-slate-600 pl-6">
+              <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300 font-bold text-xs md:text-sm whitespace-nowrap transition-colors md:border-l border-slate-100 dark:border-slate-600 md:pl-6">
                 <MapPin size={18} className="text-violet-600 dark:text-violet-400 transition-colors" />
                 <span>{job.employer?.location || "Remote"}</span>
               </div>
             </div>
             <div className="prose dark:prose-invert max-w-none">
-              <h3 className="text-2xl font-black text-slate-900 dark:text-slate-200 mb-6 transition-colors">Description</h3>
-              <p className="text-slate-600 dark:text-slate-400 leading-relaxed whitespace-pre-wrap text-lg transition-colors">
+              <h2 className="text-lg md:text-2xl font-black text-slate-900 dark:text-slate-200 mb-6 transition-colors">Description</h2>
+              <p className="text-slate-600 dark:text-slate-400 leading-[1.7] whitespace-pre-wrap text-[15px] md:text-lg transition-colors">
                 {job.description}
               </p>
             </div>
             <div className="mt-12">
-              <h3 className="text-2xl font-black text-slate-900 dark:text-slate-200 mb-6 transition-colors">Required Skills</h3>
+              <h2 className="text-lg md:text-2xl font-black text-slate-900 dark:text-slate-200 mb-6 transition-colors">Required Skills</h2>
               <div className="flex flex-wrap gap-3">
                 {job.skillsRequired.map((skill) => (
-                  <span key={skill} className="bg-slate-50 dark:bg-[#0F172A] text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-600 px-5 py-2.5 rounded-xl font-black text-base transition-colors">
+                  <span key={skill} className="bg-slate-50 dark:bg-[#0F172A] text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-600 px-4 md:px-5 py-2 md:py-2.5 rounded-xl font-bold text-[13px] md:text-base transition-colors">
                     {skill}
                   </span>
                 ))}

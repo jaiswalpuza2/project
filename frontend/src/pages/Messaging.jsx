@@ -355,8 +355,10 @@ const Messaging = () => {
     }
   };
   return (
-    <div className="flex-1 flex overflow-hidden h-[calc(100vh-80px)] -m-8">
-      <aside className="w-96 border-r border-slate-200 dark:border-slate-600 flex flex-col bg-slate-50 dark:bg-[#0F172A] shrink-0 transition-colors">
+    <div className="flex-1 flex overflow-hidden h-[calc(100vh-80px)] -m-8 relative">
+      <aside className={`absolute inset-0 md:relative md:flex md:w-96 border-r border-slate-200 dark:border-slate-600 flex-col bg-slate-50 dark:bg-[#0F172A] shrink-0 transition-all duration-300 z-20 ${
+        activeChat ? "hidden md:flex" : "flex w-full"
+      }`}>
         <div className="p-6 border-b border-slate-200 dark:border-slate-600 bg-white dark:bg-[#1E293B] transition-colors">
           <div className="relative">
             <Search className="absolute left-4 top-3 text-slate-400" size={20} />
@@ -402,21 +404,29 @@ const Messaging = () => {
           )}
         </div>
       </aside>
-      <main className="flex-1 flex flex-col bg-white dark:bg-[#0F172A] min-w-0 transition-colors">
+      <main className={`flex-1 flex flex-col bg-white dark:bg-[#0F172A] min-w-0 transition-all duration-300 ${
+        activeChat ? "flex w-full absolute inset-0 md:relative" : "hidden md:flex"
+      }`}>
         {activeChat ? (
           <>
-            <header className="px-8 py-5 border-b border-slate-200 dark:border-slate-600 flex items-center justify-between bg-white dark:bg-[#1E293B] z-10 shadow-sm relative transition-colors">
-              <div className="flex items-center gap-4 flex-1">
+            <header className="px-4 md:px-8 py-4 md:py-5 border-b border-slate-200 dark:border-slate-600 flex items-center justify-between bg-white dark:bg-[#1E293B] z-10 shadow-sm relative transition-colors">
+              <div className="flex items-center gap-3 md:gap-4 flex-1">
                 {!showSearch ? (
                   <>
-                     <div className="h-14 w-14 bg-gradient-to-r from-indigo-500 to-violet-600 rounded-2xl flex items-center justify-center text-white font-black text-xl uppercase shadow-lg dark:shadow-[0_10px_25px_-5px_rgba(79,70,229,0.4)] transition-all">
+                    <button 
+                      onClick={() => setActiveChat(null)}
+                      className="md:hidden p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full text-slate-500 transition"
+                    >
+                      <ChevronRight className="rotate-180" size={24} />
+                    </button>
+                    <div className="h-10 w-10 md:h-14 md:w-14 bg-gradient-to-r from-indigo-500 to-violet-600 rounded-xl md:rounded-2xl flex items-center justify-center text-white font-black text-lg md:text-xl uppercase shadow-lg dark:shadow-[0_10px_25px_-5px_rgba(79,70,229,0.4)] transition-all">
                       {activeChat.name[0]}
                     </div>
-                    <div>
-                      <h3 className="font-black text-slate-900 dark:text-[#E2E8F0] tracking-tight text-xl transition-colors">{activeChat.name}</h3>
-                      <div className="flex items-center gap-3 mt-1">
-                        <div className="h-2.5 w-2.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div>
-                        <p className="text-xs text-green-600 dark:text-green-400 font-black uppercase tracking-[0.2em] transition-colors">Active Now</p>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-black text-slate-900 dark:text-[#E2E8F0] tracking-tight text-base md:text-xl truncate transition-colors">{activeChat.name}</h3>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div>
+                        <p className="text-[10px] text-green-600 dark:text-green-400 font-black uppercase tracking-[0.1em] md:tracking-[0.2em] transition-colors">Online</p>
                       </div>
                     </div>
                   </>
@@ -440,24 +450,24 @@ const Messaging = () => {
                   </div>
                 )}
               </div>
-              <div className="flex items-center gap-2">
+               <div className="flex items-center gap-1 md:gap-2">
                  <button 
                   onClick={() => callUser(activeChat._id, 'audio')}
-                  className="p-3 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-2xl transition text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400"
+                  className="p-2 md:p-3 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400"
                 >
-                  <Phone size={24} />
+                  <Phone size={20} className="md:w-6 md:h-6" />
                 </button>
                 <button 
                   onClick={() => callUser(activeChat._id, 'video')}
-                  className="p-3 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-2xl transition text-slate-400 dark:text-slate-500 hover:text-green-600 dark:hover:text-green-400"
+                  className="p-2 md:p-3 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition text-slate-400 dark:text-slate-500 hover:text-green-600 dark:hover:text-green-400"
                 >
-                  <Video size={24} />
+                  <Video size={20} className="md:w-6 md:h-6" />
                 </button>
                 <button 
                   onClick={() => setShowHeaderMenu(!showHeaderMenu)}
-                  className={`p-3 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-2xl transition ${showHeaderMenu ? 'bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-slate-200' : 'text-slate-500 dark:text-slate-400'}`}
+                  className={`p-2 md:p-3 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition ${showHeaderMenu ? 'bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-slate-200' : 'text-slate-500 dark:text-slate-400'}`}
                 >
-                  <MoreHorizontal size={20} />
+                  <MoreHorizontal size={18} className="md:w-5 md:h-5" />
                 </button>
                 {showHeaderMenu && (
                   <>
@@ -514,7 +524,7 @@ const Messaging = () => {
                 )}
               </div>
             </header>
-            <div className="flex-1 px-8 py-6 overflow-y-auto space-y-6 bg-slate-50/50 dark:bg-slate-900/50 transition-colors">
+            <div className="flex-1 px-4 md:px-8 py-4 md:py-6 overflow-y-auto space-y-4 md:space-y-6 bg-slate-50/50 dark:bg-slate-900/50 transition-colors">
               {messages.filter(m => 
                 ((m.senderId === (user.id || user._id) && m.recipientId === activeChat._id) || 
                 (m.senderId === activeChat._id && m.recipientId === (user.id || user._id))) &&
@@ -727,7 +737,7 @@ const Messaging = () => {
               )}
               <div ref={messagesEndRef} />
             </div>
-            <footer className="p-6 bg-white dark:bg-[#1E293B] border-t border-slate-200 dark:border-slate-600 relative transition-colors">
+            <footer className="p-4 md:p-6 bg-white dark:bg-[#1E293B] border-t border-slate-200 dark:border-slate-600 relative transition-colors">
               {replyingTo && (
                 <div className="absolute bottom-full left-0 w-full p-4 bg-slate-100 dark:bg-[#0F172A] border-t border-slate-200 dark:border-slate-600 flex items-center justify-between animate-in slide-in-from-bottom-2 duration-300 transition-colors">
                   <div className="flex items-center gap-3 border-l-4 border-indigo-500 pl-4">

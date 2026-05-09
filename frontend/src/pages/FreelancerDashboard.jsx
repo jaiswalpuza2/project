@@ -74,19 +74,19 @@ const FreelancerDashboard = () => {
   }, [user?._id]);
 
   return (
-    <div className="space-y-6 md:space-y-10">
+    <div className="space-y-10 md:space-y-16 pb-20 md:pb-0">
       {activeTab === 'dashboard' && (
           <>
               {/* Stats Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8 md:mb-10">
+               <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-6 mb-10 md:mb-16">
                 {[
                   { label: "Active Applications", value: "12", color: "blue" },
                   { label: "Recommended Jobs", value: "24", color: "green" },
                   { label: "Profile Views", value: "158", color: "purple" }
                 ].map((stat) => (
-                  <div key={stat.label} className="bg-white dark:bg-[#1E293B] shadow-xl dark:shadow-2xl p-6 md:p-8 rounded-2xl border border-slate-100 dark:border-slate-600/50 hover:border-indigo-500/30 transition-all duration-300 group">
-                    <p className="text-slate-500 dark:text-slate-400 text-sm md:text-base font-black uppercase tracking-wider">{stat.label}</p>
-                    <h3 className="text-2xl md:text-3xl font-black mt-2 md:mt-3 text-slate-900 dark:text-[#E2E8F0] tracking-tight group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{stat.value}</h3>
+                  <div key={stat.label} className="bg-white dark:bg-[#1E293B] shadow-xl dark:shadow-2xl p-8 md:p-10 rounded-2xl md:rounded-3xl border border-slate-100 dark:border-slate-600/50 hover:border-indigo-500/30 transition-all duration-300 group">
+                    <p className="text-slate-500 dark:text-slate-400 text-[13px] md:text-sm font-black uppercase tracking-[0.1em]">{stat.label}</p>
+                    <h3 className="text-[26px] md:text-3xl font-black mt-3 md:mt-4 text-slate-900 dark:text-[#E2E8F0] tracking-tight group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{stat.value}</h3>
                   </div>
                 ))}
               </div>
@@ -97,8 +97,8 @@ const FreelancerDashboard = () => {
                   <Cpu size={24} className="md:w-7 md:h-7" />
                 </div>
                 <div>
-                  <h3 className="text-base md:text-lg lg:text-xl font-black text-slate-900 dark:text-slate-200 uppercase tracking-tight transition-colors">AI Tools Suite</h3>
-                  <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 font-bold mt-1 transition-colors">Enhance your career with intelligent AI</p>
+                  <h2 className="text-lg md:text-2xl font-black text-slate-900 dark:text-slate-200 transition-colors">AI Tools Suite</h2>
+                  <p className="text-[15px] md:text-sm text-slate-500 dark:text-slate-400 font-medium mt-1 transition-colors leading-relaxed">Enhance your career with intelligent AI assistants.</p>
                 </div>
 
 
@@ -133,13 +133,13 @@ const FreelancerDashboard = () => {
                   };
                   const colors = colorMap[tool.color];
                   return (
-                    <div key={tool.id} className="bg-white dark:bg-[#1E293B] border border-slate-100 dark:border-slate-600/50 rounded-2xl md:rounded-[2rem] p-5 md:p-6 hover:border-indigo-500/30 transition-all duration-300 group flex flex-col sm:flex-row items-center gap-5 md:gap-6 shadow-lg hover:shadow-xl dark:shadow-none hover:shadow-indigo-500/10 hover:-translate-y-1">
-                      <div className={`w-14 h-14 md:w-16 md:h-16 rounded-xl md:rounded-2xl ${colors.iconBg} border ${colors.iconBorder} flex items-center justify-center shrink-0 ${colors.iconColor} group-hover:scale-110 transition-transform shadow-inner`}>
+                     <div key={tool.id} className="bg-white dark:bg-[#1E293B] border border-slate-100 dark:border-slate-600/50 rounded-[2rem] md:rounded-[2rem] p-8 md:p-6 hover:border-indigo-500/30 transition-all duration-300 group flex flex-col sm:flex-row items-center gap-6 md:gap-6 shadow-lg hover:shadow-xl dark:shadow-none hover:shadow-indigo-500/10 hover:-translate-y-1">
+                      <div className={`w-16 h-16 md:w-16 md:h-16 rounded-2xl md:rounded-2xl ${colors.iconBg} border ${colors.iconBorder} flex items-center justify-center shrink-0 ${colors.iconColor} group-hover:scale-110 transition-transform shadow-inner`}>
                         {tool.icon}
                       </div>
                       <div className="flex-1 text-center sm:text-left min-w-0">
-                        <h4 className="text-base md:text-lg lg:text-xl font-black text-slate-900 dark:text-slate-200 mb-1.5">{tool.name}</h4>
-                        <p className="text-slate-600 dark:text-slate-400 text-sm md:text-base font-medium mb-3 line-clamp-2">{tool.description}</p>
+                        <h3 className="text-[17px] md:text-lg lg:text-xl font-bold text-slate-900 dark:text-slate-200 mb-2">{tool.name}</h3>
+                        <p className="text-slate-600 dark:text-slate-400 text-[15px] md:text-base font-medium mb-4 line-height-relaxed">{tool.description}</p>
                         <div className="flex items-center justify-center sm:justify-start gap-2">
                           <Zap size={12} className={colors.iconColor} />
                           <span className="text-[12px] md:text-xs font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">{tool.feature}</span>
@@ -158,8 +158,8 @@ const FreelancerDashboard = () => {
             </div>
 
             <div className="space-y-6">
-              <div className="flex justify-between items-center bg-white dark:bg-slate-800/20 p-6 md:p-8 rounded-2xl md:rounded-[2rem] border border-slate-100 dark:border-white/5 mx-1 md:mx-0 shadow-sm transition-colors duration-300">
-                <h3 className="text-base md:text-lg lg:text-xl font-black text-slate-900 dark:text-slate-200 uppercase tracking-tight">AI Job Matches</h3>
+              <div className="flex justify-between items-center bg-white dark:bg-slate-800/20 p-8 md:p-10 rounded-[2rem] md:rounded-[2rem] border border-slate-100 dark:border-white/5 mx-1 md:mx-0 shadow-sm transition-colors duration-300">
+                <h2 className="text-lg md:text-2xl font-black text-slate-900 dark:text-slate-200 transition-colors">AI Job Matches</h2>
                 <button onClick={() => setActiveTab('matches')} className="text-indigo-600 dark:text-cyan-400 font-extrabold hover:text-indigo-500 dark:hover:text-cyan-300 transition-colors uppercase tracking-widest text-sm md:text-base underline-offset-8 decoration-2 decoration-indigo-500/50">View All</button>
               </div>
 
@@ -174,11 +174,11 @@ const FreelancerDashboard = () => {
                   recommendations.slice(0, 3).map((job, idx) => (
                     <Link to={`/jobs/${job._id}`} key={idx} className="bg-white dark:bg-[#1E293B] shadow-lg dark:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] p-5 md:p-6 rounded-2xl border border-slate-100 dark:border-slate-600/50 hover:border-indigo-400/50 transition-all duration-300 group hover:shadow-xl dark:hover:shadow-[0_20px_50px_-12px_rgba(79,70,229,0.15)] mx-1 md:mx-0">
                       <div className="flex justify-between items-start gap-4">
-                        <div className="min-w-0">
-                          <h4 className="text-lg md:text-xl font-black text-slate-900 dark:text-[#E2E8F0] group-hover:text-indigo-600 dark:group-hover:text-white transition tracking-tight truncate">{job.title}</h4>
-                          <div className="flex flex-wrap gap-4 md:gap-6 mt-3 text-xs md:text-sm font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">
-                            <span className="flex items-center gap-1.5"><User size={18} className="text-indigo-600 dark:text-indigo-400 shrink-0" /> <span className="truncate max-w-[100px] md:max-w-none">{job.employer?.name}</span></span>
-                            <span className="flex items-center gap-1.5"><Clock size={18} className="text-cyan-600 dark:text-cyan-400 shrink-0" /> {job.category}</span>
+                        <div className="min-w-0 flex-1">
+                          <h4 className="text-base md:text-xl font-black text-slate-900 dark:text-[#E2E8F0] group-hover:text-indigo-600 dark:group-hover:text-white transition tracking-tight truncate">{job.title}</h4>
+                          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2 text-[10px] md:text-sm font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+                            <span className="flex items-center gap-1.5"><User size={14} className="text-indigo-600 dark:text-indigo-400 shrink-0" /> <span className="truncate max-w-[80px] md:max-w-none">{job.employer?.name}</span></span>
+                            <span className="flex items-center gap-1.5"><Clock size={14} className="text-cyan-600 dark:text-cyan-400 shrink-0" /> {job.category}</span>
                             <span className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-black">{formatNPR(job.budget)}</span>
                           </div>
                         </div>

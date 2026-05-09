@@ -44,11 +44,11 @@ const MyApplications = () => {
   };
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-10 md:space-y-16 px-4 md:px-0">
       <div className="max-w-6xl mx-auto">
-        <header className="mb-10 transition-all">
-          <h2 className="text-3xl font-black text-slate-900 dark:text-slate-200 tracking-tight transition-colors">My Applications </h2>
-          <p className="text-slate-500 dark:text-slate-400 mt-2 font-medium italic transition-colors">Track the status of your active proposals and job reach-outs.</p>
+        <header className="mb-10 md:mb-12 transition-all">
+          <h2 className="text-lg md:text-3xl font-black text-slate-900 dark:text-slate-200 tracking-tight transition-colors">My Applications</h2>
+          <p className="text-[15px] md:text-base text-slate-500 dark:text-slate-400 mt-2 font-medium italic transition-colors px-1 leading-relaxed">Track the status of your active proposals and job reach-outs.</p>
         </header>
 
         {loading ? (
@@ -56,12 +56,11 @@ const MyApplications = () => {
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
           </div>
         ) : applications.length > 0 ? (
-          <div className="grid gap-6">
+          <div className="grid gap-10 md:gap-6">
             {applications.map((app) => (
-              <div key={app._id} className="bg-white dark:bg-[#1E293B] shadow-lg dark:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] rounded-[2.5rem] border border-slate-100 dark:border-slate-600/50 hover:border-indigo-600/30 dark:hover:border-indigo-500/30 transition-all duration-500 group overflow-hidden">
+              <div key={app._id} className="bg-white dark:bg-[#1E293B] shadow-xl dark:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] rounded-[2.5rem] border border-slate-100 dark:border-slate-600/50 hover:border-indigo-600/30 dark:hover:border-indigo-500/30 transition-all duration-500 group overflow-hidden">
                 <div className="flex flex-col md:flex-row items-stretch">
-
-                  <div className="p-8 flex-1">
+                  <div className="p-8 md:p-10 flex-1">
                     <div className="flex justify-between items-start mb-6">
                       <div className={`flex items-center gap-2 px-4 py-2 rounded-full border text-xs font-black uppercase tracking-widest ${getStatusStyle(app.status)}`}>
                         {getStatusIcon(app.status)}
@@ -72,42 +71,42 @@ const MyApplications = () => {
                       </span>
                     </div>
 
-                    <h3 className="text-3xl font-black text-slate-900 dark:text-[#E2E8F0] group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition mb-3 tracking-tight transition-colors">
+                    <h3 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-[#E2E8F0] group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition mb-3 tracking-tight transition-colors truncate">
                        {app.job?.title || "Deleted Job"}
                     </h3>
 
-                    <div className="flex flex-wrap gap-5 text-sm font-bold text-slate-500 dark:text-slate-400 transition-colors">
+                    <div className="flex flex-wrap gap-4 md:gap-5 text-xs md:text-sm font-bold text-slate-500 dark:text-slate-400 transition-colors">
                       <div className="flex items-center gap-2">
-                        <Briefcase size={18} className="text-slate-400 dark:text-slate-500" />
-                        <span className="text-slate-700 dark:text-slate-300 transition-colors">{app.job?.employer?.name || "Company"}</span>
+                        <Briefcase size={16} className="text-slate-400 dark:text-slate-500" />
+                        <span className="text-slate-700 dark:text-slate-300 transition-colors truncate max-w-[150px] md:max-w-none">{app.job?.employer?.name || "Company"}</span>
                       </div>
                       <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-black transition-colors">
-                        <DollarSign size={18} />
+                        <DollarSign size={16} />
                         {formatNPR(app.job?.budget || 0)}
                       </div>
                     </div>
 
-                    <div className="mt-8 p-6 bg-slate-50 dark:bg-[#0F172A] rounded-2xl border border-slate-100 dark:border-white/5 shadow-inner transition-colors">
-                      <p className="text-slate-600 dark:text-slate-400 leading-relaxed font-medium italic transition-colors">
-                         <span className="font-black text-slate-400 dark:text-slate-500 not-italic mr-2 uppercase text-xs tracking-widest">Your Proposal:</span> 
+                    <div className="mt-8 md:mt-10 p-6 md:p-8 bg-slate-50 dark:bg-[#0F172A] rounded-2xl border border-slate-100 dark:border-white/5 shadow-inner transition-colors">
+                      <p className="text-[15px] md:text-base text-slate-600 dark:text-slate-400 leading-[1.7] font-medium italic transition-colors line-clamp-4 md:line-clamp-none">
+                         <span className="font-black text-slate-400 dark:text-slate-500 not-italic mr-2 uppercase text-[10px] tracking-widest block mb-2">Your Proposal:</span> 
                          "{app.proposal}"
                       </p>
                     </div>
                   </div>
 
-                  <div className="md:w-72 bg-slate-50/50 dark:bg-slate-900/30 border-t md:border-t-0 md:border-l border-slate-200 dark:border-slate-600/50 p-8 flex flex-col justify-center gap-4 transition-colors">
+                  <div className="md:w-72 bg-slate-50/50 dark:bg-slate-900/30 border-t md:border-t-0 md:border-l border-slate-200 dark:border-slate-600/50 p-6 md:p-8 flex flex-row md:flex-col justify-center gap-3 transition-colors">
                     <Link 
                       to={`/jobs/${app.job?._id || ''}`}
-                      className="w-full bg-white dark:bg-[#1E293B] text-slate-600 dark:text-slate-300 py-4 rounded-2xl font-black text-sm uppercase tracking-widest border border-slate-200 dark:border-slate-600/50 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-indigo-600 dark:hover:text-white transition text-center flex items-center justify-center gap-2 shadow-lg"
+                      className="flex-1 md:w-full bg-white dark:bg-[#1E293B] text-slate-600 dark:text-slate-300 py-3.5 md:py-4 rounded-xl md:rounded-2xl font-black text-[10px] md:text-sm uppercase tracking-widest border border-slate-200 dark:border-slate-600/50 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-indigo-600 dark:hover:text-white transition text-center flex items-center justify-center gap-1.5 shadow-lg shadow-black/5"
                     >
-                      View Job <ChevronRight size={16} />
+                      View <span className="hidden md:inline">Job</span> <ChevronRight size={14} />
                     </Link>
                     <Link 
                       to="/messages"
                       state={{ initialContact: app.job?.employer }}
-                      className="w-full bg-gradient-to-r from-indigo-500 to-violet-600 text-white py-4 rounded-2xl font-black text-sm uppercase tracking-widest hover:brightness-110 transition flex items-center justify-center gap-2 shadow-xl shadow-indigo-500/20"
+                      className="flex-1 md:w-full bg-gradient-to-r from-indigo-500 to-violet-600 text-white py-3.5 md:py-4 rounded-xl md:rounded-2xl font-black text-[10px] md:text-sm uppercase tracking-widest hover:brightness-110 transition flex items-center justify-center gap-1.5 shadow-xl shadow-indigo-500/20"
                     >
-                      <MessageSquare size={16} /> Message
+                      <MessageSquare size={14} /> Message
                     </Link>
                   </div>
                 </div>

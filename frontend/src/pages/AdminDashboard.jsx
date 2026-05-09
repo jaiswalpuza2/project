@@ -224,103 +224,169 @@ const AdminDashboard = () => {
     switch (activeTab) {
       case "users":
         return (
-          <div className="bg-white dark:bg-[#1E293B] shadow-xl dark:shadow-2xl rounded-2xl md:rounded-[2.5rem] border border-slate-100 dark:border-slate-700/50 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="p-6 md:p-10 border-b border-slate-100 dark:border-slate-700/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-50 dark:bg-slate-800/20">
-              <h3 className="text-lg md:text-xl font-black text-slate-900 dark:text-slate-100 uppercase tracking-tight">Platform Users ({users.length})</h3>
-              <div className="px-4 py-2 bg-indigo-500/10 border border-indigo-500/20 rounded-xl text-indigo-600 dark:text-indigo-400 text-xs font-black uppercase tracking-widest">
+          <div className="bg-white dark:bg-[#1E293B] shadow-xl dark:shadow-2xl rounded-[2.5rem] md:rounded-[2.5rem] border border-slate-100 dark:border-slate-700/50 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="p-8 md:p-10 border-b border-slate-100 dark:border-slate-700/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 bg-slate-50 dark:bg-slate-800/20">
+              <h2 className="text-lg md:text-xl font-black text-slate-900 dark:text-slate-100 uppercase tracking-tight">Platform Users ({users.length})</h2>
+              <div className="px-5 py-2.5 bg-indigo-500/10 border border-indigo-500/20 rounded-xl text-indigo-600 dark:text-indigo-400 text-xs font-black uppercase tracking-[0.2em]">
                 System Users List
               </div>
             </div>
-            <div className="p-4 md:p-8 overflow-x-auto">
-              <table className="w-full text-left min-w-[600px]">
-                <thead>
-                  <tr className="text-[10px] md:text-xs text-slate-500 uppercase tracking-widest font-black border-b border-slate-700/50">
-                    <th className="pb-6">Name</th>
-                    <th className="pb-6">Role</th>
-                    <th className="pb-6">Status</th>
-                    <th className="pb-6 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="text-sm text-slate-600 dark:text-slate-300">
-                  {users.map((u) => (
-                    <tr key={u._id} className="border-b border-slate-100 dark:border-slate-700/30 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-700/20 transition group">
-                      <td className="py-4 md:py-6">
-                        <div className="font-bold text-slate-900 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors uppercase tracking-tight">{u.name}</div>
-                        <div className="text-xs text-slate-400 dark:text-slate-500 font-medium">{u.email}</div>
-                      </td>
-                      <td className="py-4 md:py-6">
-                        <span className={`px-3 md:px-5 py-1.5 md:py-2 rounded-lg md:rounded-xl text-[10px] md:text-xs font-black uppercase tracking-widest border ${
-                          u.role === "admin" ? "bg-purple-500/10 text-purple-400 border-purple-500/20" : 
-                          u.role === "employer" ? "bg-indigo-500/10 text-indigo-400 border-indigo-500/20" : "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                        }`}>
-                          {u.role}
-                        </span>
-                      </td>
-                      <td className="py-4 md:py-6">
-                        <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${u.isDeactivated ? 'bg-red-500/10 text-red-500 border border-red-500/20' : 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20'}`}>
-                          {u.isDeactivated ? 'Banned' : 'Active'}
-                        </span>
-                      </td>
-                      <td className="py-4 md:py-6 text-right space-x-2">
+            <div className="p-6 md:p-10">
+              {/* Desktop Table View */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full text-left min-w-[600px]">
+                  <thead>
+                    <tr className="text-[10px] md:text-xs text-slate-500 uppercase tracking-widest font-black border-b border-slate-700/50">
+                      <th className="pb-6">Name</th>
+                      <th className="pb-6">Role</th>
+                      <th className="pb-6">Status</th>
+                      <th className="pb-6 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="text-sm text-slate-600 dark:text-slate-300">
+                    {users.map((u) => (
+                      <tr key={u._id} className="border-b border-slate-100 dark:border-slate-700/30 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-700/20 transition group">
+                        <td className="py-4 md:py-6">
+                          <div className="font-bold text-slate-900 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors uppercase tracking-tight">{u.name}</div>
+                          <div className="text-xs text-slate-400 dark:text-slate-500 font-medium">{u.email}</div>
+                        </td>
+                        <td className="py-4 md:py-6">
+                          <span className={`px-3 md:px-5 py-1.5 md:py-2 rounded-lg md:rounded-xl text-[10px] md:text-xs font-black uppercase tracking-widest border ${
+                            u.role === "admin" ? "bg-purple-500/10 text-purple-400 border-purple-500/20" : 
+                            u.role === "employer" ? "bg-indigo-500/10 text-indigo-400 border-indigo-500/20" : "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                          }`}>
+                            {u.role}
+                          </span>
+                        </td>
+                        <td className="py-4 md:py-6">
+                          <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${u.isDeactivated ? 'bg-red-500/10 text-red-500 border border-red-500/20' : 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20'}`}>
+                            {u.isDeactivated ? 'Banned' : 'Active'}
+                          </span>
+                        </td>
+                        <td className="py-4 md:py-6 text-right space-x-2">
+                          <button 
+                            onClick={() => handleToggleUserStatus(u._id)}
+                            className={`px-3 md:px-4 py-2 rounded-lg transition-all duration-300 font-black text-[10px] uppercase border ${u.isDeactivated ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20 hover:bg-emerald-500 hover:text-white' : 'bg-amber-500/10 text-amber-500 border-amber-500/20 hover:bg-amber-500 hover:text-white'}`}
+                          >
+                            {u.isDeactivated ? 'Activate' : 'Deactivate'}
+                          </button>
+                          <button 
+                            onClick={() => handleDeleteUser(u._id)}
+                            className="bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white px-3 md:px-4 py-2 rounded-lg transition-all duration-300 font-black text-[10px] uppercase border border-red-500/20"
+                          >
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile Card View */}
+              <div className="md:hidden space-y-6">
+                {users.map((u) => (
+                  <div key={u._id} className="p-6 bg-slate-50 dark:bg-slate-900/40 rounded-3xl border border-slate-200 dark:border-slate-700/50 space-y-4">
+                    <div className="flex justify-between items-start">
+                      <div className="min-w-0">
+                        <div className="font-black text-slate-900 dark:text-slate-200 uppercase tracking-tight truncate">{u.name}</div>
+                        <div className="text-xs text-slate-500 font-medium truncate">{u.email}</div>
+                      </div>
+                      <span className={`px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-[0.1em] border ${
+                        u.role === "admin" ? "bg-purple-500/10 text-purple-400 border-purple-500/20" : 
+                        u.role === "employer" ? "bg-indigo-500/10 text-indigo-400 border-indigo-500/20" : "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                      }`}>
+                        {u.role}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center pt-3 border-t border-slate-200 dark:border-slate-800">
+                      <span className={`px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider ${u.isDeactivated ? 'bg-red-500/10 text-red-500 border border-red-500/20' : 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20'}`}>
+                        {u.isDeactivated ? 'Banned' : 'Active'}
+                      </span>
+                      <div className="flex gap-2">
                         <button 
                           onClick={() => handleToggleUserStatus(u._id)}
-                          className={`px-3 md:px-4 py-2 rounded-lg transition-all duration-300 font-black text-[10px] uppercase border ${u.isDeactivated ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20 hover:bg-emerald-500 hover:text-white' : 'bg-amber-500/10 text-amber-500 border-amber-500/20 hover:bg-amber-500 hover:text-white'}`}
+                          className={`px-4 py-2 rounded-xl text-[11px] font-bold uppercase border ${u.isDeactivated ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : 'bg-amber-500/10 text-amber-500 border-amber-500/20'}`}
                         >
                           {u.isDeactivated ? 'Activate' : 'Deactivate'}
                         </button>
                         <button 
                           onClick={() => handleDeleteUser(u._id)}
-                          className="bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white px-3 md:px-4 py-2 rounded-lg transition-all duration-300 font-black text-[10px] uppercase border border-red-500/20"
+                          className="bg-red-500/10 text-red-500 px-4 py-2 rounded-xl text-[11px] font-bold uppercase border border-red-500/20"
                         >
                           Delete
                         </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         );
       case "jobs":
         return (
-          <div className="bg-white dark:bg-[#1E293B] shadow-xl dark:shadow-2xl rounded-2xl md:rounded-[2.5rem] border border-slate-100 dark:border-slate-700/50 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="p-6 md:p-8 border-b border-slate-100 dark:border-slate-700/50 flex justify-between items-center bg-slate-50 dark:bg-slate-800/20">
-              <h3 className="text-lg md:text-xl font-black text-slate-900 dark:text-slate-100 uppercase tracking-tight">Active Job Posts ({jobs.length})</h3>
+          <div className="bg-white dark:bg-[#1E293B] shadow-xl dark:shadow-2xl rounded-[2.5rem] md:rounded-[2.5rem] border border-slate-100 dark:border-slate-700/50 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="p-8 md:p-10 border-b border-slate-100 dark:border-slate-700/50 flex justify-between items-center bg-slate-50 dark:bg-slate-800/20">
+              <h2 className="text-lg md:text-xl font-black text-slate-900 dark:text-slate-100 uppercase tracking-tight">Active Job Posts ({jobs.length})</h2>
             </div>
-            <div className="p-4 md:p-8 overflow-x-auto">
-              <table className="w-full text-left min-w-[500px]">
-                <thead>
-                  <tr className="text-[10px] md:text-xs text-slate-500 uppercase tracking-widest font-black border-b border-slate-700/50">
-                    <th className="pb-6">Job Title</th>
-                    <th className="pb-6">Employer</th>
-                    <th className="pb-6">Budget</th>
-                    <th className="pb-6 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="text-sm text-slate-600 dark:text-slate-300">
-                  {jobs.map((job) => (
-                    <tr key={job._id} className="border-b border-slate-100 dark:border-slate-700/30 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-700/20 transition group">
-                      <td className="py-4 md:py-6 font-bold text-slate-900 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors uppercase tracking-tight">{job.title}</td>
-                      <td className="py-4 md:py-6">
-                        <div className="flex flex-col">
-                          <span className="font-extrabold text-slate-800 dark:text-[#F1F5F9]">{job.employer?.name}</span>
-                          <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold">{job.employer?.email}</span>
-                        </div>
-                      </td>
-                      <td className="py-4 md:py-6 font-black text-emerald-600 dark:text-emerald-400 text-xs md:text-sm">{formatNPR(job.budget)}</td>
-                      <td className="py-4 md:py-6 text-right">
-                        <button 
-                          onClick={() => handleDeleteJob(job._id)}
-                          className="bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white px-3 md:px-5 py-2 md:py-2.5 rounded-lg md:rounded-xl transition-all duration-300 font-black text-[10px] md:text-xs uppercase border border-red-500/20"
-                        >
-                          Delete Post
-                        </button>
-                      </td>
+            <div className="p-6 md:p-10">
+              {/* Desktop Table */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full text-left min-w-[500px]">
+                  <thead>
+                    <tr className="text-[10px] md:text-xs text-slate-500 uppercase tracking-widest font-black border-b border-slate-700/50">
+                      <th className="pb-6">Job Title</th>
+                      <th className="pb-6">Employer</th>
+                      <th className="pb-6">Budget</th>
+                      <th className="pb-6 text-right">Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="text-sm text-slate-600 dark:text-slate-300">
+                    {jobs.map((job) => (
+                      <tr key={job._id} className="border-b border-slate-100 dark:border-slate-700/30 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-700/20 transition group">
+                        <td className="py-4 md:py-6 font-bold text-slate-900 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors uppercase tracking-tight">{job.title}</td>
+                        <td className="py-4 md:py-6">
+                          <div className="flex flex-col">
+                            <span className="font-extrabold text-slate-800 dark:text-[#F1F5F9]">{job.employer?.name}</span>
+                            <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold">{job.employer?.email}</span>
+                          </div>
+                        </td>
+                        <td className="py-4 md:py-6 font-black text-emerald-600 dark:text-emerald-400 text-xs md:text-sm">{formatNPR(job.budget)}</td>
+                        <td className="py-4 md:py-6 text-right">
+                          <button 
+                            onClick={() => handleDeleteJob(job._id)}
+                            className="bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white px-3 md:px-5 py-2 md:py-2.5 rounded-lg md:rounded-xl transition-all duration-300 font-black text-[10px] md:text-xs uppercase border border-red-500/20"
+                          >
+                            Delete Post
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile Cards */}
+              <div className="md:hidden space-y-6">
+                {jobs.map((job) => (
+                  <div key={job._id} className="p-6 bg-slate-50 dark:bg-slate-900/40 rounded-3xl border border-slate-200 dark:border-slate-700/50 space-y-4">
+                    <div className="min-w-0">
+                      <div className="font-black text-slate-900 dark:text-slate-200 uppercase tracking-tight leading-tight">{job.title}</div>
+                      <div className="text-[11px] text-slate-500 font-bold mt-1 uppercase tracking-widest">{job.employer?.name}</div>
+                    </div>
+                    <div className="flex justify-between items-center pt-3 border-t border-slate-200 dark:border-slate-800">
+                      <span className="font-black text-emerald-500 text-sm">{formatNPR(job.budget)}</span>
+                      <button 
+                        onClick={() => handleDeleteJob(job._id)}
+                        className="bg-red-500/10 text-red-500 px-4 py-2 rounded-xl text-[11px] font-bold uppercase border border-red-500/20"
+                      >
+                        Delete Post
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         );
@@ -402,42 +468,68 @@ const AdminDashboard = () => {
             </div>
 
             {/* Blogs List */}
-            <div className="bg-white dark:bg-[#1E293B] shadow-xl dark:shadow-2xl rounded-[2.5rem] border border-slate-100 dark:border-slate-700/50 overflow-hidden">
+            <div className="bg-white dark:bg-[#1E293B] shadow-xl dark:shadow-2xl rounded-[2.5rem] md:rounded-[2.5rem] border border-slate-100 dark:border-slate-700/50 overflow-hidden">
                <div className="p-8 md:p-10 border-b border-slate-100 dark:border-slate-700/50 bg-slate-50 dark:bg-slate-800/20">
-                 <h3 className="text-lg md:text-xl font-black text-slate-900 dark:text-slate-100 uppercase tracking-tight">Existing Stories</h3>
+                 <h2 className="text-lg md:text-xl font-black text-slate-900 dark:text-slate-100 uppercase tracking-tight">Existing Stories</h2>
                </div>
-               <div className="p-8 overflow-x-auto">
-                 <table className="w-full text-left min-w-[600px]">
-                   <thead>
-                     <tr className="text-sm md:text-base text-slate-500 dark:text-slate-400 uppercase tracking-widest font-black border-b border-slate-700/50">
-                       <th className="pb-6">Title</th>
-                       <th className="pb-6">Category</th>
-                       <th className="pb-6">Date</th>
-                       <th className="pb-6 text-right">Actions</th>
-                     </tr>
-                   </thead>
-                   <tbody className="text-base text-slate-600 dark:text-slate-300">
-                     {blogs.map((b) => (
-                       <tr key={b._id} className="border-b border-slate-100 dark:border-slate-700/30 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-700/20 transition group">
-                         <td className="py-6 pr-6 font-bold text-slate-900 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors tracking-tight line-clamp-1">{b.title}</td>
-                         <td className="py-6">
-                           <span className="px-3 py-1 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-[10px] font-black uppercase tracking-widest rounded-lg border border-indigo-500/20">
-                             {b.category}
-                           </span>
-                         </td>
-                         <td className="py-6 text-slate-400 dark:text-slate-500 text-xs font-black tracking-widest">{new Date(b.createdAt).toLocaleDateString()}</td>
-                         <td className="py-6 text-right">
-                           <button 
-                             onClick={() => handleDeleteBlog(b._id)}
-                             className="bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white px-5 py-2.5 rounded-xl transition-all font-black text-xs uppercase border border-red-500/20"
-                           >
-                             Delete
-                           </button>
-                         </td>
+               <div className="p-8 md:p-10">
+                 {/* Desktop Table */}
+                 <div className="hidden md:block overflow-x-auto">
+                   <table className="w-full text-left min-w-[600px]">
+                     <thead>
+                       <tr className="text-sm md:text-base text-slate-500 dark:text-slate-400 uppercase tracking-widest font-black border-b border-slate-700/50">
+                         <th className="pb-6">Title</th>
+                         <th className="pb-6">Category</th>
+                         <th className="pb-6">Date</th>
+                         <th className="pb-6 text-right">Actions</th>
                        </tr>
-                     ))}
-                   </tbody>
-                 </table>
+                     </thead>
+                     <tbody className="text-base text-slate-600 dark:text-slate-300">
+                       {blogs.map((b) => (
+                         <tr key={b._id} className="border-b border-slate-100 dark:border-slate-700/30 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-700/20 transition group">
+                           <td className="py-6 pr-6 font-bold text-slate-900 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors tracking-tight line-clamp-1">{b.title}</td>
+                           <td className="py-6">
+                             <span className="px-3 py-1 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-[10px] font-black uppercase tracking-widest rounded-lg border border-indigo-500/20">
+                               {b.category}
+                             </span>
+                           </td>
+                           <td className="py-6 text-slate-400 dark:text-slate-500 text-xs font-black tracking-widest">{new Date(b.createdAt).toLocaleDateString()}</td>
+                           <td className="py-6 text-right">
+                             <button 
+                               onClick={() => handleDeleteBlog(b._id)}
+                               className="bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white px-5 py-2.5 rounded-xl transition-all font-black text-xs uppercase border border-red-500/20"
+                             >
+                               Delete
+                             </button>
+                           </td>
+                         </tr>
+                       ))}
+                     </tbody>
+                   </table>
+                 </div>
+
+                 {/* Mobile Cards */}
+                 <div className="md:hidden space-y-6">
+                   {blogs.map((b) => (
+                      <div key={b._id} className="p-8 bg-slate-50 dark:bg-slate-900/40 rounded-3xl border border-slate-200 dark:border-slate-700/50 space-y-5">
+                        <div className="min-w-0">
+                          <div className="font-black text-slate-900 dark:text-slate-200 uppercase tracking-tight leading-tight line-clamp-2 text-base">{b.title}</div>
+                          <div className="flex items-center gap-3 mt-4">
+                            <span className="px-3 py-1 bg-indigo-500/10 text-indigo-600 text-[11px] font-bold uppercase tracking-wider rounded-lg border border-indigo-500/20">{b.category}</span>
+                            <span className="text-[11px] text-slate-500 font-bold uppercase tracking-widest">{new Date(b.createdAt).toLocaleDateString()}</span>
+                          </div>
+                        </div>
+                        <div className="pt-4 border-t border-slate-200 dark:border-slate-800">
+                          <button 
+                            onClick={() => handleDeleteBlog(b._id)}
+                            className="w-full bg-red-500/10 text-red-500 py-3.5 rounded-xl text-[11px] font-bold uppercase border border-red-500/20"
+                          >
+                            Delete Story
+                          </button>
+                        </div>
+                      </div>
+                   ))}
+                 </div>
                </div>
             </div>
           </div>
@@ -596,34 +688,53 @@ const AdminDashboard = () => {
                      <p className="text-slate-500 text-[10px] md:text-xs font-medium transition-colors">No recent incidents detected.</p>
                   </div>
                 ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left min-w-[600px]">
-                    <thead>
-                      <tr className="text-[10px] md:text-xs text-slate-500 uppercase tracking-widest font-black border-b border-slate-700/50">
-                        <th className="pb-6">Activity Type</th>
-                        <th className="pb-6">User Identity</th>
-                        <th className="pb-6 text-right">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody className="text-sm text-slate-300">
-                      {(fraudReports || []).map((row, i) => (
-                        <tr key={i} className="border-b border-slate-100 dark:border-slate-700/30 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-700/20 transition group">
-                          <td className="py-4 md:py-6">
-                            <span className="font-bold text-slate-900 dark:text-slate-200 group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors uppercase tracking-tight">{row.type}</span>
-                          </td>
-                          <td className="py-4 md:py-6">
-                            <div className="flex flex-col">
-                              <span className="text-slate-800 dark:text-slate-300 font-bold transition-colors">{row.user}</span>
-                              <span className="text-slate-500 text-[10px] transition-colors">{row.email}</span>
-                            </div>
-                          </td>
-                          <td className="py-4 md:py-6 text-right">
-                             <span className="px-3 md:px-5 py-1.5 bg-pink-500/10 text-pink-400 border border-pink-500/20 rounded-lg md:rounded-xl text-[10px] font-black uppercase tracking-widest">Flagged</span>
-                          </td>
+                <div className="p-6 md:p-10">
+                  {/* Desktop Table */}
+                  <div className="hidden md:block overflow-x-auto">
+                    <table className="w-full text-left min-w-[600px]">
+                      <thead>
+                        <tr className="text-[10px] md:text-xs text-slate-500 uppercase tracking-widest font-black border-b border-slate-700/50">
+                          <th className="pb-6">Activity Type</th>
+                          <th className="pb-6">User Identity</th>
+                          <th className="pb-6 text-right">Status</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody className="text-sm text-slate-300">
+                        {(fraudReports || []).map((row, i) => (
+                          <tr key={i} className="border-b border-slate-100 dark:border-slate-700/30 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-700/20 transition group">
+                            <td className="py-4 md:py-6">
+                              <span className="font-bold text-slate-900 dark:text-slate-200 group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors uppercase tracking-tight">{row.type}</span>
+                            </td>
+                            <td className="py-4 md:py-6">
+                              <div className="flex flex-col">
+                                <span className="text-slate-800 dark:text-slate-300 font-bold transition-colors">{row.user}</span>
+                                <span className="text-slate-500 text-[10px] transition-colors">{row.email}</span>
+                              </div>
+                            </td>
+                            <td className="py-4 md:py-6 text-right">
+                               <span className="px-3 md:px-5 py-1.5 bg-pink-500/10 text-pink-400 border border-pink-500/20 rounded-lg md:rounded-xl text-[10px] font-black uppercase tracking-widest">Flagged</span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Mobile Cards */}
+                  <div className="md:hidden space-y-6">
+                    {(fraudReports || []).map((row, i) => (
+                      <div key={i} className="p-8 bg-slate-50 dark:bg-slate-900/40 rounded-3xl border border-slate-200 dark:border-slate-700/50 space-y-5">
+                        <div className="flex justify-between items-center">
+                          <span className="font-black text-pink-500 uppercase tracking-tight text-sm">{row.type}</span>
+                          <span className="px-3 py-1 bg-pink-500/10 text-pink-400 text-[11px] font-bold uppercase tracking-wider rounded-lg border border-pink-500/20">Flagged</span>
+                        </div>
+                        <div className="min-w-0">
+                          <div className="font-bold text-slate-900 dark:text-slate-200 text-base">{row.user}</div>
+                          <div className="text-[12px] text-slate-500 font-medium">{row.email}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
                 )}
               </div>
@@ -640,12 +751,12 @@ const AdminDashboard = () => {
       activeTab={activeTab} 
       setActiveTab={setActiveTab}
     >
-      <div className="space-y-6 md:space-y-10">
-        <header className="mb-6 md:mb-10 px-1 md:px-0">
-          <h2 className="text-lg md:text-xl font-black text-slate-900 dark:text-slate-200 uppercase tracking-tight transition-colors">
+      <div className="space-y-10 md:space-y-16 px-4 md:px-0 pb-20">
+        <header className="mb-10 md:mb-12 text-center md:text-left transition-all">
+          <h2 className="text-[26px] md:text-3xl font-black text-slate-900 dark:text-slate-200 tracking-tight transition-colors">
             {activeTab === "overview" ? "System Insight" : activeTab === "users" ? "User Management" : activeTab === "jobs" ? "Job Management" : "Insights Blog"}
           </h2>
-          <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 mt-1 font-bold transition-colors">JobSphere real-time control panel</p>
+          <p className="text-[15px] md:text-sm text-slate-500 dark:text-slate-400 mt-2 font-medium italic transition-colors leading-relaxed">JobSphere real-time administration panel</p>
         </header>
         {renderContent()}
       </div>

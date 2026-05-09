@@ -54,15 +54,18 @@ import ReactMarkdown from "react-markdown";
         </button>
       )}
       {isOpen && (
-        <div className="fixed bottom-6 right-6 w-96 max-w-[calc(100vw-3rem)] bg-white rounded-2xl shadow-2xl overflow-hidden z-50 flex flex-col border border-gray-100" style={{ height: "500px", maxHeight: "80vh" }}>
-          <div className="bg-[#1E293B] text-white p-4 flex justify-between items-center rounded-t-2xl border-b border-slate-700">
-            <div className="flex items-center gap-2">
-              <div className="h-6 w-6 bg-indigo-500/20 rounded flex items-center justify-center text-indigo-400">
-                <Bot size={16} />
+        <div className="fixed inset-0 md:inset-auto md:bottom-6 md:right-6 md:w-96 bg-white dark:bg-[#0F172A] md:rounded-2xl shadow-2xl overflow-hidden z-[100] flex flex-col border border-gray-200 dark:border-slate-700 md:h-[500px] md:max-h-[80vh] transition-all duration-300">
+          <div className="bg-[#1E293B] dark:bg-[#1E293B] text-white p-5 md:p-4 flex justify-between items-center border-b border-slate-700">
+            <div className="flex items-center gap-3">
+              <div className="h-8 w-8 bg-indigo-500/20 rounded-lg flex items-center justify-center text-indigo-400">
+                <Bot size={20} />
               </div>
-              <h3 className="font-bold tracking-tight uppercase text-xs text-white">Jobsphere AI</h3>
+              <div>
+                <h3 className="font-black tracking-tight uppercase text-[11px] md:text-xs text-white">Jobsphere AI</h3>
+                <p className="text-[10px] text-green-400 font-bold uppercase tracking-widest mt-0.5">Online</p>
+              </div>
             </div>
-            <button onClick={() => setIsOpen(false)} className="text-slate-400 hover:text-white transition">
+            <button onClick={() => setIsOpen(false)} className="p-2 bg-white/5 hover:bg-white/10 rounded-xl text-slate-400 hover:text-white transition">
               <X size={20} />
             </button>
           </div>

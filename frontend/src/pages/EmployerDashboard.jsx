@@ -126,24 +126,24 @@ const EmployerDashboard = () => {
         </Link>
       </div>
         {activeTab === 'dashboard' && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 space-y-8">
-              <h3 className="text-2xl font-black text-slate-900 dark:text-slate-200 transition-colors">Recently Posted Jobs</h3>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 md:gap-8">
+            <div className="lg:col-span-2 space-y-10 md:space-y-8">
+              <h2 className="text-lg md:text-2xl font-black text-slate-900 dark:text-slate-200 transition-colors">Recently Posted Jobs</h2>
               <div className="space-y-4">
                 {jobs.slice(0, 3).length > 0 ? (
                   jobs.slice(0, 3).map((job) => (
                     <div 
                       key={job._id} 
                       onClick={() => viewApplications(job)}
-                      className="bg-white dark:bg-[#1E293B] shadow-lg dark:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] p-6 rounded-2xl border border-slate-100 dark:border-slate-600/50 flex justify-between items-center hover:border-indigo-400/50 transition-all duration-300 cursor-pointer group hover:shadow-xl dark:hover:shadow-[0_20px_50px_-12px_rgba(79,70,229,0.1)]"
+                      className="bg-white dark:bg-[#1E293B] shadow-lg dark:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] p-8 md:p-10 rounded-2xl border border-slate-100 dark:border-slate-600/50 flex justify-between items-center hover:border-indigo-400/50 transition-all duration-300 cursor-pointer group hover:shadow-xl dark:hover:shadow-[0_20px_50px_-12px_rgba(79,70,229,0.1)] mb-6 md:mb-0"
                     >
-                      <div className="flex items-center gap-4">
-                        <div className="h-12 w-12 bg-slate-50 dark:bg-[#0F172A] border border-slate-100 dark:border-white/5 rounded-xl flex items-center justify-center text-indigo-600 dark:text-indigo-400 shadow-inner group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300">
-                          <FileText size={20} />
+                      <div className="flex items-start gap-4 md:gap-8">
+                        <div className="h-14 w-14 md:h-20 md:w-20 bg-slate-50 dark:bg-[#0F172A] border border-slate-100 dark:border-white/5 rounded-xl md:rounded-2xl flex items-center justify-center text-indigo-600 dark:text-indigo-400 shadow-inner group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300 shrink-0 mt-1 md:mt-0">
+                          <FileText size={24} />
                         </div>
-                         <div>
-                          <h4 className="text-xl font-black text-slate-900 dark:text-[#E2E8F0] group-hover:text-indigo-600 dark:group-hover:text-white transition tracking-tight">{job.title}</h4>
-                          <p className="text-sm font-black text-slate-500 dark:text-slate-400 mt-2 uppercase tracking-wider">NPR {(job.budget * 133).toLocaleString()} • <span className="text-indigo-600 dark:text-indigo-400">{job.status}</span></p>
+                         <div className="min-w-0">
+                          <h3 className="text-base md:text-2xl font-black text-slate-900 dark:text-[#E2E8F0] group-hover:text-indigo-600 dark:group-hover:text-white transition tracking-tight line-clamp-2 mb-2 leading-tight">{job.title}</h3>
+                          <p className="text-[12px] md:text-sm font-bold text-slate-500 dark:text-slate-400 leading-relaxed uppercase tracking-widest">NPR {(job.budget * 133).toLocaleString()} • <span className="text-indigo-600 dark:text-indigo-400 font-black">{job.status}</span></p>
                         </div>
                       </div>
                       <ChevronRight className="text-slate-400 dark:text-slate-500 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-hover:translate-x-1 transition-all" />
@@ -164,9 +164,9 @@ const EmployerDashboard = () => {
                 )}
               </div>
             </div>
-            <div className="space-y-8">
-              <h3 className="text-2xl font-black text-slate-900 dark:text-slate-200 transition-colors">Hiring Pipeline</h3>
-              <div className="bg-white dark:bg-[#1E293B] shadow-xl dark:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] p-8 rounded-3xl border border-slate-100 dark:border-slate-600/50 space-y-8 transition-colors">
+            <div className="space-y-10 md:space-y-8">
+              <h2 className="text-lg md:text-2xl font-black text-slate-900 dark:text-slate-200 transition-colors">Hiring Pipeline</h2>
+              <div className="bg-white dark:bg-[#1E293B] shadow-xl dark:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] p-8 md:p-10 rounded-3xl border border-slate-100 dark:border-slate-600/50 space-y-10 md:space-y-8 transition-colors">
                 {loading ? (
                   <div className="animate-pulse space-y-4">
                     {[1, 2, 3].map(i => <div key={i} className="h-4 bg-slate-700 rounded w-full"></div>)}
@@ -178,8 +178,8 @@ const EmployerDashboard = () => {
                     { label: "Waitlist", value: 12, color: "violet" }
                   ].map((stat) => (
                      <div key={stat.label}>
-                      <div className="flex justify-between text-base mb-4">
-                        <span className="text-slate-500 dark:text-slate-400 font-black uppercase tracking-widest transition-colors">{stat.label}</span>
+                      <div className="flex justify-between text-[15px] md:text-base mb-4">
+                        <span className="text-slate-500 dark:text-slate-400 font-bold uppercase tracking-[0.1em] transition-colors">{stat.label}</span>
                         <span className="text-slate-900 dark:text-[#E2E8F0] font-black text-xl transition-colors">{stat.value}</span>
                       </div>
                       <div className="h-2 bg-slate-100 dark:bg-[#0F172A] rounded-full overflow-hidden border border-slate-200 dark:border-white/5 shadow-inner transition-colors">
@@ -204,16 +204,16 @@ const EmployerDashboard = () => {
               >
                 <ChevronRight className="rotate-180" size={24} />
               </button>
-              <h3 className="text-xl md:text-2xl font-black text-slate-900 dark:text-slate-200 transition-colors">All Job Posts</h3>
+              <h2 className="text-lg md:text-2xl font-black text-slate-900 dark:text-slate-200 transition-colors">All Job Posts</h2>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 md:gap-6">
               {jobs.length > 0 ? (
                 jobs.map((job) => (
                   <div 
                     key={job._id}
-                    className="group bg-white dark:bg-[#1E293B] shadow-xl dark:shadow-black/20 p-6 rounded-3xl border border-slate-100 dark:border-slate-600 flex flex-col hover:shadow-2xl dark:hover:shadow-indigo-500/10 hover:border-indigo-500/30 transition duration-300 relative"
+                    className="group bg-white dark:bg-[#1E293B] shadow-xl dark:shadow-black/20 p-8 rounded-[2rem] md:rounded-3xl border border-slate-100 dark:border-slate-600 flex flex-col hover:shadow-2xl dark:hover:shadow-indigo-500/10 hover:border-indigo-500/30 transition duration-300 relative"
                   >
-                    <div className="flex justify-between items-start mb-4">
+                    <div className="flex justify-between items-start mb-6 md:mb-4">
                       <div 
                         onClick={() => viewApplications(job)}
                         className="h-14 w-14 bg-slate-50 dark:bg-[#0F172A] text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center border border-slate-100 dark:border-slate-600 cursor-pointer group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-inner"
@@ -256,14 +256,14 @@ const EmployerDashboard = () => {
           </div>
         )}
          {activeTab === 'talent' && (
-          <div className="space-y-8 mb-10">
-            <h3 className="text-3xl font-black text-slate-900 dark:text-slate-200 transition-colors">Talent Search</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="space-y-10 md:space-y-8 mb-10">
+            <h2 className="text-lg md:text-3xl font-black text-slate-900 dark:text-slate-200 transition-colors">Talent Search</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 md:gap-6">
               {loadingTalent ? (
                 <div className="col-span-3 text-center py-10 font-bold text-slate-400 italic">Finding talent...</div>
               ) : talents.length > 0 ? (
                 talents.map((freelancer) => (
-                  <div key={freelancer._id} className="bg-white dark:bg-[#1E293B] shadow-xl dark:shadow-black/20 p-6 rounded-3xl border border-slate-100 dark:border-slate-600 flex flex-col items-center hover:shadow-2xl hover:border-indigo-500/30 transition duration-300">
+                  <div key={freelancer._id} className="bg-white dark:bg-[#1E293B] shadow-xl dark:shadow-black/20 p-8 md:p-6 rounded-[2rem] md:rounded-3xl border border-slate-100 dark:border-slate-600 flex flex-col items-center hover:shadow-2xl hover:border-indigo-500/30 transition duration-300">
                     <div className="h-20 w-20 bg-gradient-to-tr from-indigo-500 to-violet-500 rounded-full flex items-center justify-center text-white font-black text-2xl shadow-md mb-4">
                       {freelancer.name[0]}
                     </div>
@@ -316,9 +316,9 @@ const EmployerDashboard = () => {
                             {app.freelancer?.name[0]}
                           </div>
                            <div className="min-w-0 flex-1">
-                            <h4 className="font-black text-lg md:text-2xl text-slate-900 dark:text-[#E2E8F0] tracking-tight truncate transition-colors">{app.freelancer?.name}</h4>
-                            <div className="flex flex-wrap items-center gap-2 md:gap-4 mt-1 md:mt-2">
-                               <p className="text-xs md:text-sm text-cyan-400 font-black uppercase tracking-[0.1em] truncate max-w-[150px] md:max-w-none">{app.freelancer?.email}</p>
+                             <h4 className="font-black text-base md:text-2xl text-slate-900 dark:text-[#E2E8F0] tracking-tight truncate transition-colors">{app.freelancer?.name}</h4>
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-1 md:gap-4 mt-1">
+                               <p className="text-[10px] md:text-sm text-cyan-400 font-black uppercase tracking-[0.1em] truncate">{app.freelancer?.email}</p>
                                <span className={`text-xs md:text-sm px-3 md:px-4 py-1 rounded-full font-black uppercase tracking-widest border ${
                                  app.status === 'accepted' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
                                  app.status === 'rejected' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
@@ -344,9 +344,9 @@ const EmployerDashboard = () => {
                               <CreditCard size={18} className="md:w-5 md:h-5" /> Hire & Pay
                             </button>
                           )}
-                          <button 
+                           <button 
                             onClick={() => navigate("/messages", { state: { initialContact: app.freelancer } })}
-                            className="w-full bg-cyan-500 text-slate-900 h-14 rounded-2xl font-black hover:bg-cyan-400 transition flex items-center justify-center gap-3 shadow-lg shadow-cyan-500/20 whitespace-nowrap text-base uppercase tracking-widest"
+                            className="w-full bg-cyan-500 text-slate-900 h-12 md:h-14 rounded-xl md:rounded-2xl font-black hover:bg-cyan-400 transition flex items-center justify-center gap-3 shadow-lg shadow-cyan-500/20 whitespace-nowrap text-sm md:text-base uppercase tracking-widest"
                           >
                             <MessageSquare size={20} /> Message User
                           </button>
