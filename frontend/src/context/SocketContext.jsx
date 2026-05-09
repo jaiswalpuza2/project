@@ -24,7 +24,8 @@ export const SocketProvider = ({ children }) => {
 
   useEffect(() => {
     if (isAuthenticated && user) {
-      const newSocket = io("/", {
+      const socketUrl = import.meta.env.VITE_SOCKET_URL || "/";
+      const newSocket = io(socketUrl, {
         transports: ["websocket"]
       });
       setSocket(newSocket);
